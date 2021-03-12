@@ -2,7 +2,7 @@
     "ES11": "Galicia",
     "ES12": "Principado de Asturias",
     "ES13": "Cantabria",
-    "ES21": "Pais Vasco",
+    "ES21": "País Vasco",
     "ES22": "Comunidad Floral de Navarra",
     "ES23": "La Rioja",
     "ES24": "Aragón",

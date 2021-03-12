@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 
-
 def deaths_cleanup(dataset, metadata_colname):
     # %% Provisional variable for the output of the function
     output = dataset.copy()
