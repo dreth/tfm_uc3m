@@ -10,12 +10,12 @@ def deaths_cleanup(dataset, metadata_colname):
         output[col] = output[col].apply(lambda x: int(str(x).replace('p', '')))
 
     # %% Melting the dataframe for easier management
-    output = pd.melt(output, id_vars=['freq,age,sex,unit,geo\TIME_PERIOD'], value_vars=[
-                     x for x in output.columns if x != 'freq,age,sex,unit,geo\TIME_PERIOD'])
+    output = pd.melt(output, id_vars=[metadata_colname], value_vars=[
+                     x for x in output.columns if x != metadata_colname])
 
     # rename variables
     output = output.rename(columns={
-        'freq,age,sex,unit,geo\TIME_PERIOD': 'metadata',
+        metadata_colname: 'metadata',
         'variable': 'year_week',
         'value': 'deaths'
     })
