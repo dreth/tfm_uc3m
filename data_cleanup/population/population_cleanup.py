@@ -33,7 +33,7 @@ ccaa_eurostat_replace_dict = {
     '12 Galicia': 'ES11',
     '03 Asturias, Principado de': 'ES12',
     '06 Cantabria': 'ES13',
-    '16 País Vasco': 'País Vasco',
+    '16 País Vasco': 'ES21',
     '15 Navarra, Comunidad Foral de': 'ES22',
     '17 Rioja, La': 'ES23',
     '02 Aragón': 'ES24',
@@ -103,6 +103,9 @@ pop.loc[pop['age_group'].isna(), 'age_group'] = pd.cut(pop['age'], [5, 9, 14, 19
 
 # Removing age, as we now have age groups
 pop = pop.drop('age', axis=1)
+
+# %% Performing aggregation on corresponding fields
+pop = pop.groupby(['ccaa','sex','period','age_group']).sum().reset_index()
 
 # %% Exporting dataset
 pop.to_csv('./population.csv')
