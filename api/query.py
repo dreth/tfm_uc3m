@@ -208,6 +208,3 @@ def generate_pop_df(raw_data):
 
     # Returning the resulting dataframe
     return df
-
-
-# %%
