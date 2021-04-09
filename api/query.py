@@ -13,6 +13,8 @@ ccaa_list = ['ES11', 'ES12', 'ES13', 'ES21', 'ES22', 'ES23', 'ES24', 'ES3', 'ES4
 age_groups = ['Y10-14', 'Y15-19', 'Y20-24', 'Y25-29', 'Y30-34', 'Y35-39', 'Y40-44', 'Y45-49', 'Y5-9',
               'Y50-54', 'Y55-59', 'Y60-64', 'Y65-69', 'Y70-74', 'Y75-79', 'Y80-84', 'Y85-89', 'Y_GE90', 'Y_LT5']
 
+# Sexes
+sexes = ['M','F','T']
 
 # %% Basic boilerplate query dict
 query = {
@@ -83,7 +85,7 @@ def generate_death_df(raw_data):
     df = pd.DataFrame(df)
     df['year'] = df['year_week'].apply(lambda x: x.split('W')[0]).astype(int)
     df['week'] = df['year_week'].apply(lambda x: x.split('W')[1]).astype(int)
-    df['date'] = [dt.date.fromisocalendar(x,y,1) for x,y in zip(df['year'],df['week'])]
+    df['date'] = [dt.date.fromisocalendar(x,y,5) for x,y in zip(df['year'],df['week'])]
 
     # summing 53rd week with 1st week of following year
     for idx,y,w in zip(df.index,df['year'], df['week']):
@@ -152,6 +154,13 @@ def generate_pop_df(raw_data):
         'Canarias': 'ES70'
     }
 
+    # Sex reference
+    sex_dict = {
+        'Hombres':'M',
+        'Mujeres':'F',
+        'Total':'T'
+    }
+
     for entry in raw_data:
         # Splitting metadata by '. ' element in Nombre string entry
         if 'Total Nacional' in entry['Nombre'] or 'Todas las edades' in entry['Nombre']:
@@ -160,13 +169,13 @@ def generate_pop_df(raw_data):
 
         # Obtaining key values from Nombre metadata
         if '100 y más años' in entry['Nombre']:
-            sex = metadata[0]
+            sex = sex_dict[metadata[0]]
             age = int(metadata[1].split(' ')[0])
             ccaa = ccaa_eurostat_replace_dict[metadata[2]]
         else:
             age = int(metadata[0].split(' ')[0])
             ccaa = ccaa_eurostat_replace_dict[metadata[1]]
-            sex = metadata[2]
+            sex = sex_dict[metadata[2]]
 
         # Data loop to extract values
         for data_point in entry['Data']:
@@ -208,3 +217,20 @@ def generate_pop_df(raw_data):
 
     # Returning the resulting dataframe
     return df
+
+# %% QUERYING ALL DATASETS AND EXPORTING
+# Create a list of death datasets for each age+sex to append all to one df
+death_datasets = []
+for age in age_groups:
+    for sex in sexes:
+        new_query = {**query, **{'sex':sex, 'age':age}}
+        new_df = generate_death_df(query_eurostat(**new_query))
+        death_datasets.append(new_df)
+
+# concatenating death datasets
+death = pd.concat(death_datasets)
+death.to_csv('death.csv')
+
+# obtain pop dataset
+pop = generate_pop_df(query_INE_pop())
+pop.to_csv('pop.csv')
