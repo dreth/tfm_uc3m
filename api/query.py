@@ -229,8 +229,8 @@ for age in age_groups:
 
 # concatenating death datasets
 death = pd.concat(death_datasets)
-death.to_csv('death.csv')
+death.to_csv('../data/death.csv')
 
 # obtain pop dataset
 pop = generate_pop_df(query_INE_pop())
-pop.to_csv('pop.csv')
+pop.to_csv('../data/pop.csv')
