@@ -2,6 +2,7 @@
 require(shiny)
 require(tidyverse)
 require(shinythemes)
+library(shinydashboard)
 require(dplyr)
 require(ggplot2)
 require(stringr)
@@ -14,3 +15,10 @@ require(plotly)
 # DATASETS
 pop = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
 death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv')    
+
+# SERVER
+shinyServer(
+    function(input, output, session) {
+        
+    }
+)

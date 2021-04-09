@@ -33,16 +33,17 @@ def query_eurostat(**kwargs):
         # URL
         if param == 'dataset':
             url = f'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/{value}?'
-        if param == 'sinceTimePeriod':
+        elif param == 'sinceTimePeriod':
             field = f'sinceTimePeriod={value}&'
-        if param == 'geo':
+        elif param == 'geo':
             field = ''.join([f'geo={x}&' for x in value])
-        if param == 'age':
+        elif param == 'age':
             field = f'age={value}'
-        if param == 'unit':
+        elif param == 'unit':
             field = f'unit={value}'
-        if param == 'sex':
+        elif param == 'sex':
             field = f'sex={value}'
+        # appending to URL
         if param != 'dataset':
             url = f'{url}&{field}'
 
