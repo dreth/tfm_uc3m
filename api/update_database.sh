@@ -15,5 +15,5 @@ fi
 
 python -m query.py
 echo 'commit database up to' $date
-git commit -m "Update database" '../data/*'
+git commit -m "Update database ${date}" '../data/*'
 git push
