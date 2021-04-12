@@ -120,6 +120,8 @@ def generate_pop_df(raw_data):
     # column fields
     df = {
         'date': [],
+        'year':[],
+        'week':[],
         'pop': [],
         'ccaa': [],
         'sex': [],
@@ -162,6 +164,12 @@ def generate_pop_df(raw_data):
         'Total':'T'
     }
 
+    # week reference
+    week_dict = {
+        1:1,
+        7:27
+    }
+
     for entry in raw_data:
         # Splitting metadata by '. ' element in Nombre string entry
         if 'Total Nacional' in entry['Nombre'] or 'Todas las edades' in entry['Nombre']:
@@ -184,11 +192,18 @@ def generate_pop_df(raw_data):
             df['pop'].append(int(data_point['Valor']))
 
             # appending full date
-            df['date'].append(dt.date(
+            date = dt.date(
                 data_point['Anyo'],
                 date_ref[data_point['FK_Periodo']][0],
                 date_ref[data_point['FK_Periodo']][1]
-            ))
+            )
+            df['date'].append(date)
+
+            # appending year
+            df['year'].append(date.year)
+
+            # appending week
+            df['week'].append(week_dict[date.month])
 
             # appending age, cca and sex
             df['age'].append(age)
