@@ -6,8 +6,14 @@ require(stringr)
 library(shinydashboard)
 
 # DATASETS
-pop = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
-death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv')
+pop = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv', header=TRUE)
+death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv', header=TRUE)
+
+# Options
+CCAA <- unique(pop$ccaa)
+AGE_GROUPS <- unique(pop$age_group)
+SEXES <- unique(pop$sex)
+
 
 # UI
 shinyUI(

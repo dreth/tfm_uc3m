@@ -120,8 +120,6 @@ def generate_pop_df(raw_data):
     # column fields
     df = {
         'date': [],
-        'year':[],
-        'week':[],
         'pop': [],
         'ccaa': [],
         'sex': [],
@@ -199,12 +197,6 @@ def generate_pop_df(raw_data):
             )
             df['date'].append(date)
 
-            # appending year
-            df['year'].append(date.year)
-
-            # appending week
-            df['week'].append(week_dict[date.month])
-
             # appending age, cca and sex
             df['age'].append(age)
             df['ccaa'].append(ccaa)
@@ -230,6 +222,12 @@ def generate_pop_df(raw_data):
 
     # Performing aggregation on corresponding fields to sum values among same age groups
     df = df.groupby(['ccaa','sex','date','age_group']).sum().reset_index()
+
+    # appending year
+    df['year'] = df['date'].apply(lambda x: x.year)
+
+    # appending week
+    df['week'] = df['date'].apply(lambda x: week_dict[x.month])
 
     # Returning the resulting dataframe
     return df
