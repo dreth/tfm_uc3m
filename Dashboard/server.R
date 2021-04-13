@@ -18,9 +18,28 @@ death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/dea
 
 # USEFUL FUNCTIONS
 # project weekly population
-project_pop <- function(dataset, year, initial_week, ccaa, age_group, all_ages=FALSE, all_ccaa=FALSE) {
-    if (all_ccaa == TRUE) {
-        totals <- dataset 
+project_pop <- function(dataset, year, initial_week, ccaa, age_group, sex, aggfun=sum) {
+    data <- dataset
+    if (ccaa == 'all') {
+        if (age_group == 'all') {
+            if (sex == 'all') {
+                data_t <- data[data$sex == 'T',]
+                data <- aggregate(data_t$pop, list(year = data_t$year, week = data_t$week), FUN=aggfun)
+            } else {
+                data_t <- data[data$sex == sex,]
+                data <- aggregate(data_t$pop, list(year = data_t$year, week = data_t$week), FUN=aggfun)
+            }
+        } else {
+            if (sex == 'all') {
+                data_t <- data[data$age_group == age_group & data$sex == 'T',]
+                data <- aggregate(data_t$pop, list(year = data_t$year, week = data_t$week), FUN=aggfun)
+            } else {
+                data_t <- data[data$age_group == age_group & data$sex == sex,]
+                data <- aggregate(data_t$pop, list(year = data_t$year, week = data_t$week), FUN=aggfun)
+            }
+        }
+        
+        
     }
     initial_pop <- dataset %>% 
     final_pop <- 

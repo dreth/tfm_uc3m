@@ -21,7 +21,10 @@ shinyUI(
     dashboardHeader(title = "Basic dashboard"),
     dashboardSidebar(
       sidebarMenu(
+        # First tab content
         menuItem("Mortality", tabName = "mortality", icon = icon("stats", lib="glyphicon")),
+
+        # Second tab content
         menuItem("Widgets", tabName = "widgets", icon = icon("th"))
       )
     ),
@@ -31,7 +34,7 @@ shinyUI(
         tabItem(tabName = "",
           sidebarLayout(
             sidebarPanel(
-
+              
             ),
 
             mainPanel(
@@ -48,4 +51,5 @@ shinyUI(
     )
   )
 )
+
 
