@@ -58,7 +58,6 @@ project_pop <- function(dataset, yr, initial_week, ccaas, age_groups, sexes, agg
     }
     # Aggregate
     data <- aggregate(data_t$pop, list(year = data_t$year, week = data_t$week), FUN=aggfun)
-    print(data)
     # 
     tryCatch({
         if (initial_week == 26) {
@@ -85,7 +84,11 @@ project_pop <- function(dataset, yr, initial_week, ccaas, age_groups, sexes, agg
     })
 }
 
-project_pop(pop, yr=2020, initial_week=26, ccaas='ES11', age_groups='Y10-14', sexes='M')
+# RATIOS
+# Tasa de mortalidad acumulada
+TMA <- function(week, year, ccaas, age_groups, sexes) {
+    numerator <- death %>% dplyr::filter()
+}
 
 # SERVER
 shinyServer(

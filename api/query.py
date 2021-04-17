@@ -51,7 +51,7 @@ def query_eurostat(**kwargs):
     return json.loads(requests.get(url).text)
 
 # %% GENERATE DEATH DF
-def generate_death_df(raw_data):
+def generate_death_df(raw_data, date=False):
     """
     """
     # column fields
@@ -86,7 +86,13 @@ def generate_death_df(raw_data):
     df = pd.DataFrame(df)
     df['year'] = df['year_week'].apply(lambda x: x.split('W')[0]).astype(int)
     df['week'] = df['year_week'].apply(lambda x: x.split('W')[1]).astype(int)
-    df['date'] = [dt.date.fromisocalendar(x,y,5) for x,y in zip(df['year'],df['week'])]
+
+    # if date is specified to be included
+    if date == True:
+        df['date'] = [dt.date.fromisocalendar(x,y,5) for x,y in zip(df['year'],df['week'])]
+        grouping = ['year_week','date','year','week','ccaa','sex','age']
+    else:
+        grouping = ['year_week','year','week','ccaa','sex','age']
 
     # summing 53rd week with 1st week of following year
     for idx,y,w in zip(df.index,df['year'], df['week']):
@@ -96,7 +102,7 @@ def generate_death_df(raw_data):
             df.iloc[idx,6] = 1
 
     # grouping in order to aggregate W53 with corresponding W01
-    df = df.groupby(['year_week','date','year','week','ccaa','sex','age']).sum().reset_index()
+    df = df.groupby(grouping).sum().reset_index()
 
     # dropping year_week
     df = df.drop('year_week', axis='columns')
