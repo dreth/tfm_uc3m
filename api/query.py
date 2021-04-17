@@ -165,7 +165,7 @@ def generate_pop_df(raw_data):
     # week reference
     week_dict = {
         1:1,
-        7:27
+        7:26
     }
 
     for entry in raw_data:
