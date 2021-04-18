@@ -16,6 +16,10 @@ require(plotly)
 pop = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
 death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv')
 
+# REUSABLE METRICS
+# years in pop dataset
+years_pop <- unique(pop$year)
+
 # USEFUL FUNCTIONS
 # project weekly population
 project_pop <- function(dataset, yr, initial_week, ccaas, age_groups, sexes, aggfun=sum, return_ratio=FALSE) {
@@ -26,36 +30,8 @@ project_pop <- function(dataset, yr, initial_week, ccaas, age_groups, sexes, agg
         data <- dataset %>% dplyr::filter(year == yr)
     }
     
-    #
-    if (ccaas == 'all') {
-        if (age_groups == 'all') {
-            if (sexes == 'all') {
-                data_t <- data %>% dplyr::filter(sex == 'T')
-            } else {
-                data_t <- data %>% dplyr::filter(sex == sexes)
-            }
-        } else {
-            if (sexes == 'all') {
-                data_t <- data %>% dplyr::filter(sex == 'T' & age_group %in% age_groups)
-            } else {
-                data_t <- data %>% dplyr::filter(sex == sexes & age_group %in% age_groups)
-            }
-        }
-    } else {
-        if (age_groups == 'all') {
-            if (sexes == 'all') {
-                data_t <- data %>% dplyr::filter(sex == 'T' & ccaa %in% ccaas)
-            } else {
-                data_t <- data %>% dplyr::filter(sex == sexes & ccaa %in% ccaas)
-            }
-        } else {
-            if (sexes == 'all') {
-                data_t <- data %>% dplyr::filter(sex == 'T' & age_group %in% age_groups & ccaa %in% ccaas)
-            } else {
-                data_t <- data %>% dplyr::filter(sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
-            }
-        }   
-    }
+    # Creating filtered dataset
+    data_t <- data %>% dplyr::filter(sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
     # Aggregate
     data <- aggregate(data_t$pop, list(year = data_t$year, week = data_t$week), FUN=aggfun)
     # 
@@ -63,7 +39,7 @@ project_pop <- function(dataset, yr, initial_week, ccaas, age_groups, sexes, agg
         if (initial_week == 26) {
             initial_pop <- data[data$year == yr & data$week == initial_week,'x']
             final_pop <- data[data$year == yr+1 & data$week == 1,'x']
-            pop_inbetween <- seq(initial_pop, final_pop, length.out = 27)[2:27]
+            pop_inbetween <- seq(initial_pop, final_pop, length.out = 26)
             ratio_inbetween <- sapply(pop_inbetween, function(x) {x/initial_pop})
         } else {
             initial_pop <- data[data$year == yr & data$week == initial_week,'x']
@@ -86,9 +62,58 @@ project_pop <- function(dataset, yr, initial_week, ccaas, age_groups, sexes, agg
 
 # RATIOS
 # Tasa de mortalidad acumulada
-TMA <- function(week, year, ccaas, age_groups, sexes) {
-    numerator <- death %>% dplyr::filter()
+TMA <- function(wk, yr, ccaas, age_groups, sexes) {
+    death_num <- 0
+    for (i in 1:wk) {
+        numerator <- death %>% dplyr::filter(year == yr & week == i & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week), FUN=sum)
+        death_num <- death_num + numerator$x
+    }
+    
+    if (wk != 26 & wk != 1) {
+        initial_week <- ifelse(wk > 26, 26, 1)
+        selected_wk <- ifelse(wk > 26, wk - 26, wk)
+        pop_num <- project_pop(dataset=pop, yr=yr, initial_week=initial_week, ccaas=ccaas, age_groups=age_groups, sexes=sexes)[selected_wk]
+        if (pop_num[1] == 1) {
+            start_period_pop <- pop %>% dplyr::filter(year == yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+            start_period_pop <- aggregate(start_period_pop$pop, list(year = start_period_pop$year, week = start_period_pop$week), FUN=sum)
+            selected_wk <- ifelse(wk > 26, wk - 26, wk)
+            pop_num <- (start_period_pop$x * pop_num)[selected_wk]
+        }
+    } else {
+        start_period_pop <- pop %>% dplyr::filter(year == yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+        start_period_pop <- aggregate(start_period_pop$pop, list(year = start_period_pop$year, week = start_period_pop$week), FUN=sum)
+        pop_num <- start_period_pop$x
+    }
+
+    ratio <- death_num / pop_num
+    return(ratio)
 }
+
+# Tasa de mortalidad relativa acumulada
+TMRA <- function(wk, yr, ccaas, age_groups, sexes) {
+    tma <- TMA(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    
+    med_tma_wk <- c()
+    last_tma_wk <- c()
+    for (i in 2010:2019) {
+        med_tma_wk <- c(med_tma_wk, TMA(wk=wk, yr=i, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+        last_tma_wk <- c(last_tma_wk, TMA(wk=52, yr=i, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+    }
+
+    return((tma - mean(med_tma_wk))/mean(last_tma_wk))
+}
+
+# Factor de mejora acumulado
+FMA <- function(wk, yr, ccaas, age_groups, sexes) {
+    tma_1 <- TMA(wk=wk, yr=yr-1, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    tma <- TMA(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    end_tma <- TMA(wk=52, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    return((tma_1-tma)/end_tma)
+}
+
+TMRA(27, 2020, CCAA, AGE_GROUPS, 'T')
+project_pop(dataset=pop, yr=2020, initial_week=26, ccaas=c('ES11','ES53'), age_groups='Y80-84', sexes='M')
 
 # SERVER
 shinyServer(
@@ -96,3 +121,5 @@ shinyServer(
         
     }
 )
+
+
