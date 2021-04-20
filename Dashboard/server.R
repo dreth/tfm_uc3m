@@ -129,9 +129,10 @@ tmra_df <- data.frame(week=weeks, year=years, tmra=tmras)
 tmras <- read.csv('./tmras.csv')
 tmras <- tmras[2:length(tmras)]
 
-for (i in 2010:2019) {
-    line()
-}
+tmras$year <- as.factor(tmras$year)
+ggplot(data=tmras %>% dplyr::filter(year %in% 2015:2019), aes(x=week, y=tmra)) + geom_line(aes(colour=year))
+
+
 project_pop(dataset=pop, yr=2020, initial_week=26, ccaas=c('ES11','ES53'), age_groups='Y80-84', sexes='M')
 
 # SERVER
