@@ -112,14 +112,34 @@ FMA <- function(wk, yr, ccaas, age_groups, sexes) {
     return((tma_1-tma)/end_tma)
 }
 
-TMRA(27, 2020, CCAA, AGE_GROUPS, 'T')
+weeks <- c()
+years <- c()
+tmras <- c()
+for (i in 2010:2019) {
+    for (j in 1:52) {
+        weeks <- c(weeks, j)
+        years <- c(years, i)
+        print(j)
+        print(i)
+        tmras <- c(tmras, TMRA(j, i, CCAA, AGE_GROUPS, 'T'))
+        print(tmras)
+    }
+}
+tmra_df <- data.frame(week=weeks, year=years, tmra=tmras)
+tmras <- read.csv('./tmras.csv')
+tmras <- tmras[2:length(tmras)]
+
+for (i in 2010:2019) {
+    line()
+}
 project_pop(dataset=pop, yr=2020, initial_week=26, ccaas=c('ES11','ES53'), age_groups='Y80-84', sexes='M')
 
 # SERVER
 shinyServer(
     function(input, output, session) {
         
-    }
+    } 
 )
+
 
 
