@@ -235,12 +235,12 @@ def generate_pop_df(raw_data, date=False):
             df['pop'].append(int(data_point['Valor']))
             
             # appending full date
-            date = dt.date(
+            date_entry = dt.date(
                 data_point['Anyo'],
                 date_ref[data_point['FK_Periodo']][0],
                 date_ref[data_point['FK_Periodo']][1]
             )
-            df['date'].append(date)
+            df['date'].append(date_entry)
 
             # appending age, cca and sex
             df['age'].append(age)
@@ -279,9 +279,16 @@ def generate_pop_df(raw_data, date=False):
 
     # obtain unique markers in a variable
     umarkers = df['marker'].unique()
+    uyears = df['year'].nunique()
+
+    # indexes for df_array
+    idx = {
+        'pop':4,
+        'week':6
+    }
 
     # weekly population prediction
-    df_array = np.zeros((52*len(umarkers)*df['year'].nunique(),8), dtype=object)
+    df_array = np.zeros((52*len(umarkers)*uyears,8), dtype=object)
     for m in range(len(umarkers)):
         dat = df.loc[df['marker'] == umarkers[m]].values
         entries = len(dat)
@@ -290,29 +297,21 @@ def generate_pop_df(raw_data, date=False):
             entries -= 1
 
         for i in range(entries):
+            
             pred_range = dat[i:i+2,]
-            week_start = dat[i,5]
+            week_start = dat[i,idx['week']]
             new_p = np.repeat(pred_range[0,:][np.newaxis,:], 26, 0)
 
             if week_start == 1:
-                new_p[:,6] = np.linspace(1,26,26, dtype=np.int64)
-                pop_est = np.linspace(pred_range[0,4], pred_range[1,4], 26, dtype=np.int64)
+                new_p[:,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
+                pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 26, dtype=np.int64)
             else:
-                new_p[:,6] = np.linspace(27,52,26, dtype=np.int64)
-                pop_est = np.linspace(pred_range[0,4], pred_range[1,4], 27, dtype=np.int64)[1:]
+                new_p[:,idx['week']] = np.linspace(27,52,26, dtype=np.int64)
+                pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 27, dtype=np.int64)[1:]
 
-            new_p[:,4] = pop_est
-
-            if (i+1)*(m+1)*26 > df_array.shape[0]:
-                break
-            else:
-                if i == 0:
-                    df_array[(m)*26:(m+1)*26,:] = new_p
-                else:
-                    df_array[(m*i)*26:(m*i+1)*26,:] = new_p
-                    
-
-
+            new_p[:,idx['pop']] = pop_est
+            df_array[52*uyears*m+26*i:52*uyears*m+26*(i+1),:] = new_p
+            test.append((52*uyears*m+26*i,52*uyears*m+26*(i+1)))
     
     # making df_array a dataframe
     df_array = pd.DataFrame(df_array)
