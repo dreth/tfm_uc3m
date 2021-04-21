@@ -3,6 +3,7 @@ import requests
 import json
 import pandas as pd
 import datetime as dt
+import numpy as np
 
 # %% CCAA and Age groups to query
 # CCAA
@@ -15,6 +16,44 @@ age_groups = ['Y10-14', 'Y15-19', 'Y20-24', 'Y25-29', 'Y30-34', 'Y35-39', 'Y40-4
 
 # Sexes
 sexes = ['M','F','T']
+
+# %% TESTING
+years = pop.year.unique()[10:]
+
+markers_test = ['ES11FY10-14']
+test_array = np.zeros((520,7), dtype=object)
+
+
+for m in range(len(markers_test)):
+    dat = pop.loc[(pop['marker'] == markers_test[m])].values
+    entries = len(dat)
+    if entries % 2 == 0:
+        entries -= 1
+    for i in range(entries):
+        pred_range = dat[i:i+2,]
+        week_start = dat[i,5]
+        new_p = np.repeat(pred_range[0,:][np.newaxis,:], 26, 0)
+        if week_start == 1:
+            new_p[:,5] = np.linspace(1,26,26, dtype=np.int64)
+            pop_est = np.linspace(pred_range[0,3], pred_range[1,3], 26, dtype=np.int64)
+            new_p[:,3] = pop_est
+            if (i+1)*26 > test_array.shape[0]:
+                break
+            else:
+                test_array[(i)*26:(i+1)*26,:] = new_p
+        else:
+            new_p[:,5] = np.linspace(27,52,26, dtype=np.int64)
+            pop_est = np.linspace(pred_range[0,3], pred_range[1,3], 27, dtype=np.int64)[1:]
+            new_p[:,3] = pop_est
+            if (i+1)*26 > test_array.shape[0]:
+                break
+            else:
+                test_array[(i)*26:(i+1)*26,:] = new_p
+        
+        
+
+
+
 
 # %% Basic boilerplate query dict
 query = {
@@ -113,24 +152,24 @@ def generate_death_df(raw_data, date=False):
 # %% QUERY INE DATA TABLES
 
 
-def query_INE_pop(df_id='9681', start='20020101', end=''):
+def query_INE_pop(df_id='9681', start='20100101', end=''):
     url = f'https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/{df_id}?date={start}:{end}'
     return json.loads(requests.get(url).text)
 
 
 # %% GENERATE POPULATION DF
 
-def generate_pop_df(raw_data):
+def generate_pop_df(raw_data, date=False):
     """
     """
     # column fields
     df = {
-        'date': [],
         'pop': [],
         'ccaa': [],
+        'date': [],
         'sex': [],
         'age': []
-    }
+    }   
 
     # Date reference field
     date_ref = {
@@ -194,7 +233,7 @@ def generate_pop_df(raw_data):
         for data_point in entry['Data']:
             # appending population number
             df['pop'].append(int(data_point['Valor']))
-
+            
             # appending full date
             date = dt.date(
                 data_point['Anyo'],
@@ -234,6 +273,56 @@ def generate_pop_df(raw_data):
 
     # appending week
     df['week'] = df['date'].apply(lambda x: week_dict[x.month])
+
+    # creating marker for unique pop. identifier
+    df['marker'] = df['ccaa'] + df['sex'] + df['age_group']
+
+    # obtain unique markers in a variable
+    umarkers = df['marker'].unique()
+
+    # weekly population prediction
+    df_array = np.zeros((52*len(umarkers)*df['year'].nunique(),8), dtype=object)
+    for m in range(len(umarkers)):
+        dat = df.loc[df['marker'] == umarkers[m]].values
+        entries = len(dat)
+
+        if entries % 2 == 0:
+            entries -= 1
+
+        for i in range(entries):
+            pred_range = dat[i:i+2,]
+            week_start = dat[i,5]
+            new_p = np.repeat(pred_range[0,:][np.newaxis,:], 26, 0)
+
+            if week_start == 1:
+                new_p[:,6] = np.linspace(1,26,26, dtype=np.int64)
+                pop_est = np.linspace(pred_range[0,4], pred_range[1,4], 26, dtype=np.int64)
+            else:
+                new_p[:,6] = np.linspace(27,52,26, dtype=np.int64)
+                pop_est = np.linspace(pred_range[0,4], pred_range[1,4], 27, dtype=np.int64)[1:]
+
+            new_p[:,4] = pop_est
+
+            if (i+1)*(m+1)*26 > df_array.shape[0]:
+                break
+            else:
+                if i == 0:
+                    df_array[(m)*26:(m+1)*26,:] = new_p
+                else:
+                    df_array[(m*i)*26:(m*i+1)*26,:] = new_p
+                    
+
+
+    
+    # making df_array a dataframe
+    df_array = pd.DataFrame(df_array)
+    df_array.columns = df.columns
+    df = df_array
+    df = df.drop('marker',axis=1)
+
+    # remove date if date is false
+    if date == False:
+        df = df.drop('date',axis=1)
 
     # Returning the resulting dataframe
     return df
