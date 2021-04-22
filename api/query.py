@@ -311,6 +311,22 @@ def generate_pop_df(raw_data, date=False):
 
             new_p[:,idx['pop']] = pop_est
             df_array[52*uyears*m+26*i:52*uyears*m+26*(i+1),:] = new_p
+        
+        last_val = dat[entries]
+        week_end = dat[entries,idx['week']]
+        ratios_forward = pop_est/pop_est[0]
+        new_p = np.repeat(last_val[np.newaxis,:], 26, 0)
+        ratios_forward[0:len(ratios_forward)-2] = ratios_forward[1:len(ratios_forward)-1]
+        ratios_forward[len(ratios_forward)-1] = np.mean(ratios_forward[0:len(ratios_forward)-2])
+
+        if week_end == 1:
+            new_p[:,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
+        else:
+            new_p[:,idx['week']] = np.linspace(27,52,26, dtype=np.int64)
+
+        pop_est = (ratios_forward*last_val[idx['pop']]).astype('int64')
+        new_p[:,idx['pop']] = pop_est
+        df_array[52*uyears*m+26*entries:52*uyears*m+26*(entries+1),:] = new_p
     
     # making df_array a dataframe
     df_array = pd.DataFrame(df_array)
