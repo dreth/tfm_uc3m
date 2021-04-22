@@ -17,44 +17,6 @@ age_groups = ['Y10-14', 'Y15-19', 'Y20-24', 'Y25-29', 'Y30-34', 'Y35-39', 'Y40-4
 # Sexes
 sexes = ['M','F','T']
 
-# %% TESTING
-years = pop.year.unique()[10:]
-
-markers_test = ['ES11FY10-14']
-test_array = np.zeros((520,7), dtype=object)
-
-
-for m in range(len(markers_test)):
-    dat = pop.loc[(pop['marker'] == markers_test[m])].values
-    entries = len(dat)
-    if entries % 2 == 0:
-        entries -= 1
-    for i in range(entries):
-        pred_range = dat[i:i+2,]
-        week_start = dat[i,5]
-        new_p = np.repeat(pred_range[0,:][np.newaxis,:], 26, 0)
-        if week_start == 1:
-            new_p[:,5] = np.linspace(1,26,26, dtype=np.int64)
-            pop_est = np.linspace(pred_range[0,3], pred_range[1,3], 26, dtype=np.int64)
-            new_p[:,3] = pop_est
-            if (i+1)*26 > test_array.shape[0]:
-                break
-            else:
-                test_array[(i)*26:(i+1)*26,:] = new_p
-        else:
-            new_p[:,5] = np.linspace(27,52,26, dtype=np.int64)
-            pop_est = np.linspace(pred_range[0,3], pred_range[1,3], 27, dtype=np.int64)[1:]
-            new_p[:,3] = pop_est
-            if (i+1)*26 > test_array.shape[0]:
-                break
-            else:
-                test_array[(i)*26:(i+1)*26,:] = new_p
-        
-        
-
-
-
-
 # %% Basic boilerplate query dict
 query = {
     'dataset': 'demo_r_mwk2_05',  # Name of the dataset
@@ -288,42 +250,71 @@ def generate_pop_df(raw_data, date=False):
     }
 
     # weekly population prediction
+    # Size of the new df will be 52 (weeks in a year) times amount of ccaa+sex+age group times amount of
+    # unique years
     df_array = np.zeros((52*len(umarkers)*uyears,8), dtype=object)
+
+    # main loop
     for m in range(len(umarkers)):
+        # obtain array of values matching loop marker
         dat = df.loc[df['marker'] == umarkers[m]].values
-        entries = len(dat)
 
-        if entries % 2 == 0:
-            entries -= 1
+        # reducing entries by one to simplify the code
+        entries = len(dat)-1
 
+        # looping through the matched values for marker m
         for i in range(entries):
-            
+            # obtaining the prediction range (rolling window of 2)
             pred_range = dat[i:i+2,]
+
+            # obtaining starting week (either 1 or 26)
             week_start = dat[i,idx['week']]
+            
+            # creating a new array for the current marker selection
             new_p = np.repeat(pred_range[0,:][np.newaxis,:], 26, 0)
 
+            # if week starts at one we assign week numbers from 1-26, else 27-52
             if week_start == 1:
+                # assigning week number
                 new_p[:,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
+
+                # estimating the population
                 pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 26, dtype=np.int64)
             else:
+                # assigning week number
                 new_p[:,idx['week']] = np.linspace(27,52,26, dtype=np.int64)
+
+                # estimating the population, we do not intend to repeat 26th week's value, so we select from index
+                # 1 and onwards
                 pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 27, dtype=np.int64)[1:]
 
+            # replace column of new_p with the estimated population
             new_p[:,idx['pop']] = pop_est
+
+            # We index the element of the array corresponding to the marker in question 
             df_array[52*uyears*m+26*i:52*uyears*m+26*(i+1),:] = new_p
-        
+
+        # we obtain the last entry (as there will always be at least one period to predict on)
         last_val = dat[entries]
+
+        # We obtain the ending week (week to forecast from)
         week_end = dat[entries,idx['week']]
+
+        # we obtain the ratios forward by dividing the populations of the period by the starting pop of the previous one
         ratios_forward = pop_est/pop_est[0]
+
+        # obtain the ratios forward and obtain the mean for the last one (as to avoid repetition of the previous value)
         new_p = np.repeat(last_val[np.newaxis,:], 26, 0)
         ratios_forward[0:len(ratios_forward)-2] = ratios_forward[1:len(ratios_forward)-1]
         ratios_forward[len(ratios_forward)-1] = np.mean(ratios_forward[0:len(ratios_forward)-2])
 
-        if week_end == 1:
+        # if week ends at one we assign week numbers from 1-26, else 27-52
+        if week_end == 1:   
             new_p[:,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
         else:
             new_p[:,idx['week']] = np.linspace(27,52,26, dtype=np.int64)
 
+        # add the population estimation to the last section of each marker (as it is a forecast)
         pop_est = (ratios_forward*last_val[idx['pop']]).astype('int64')
         new_p[:,idx['pop']] = pop_est
         df_array[52*uyears*m+26*entries:52*uyears*m+26*(entries+1),:] = new_p
