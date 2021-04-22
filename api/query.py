@@ -311,7 +311,6 @@ def generate_pop_df(raw_data, date=False):
 
             new_p[:,idx['pop']] = pop_est
             df_array[52*uyears*m+26*i:52*uyears*m+26*(i+1),:] = new_p
-            test.append((52*uyears*m+26*i,52*uyears*m+26*(i+1)))
     
     # making df_array a dataframe
     df_array = pd.DataFrame(df_array)
