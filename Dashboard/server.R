@@ -30,10 +30,10 @@ TMA <- function(wk, yr, ccaas, age_groups, sexes) {
         death_num <- death_num + numerator$x
     }
     
-    start_period_pop <- pop %>% dplyr::filter(year == yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
-    start_period_pop <- aggregate(start_period_pop$pop, list(year = start_period_pop$year, week = start_period_pop$week), FUN=sum)
+    period_pop <- pop %>% dplyr::filter(year == yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+    period_pop <- aggregate(period_pop$pop, list(year = period_pop$year, week = period_pop$week), FUN=sum)
             
-    ratio <- death_num / pop_num
+    ratio <- death_num / period_pop$x
     return(ratio)
 }
 
