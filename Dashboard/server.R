@@ -20,47 +20,7 @@ death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/dea
 # years in pop dataset
 years_pop <- unique(pop$year)
 
-# USEFUL FUNCTIONS
-# project weekly population
-project_pop <- function(dataset, yr, initial_week, ccaas, age_groups, sexes, aggfun=sum, return_ratio=FALSE) {
-    #
-    if (initial_week == 26) {
-        data <- dataset %>% dplyr::filter(year %in% c(yr, yr+1))
-    } else {
-        data <- dataset %>% dplyr::filter(year == yr)
-    }
-    
-    # Creating filtered dataset
-    data_t <- data %>% dplyr::filter(sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
-    # Aggregate
-    data <- aggregate(data_t$pop, list(year = data_t$year, week = data_t$week), FUN=aggfun)
-    # 
-    tryCatch({
-        if (initial_week == 26) {
-            initial_pop <- data[data$year == yr & data$week == initial_week,'x']
-            final_pop <- data[data$year == yr+1 & data$week == 1,'x']
-            pop_inbetween <- seq(initial_pop, final_pop, length.out = 26)
-            ratio_inbetween <- sapply(pop_inbetween, function(x) {x/initial_pop})
-        } else {
-            initial_pop <- data[data$year == yr & data$week == initial_week,'x']
-            final_pop <- data[data$year == yr & data$week == 26,'x']
-            pop_inbetween <- seq(initial_pop, final_pop, length.out = 26)
-            ratio_inbetween <- sapply(pop_inbetween, function(x) {x/initial_pop})
-        }
-        # returning ratios or population values for the specified week range
-        if (return_ratio == TRUE) {
-            return(ratio_inbetween)
-        } else {
-            return(pop_inbetween)
-        }
-    }, error = function(cond) {
-        new_yr = ifelse(initial_week == 26, yr, yr-1)
-        new_initial_week = ifelse(initial_week == 26, 1, 26)
-        return(project_pop(dataset=dataset, yr=new_yr, initial_week=new_initial_week, ccaas=ccaas, age_groups=age_groups, sexes=sexes, aggfun=aggfun, return_ratio=TRUE))
-    })
-}
-
-# RATIOS
+# MEASURES AND RATIOS
 # Tasa de mortalidad acumulada
 TMA <- function(wk, yr, ccaas, age_groups, sexes) {
     death_num <- 0
@@ -70,12 +30,7 @@ TMA <- function(wk, yr, ccaas, age_groups, sexes) {
         death_num <- death_num + numerator$x
     }
     
-    if (wk != 26 & wk != 1) {
-        initial_week <- ifelse(wk > 26, 26, 1)
-        selected_wk <- ifelse(wk > 26, wk - 26, wk)
-        pop_num <- project_pop(dataset=pop, yr=yr, initial_week=initial_week, ccaas=ccaas, age_groups=age_groups, sexes=sexes)[selected_wk]
-        if (pop_num[1] == 1) {
-            start_period_pop <- pop %>% dplyr::filter(year == yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+    start_period_pop <- pop %>% dplyr::filter(year == yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
             start_period_pop <- aggregate(start_period_pop$pop, list(year = start_period_pop$year, week = start_period_pop$week), FUN=sum)
             selected_wk <- ifelse(wk > 26, wk - 26, wk)
             pop_num <- (start_period_pop$x * pop_num)[selected_wk]

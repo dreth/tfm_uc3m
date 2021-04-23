@@ -334,17 +334,21 @@ def generate_pop_df(raw_data, date=False):
 
 # %% QUERYING ALL DATASETS AND EXPORTING
 # Create a list of death datasets for each age+sex to append all to one df
+print('############ - Querying Eurostat...\n')
 death_datasets = []
 for age in age_groups:
     for sex in sexes:
+        print(f'Querying deaths for age group: {age} and sex: {sex}...')
         new_query = {**query, **{'sex':sex, 'age':age}}
         new_df = generate_death_df(query_eurostat(**new_query))
         death_datasets.append(new_df)
 
 # concatenating death datasets
+print('############ - Creating death dataset...\n')
 death = pd.concat(death_datasets)
 death.to_csv('../data/death.csv')
 
 # obtain pop dataset
+print('############ - Creating pop dataset...\n')
 pop = generate_pop_df(query_INE_pop())
 pop.to_csv('../data/pop.csv')
