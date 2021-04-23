@@ -115,6 +115,7 @@ def generate_death_df(raw_data, date=False):
 
 
 def query_INE_pop(df_id='9681', start='20100101', end=''):
+    print(f'Querying INE table id: {df_id}, starting at: {start[0:4]}-{start[4:6]}-{start[6:]}...\n')
     url = f'https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/{df_id}?date={start}:{end}'
     return json.loads(requests.get(url).text)
 
@@ -332,23 +333,27 @@ def generate_pop_df(raw_data, date=False):
     # Returning the resulting dataframe
     return df
 
-# %% QUERYING ALL DATASETS AND EXPORTING
+# %% QUERYING ALL DATASETS AND EXPORTING + DIAGNOSTIC MESSAGES
 # Create a list of death datasets for each age+sex to append all to one df
-print('############ - Querying Eurostat...\n')
+print('\nSTEP 1 - Querying Eurostat...\n')
 death_datasets = []
 for age in age_groups:
     for sex in sexes:
-        print(f'Querying deaths for age group: {age} and sex: {sex}...')
+        print(f'Querying deaths for age group: {age}, sex: {sex}...')
         new_query = {**query, **{'sex':sex, 'age':age}}
         new_df = generate_death_df(query_eurostat(**new_query))
         death_datasets.append(new_df)
 
 # concatenating death datasets
-print('############ - Creating death dataset...\n')
+print('\nSTEP 2 - Creating death dataset...\n')
 death = pd.concat(death_datasets)
 death.to_csv('../data/death.csv')
 
 # obtain pop dataset
-print('############ - Creating pop dataset...\n')
-pop = generate_pop_df(query_INE_pop())
+print('STEP 3 - Creating pop dataset...\n')
+pop_raw = query_INE_pop()
+pop = generate_pop_df(pop_raw)
 pop.to_csv('../data/pop.csv')
+
+# Finished process
+print('\nDone!\n')
