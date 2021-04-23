@@ -287,7 +287,7 @@ def generate_pop_df(raw_data, date=False):
 
                 # estimating the population, we do not intend to repeat 26th week's value, so we select from index
                 # 1 and onwards
-                pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 27, dtype=np.int64)[1:]
+                pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 28, dtype=np.int64)[1:27]
 
             # replace column of new_p with the estimated population
             new_p[:,idx['pop']] = pop_est

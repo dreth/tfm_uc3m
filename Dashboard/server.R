@@ -23,32 +23,61 @@ years_pop <- unique(pop$year)
 # MEASURES AND RATIOS
 # Tasa de mortalidad acumulada
 TMA <- function(wk, yr, ccaas, age_groups, sexes) {
+    # initialize number of deaths
     death_num <- 0
-    for (i in 1:wk) {
-        numerator <- death %>% dplyr::filter(year == yr & week == i & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
-        numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week), FUN=sum)
-        death_num <- death_num + numerator$x
-    }
     
-    period_pop <- pop %>% dplyr::filter(year == yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+    # cumulative deaths
+    numerator <- death %>% dplyr::filter(year %in% yr & week %in% 1:wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+
+    numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week), FUN=sum)
+    death_num <- sum(numerator$x)
+
+    # pop for week wk
+    period_pop <- pop %>% dplyr::filter(year %in% yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+
     period_pop <- aggregate(period_pop$pop, list(year = period_pop$year, week = period_pop$week), FUN=sum)
-            
-    ratio <- death_num / period_pop$x
+    ratio <- death_num / sum(period_pop$x)
+    
     return(ratio)
 } 
 
-# Tasa de mortalidad relativa acumulada
-TMRA <- function(wk, yr, ccaas, age_groups, sexes) {
-    tma <- TMA(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
-    
-    med_tma_wk <- c()
-    last_tma_wk <- c()
-    for (i in 2010:2019) {
-        med_tma_wk <- c(med_tma_wk, TMA(wk=wk, yr=i, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
-        last_tma_wk <- c(last_tma_wk, TMA(wk=52, yr=i, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+TMA_C <- function(ccaas, age_groups, sexes, all=FALSE, sel_week=FALSE) {
+    yrs <- 2010:2019
+    if (all == TRUE) {
+        all_weeks <- list()
+        for (i in 1:52) {
+            all_weeks[[i]] <- mean(sapply(yrs, function(y) TMA(wk=i, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
+        }
+        return(all_weeks)
+    } else {
+        med_tma_wk <- mean(sapply(yrs, function(y) TMA(wk=sel_week, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
+        last_tma_wk <- mean(sapply(yrs, function(y) TMA(wk=52, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
+        return(c(med_tma_wk, last_tma_wk))
     }
+}
 
-    return((tma - mean(med_tma_wk))/mean(last_tma_wk))
+# Tasa de mortalidad relativa acumulada
+TMRA <- function(wk, yr, ccaas, age_groups, sexes, tma_c=FALSE) {    
+    if (length(tma_c) > 1) {
+        wks <- c()
+        yrs <- c()
+        tmras <- c()
+        for (i in yr) {
+            for (j in wk) {
+                yrs <- c(yrs, i)
+                wks <- c(wks, j)
+                tmras <- c(tmras, (TMA(wk=j, yr=i, ccaas=ccaas, age_groups=age_groups, sexes=sexes)-tma_c[[j]])/tma_c[[52]])
+            }
+        }
+        tmra_df <- data.frame(week=wks, year=yrs, tmra=tmras)
+        tmra_df$year <- as.factor(tmra_df$year)
+        return(tmra_df)
+            
+    } else {
+        tma <- TMA(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+        tma_c <- TMA_C(sel_week=wk, all=FALSE, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+        return((tma - tma_c[1])/tma_c[2])
+    }
 }
 
 # Factor de mejora acumulado
@@ -59,22 +88,12 @@ FMA <- function(wk, yr, ccaas, age_groups, sexes) {
     return((tma_1-tma)/end_tma)
 }
 
-weeks <- c()
-years <- c()
-tmras <- c()
-for (i in 2010:2019) {
-    for (j in 1:52) {
-        weeks <- c(weeks, j)
-        years <- c(years, i)
-        print(j)
-        print(i)
-        tmras <- c(tmras, TMRA(j, i, CCAA, AGE_GROUPS, 'T'))
-        print(tmras)
-    }
-}
-tmra_df <- data.frame(week=weeks, year=years, tmra=tmras)
-tmras <- read.csv('./tmras.csv')
-tmras <- tmras[2:length(tmras)]
+TMRA(wk=33, yr=2019, ccaas='ES11', age_groups='Y85-89', sexes='M')
+
+tma_c <- TMA_C(CCAA, AGE_GROUPS, 'T', all=TRUE, sel_week=FALSE)
+tmras <- TMRA(wk=1:52, yr=2010:2020, ccaas=CCAA, age_groups=AGE_GROUPS, sexes='T', tma_c=tma_c)
+plt <- ggplot(data=tmras %>% dplyr::filter(year %in% 2015:2020), aes(x=week, y=tmra)) + geom_line(aes(colour=year))
+ggsave('plt.png', plt)
 
 tmras$year <- as.factor(tmras$year)
 ggplot(data=tmras %>% dplyr::filter(year %in% 2015:2019), aes(x=week, y=tmra)) + geom_line(aes(colour=year))
