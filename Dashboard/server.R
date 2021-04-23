@@ -35,7 +35,7 @@ TMA <- function(wk, yr, ccaas, age_groups, sexes) {
             
     ratio <- death_num / period_pop$x
     return(ratio)
-}
+} 
 
 # Tasa de mortalidad relativa acumulada
 TMRA <- function(wk, yr, ccaas, age_groups, sexes) {
