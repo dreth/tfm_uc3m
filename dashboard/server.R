@@ -90,7 +90,7 @@ BF <- function(wk, yr, ccaas, age_groups, sexes) {
     return((cmr_1-cmr)/end_cmr)
 }
 
-# PLOTTING FUNCTIONS
+# DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
 factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:2019) {
     # Initializing vectors for the df
@@ -132,10 +132,20 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
     return(result)
 }
 
-#
-df <- factors_df(wk=1:52, yr=2014:2020, ccaas=CCAA, age_groups=AGE_GROUPS, sexes='T', type='cmr')
-plt <- ggplot(data=df %>% dplyr::filter(year %in% 2015:2020), aes_string(x='week', y='cmr')) + geom_line(aes(colour=year))
-plt
+df <- factors_df(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes, type=type)
+
+# PLOTTING FUNCTIONS
+# mortality plots
+plot_mortality <- function(df, week_range, type='crmr') {
+    plt <- ggplot(data=df %>% dplyr::filter(year %in% yr & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+    ggtitle(
+        switch(type,
+            'crmr'='Cumulative Relativel Mortality Rate',
+            'cmr'='Cumulative Mortality Rate',
+            'bf'='Cumulative Improvement Factor'
+        ))
+    return(plt)
+}
 
 
 # SERVER
@@ -144,6 +154,4 @@ shinyServer(
         
     } 
 )
-
-
 

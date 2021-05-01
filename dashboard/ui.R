@@ -23,7 +23,8 @@ names(AGE_GROUPS) <- c('Less than 5 years old', 'From 10 to 14 years old', 'From
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
 # OPTIONS TO PLOT
-MORTALITY_PLOT_TYPE <- c("deaths", "cum_mort_rate", "cum_rel_mort_rate", "bett_factor")
+MORTALITY_PLOT_TYPE <- c("deaths", "cmr", "crmr", "bf")
+names(MORTALITY_PLOT_TYPE) <- c('Deaths','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor')
 # DATE
 YEAR <- unique(pop$year)
 WEEK <- unique(death$week)
@@ -50,7 +51,7 @@ shinyUI(
             sidebarPanel(
               selectInput("plotTypeMortality",
                   label = h5(strong("Select content to plot")),
-                  choices = 
+                  choices = MORTALITY_PLOT_TYPE
                 ),
               selectizeInput("selectCCAAMortality",
                   label = h5(strong("Select CCAAs")),
@@ -66,10 +67,17 @@ shinyUI(
                   label = h5(strong("Select Sex/Total")),
                   choices = SEXES
                 ),
+              sliderInput("weekSliderSelector",
+                  label = h5(strong("Select week range to plot")),
+                  min = 1,
+                  max = 52,
+                  value = c(1,52),
+                  step = 1
+                )
             ),
 
             mainPanel(
-              plotOutput("")
+              plotOutput(outputId = "mortalityPlot")
             )
           )
         ),
