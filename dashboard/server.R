@@ -2,7 +2,7 @@
 require(shiny)
 require(tidyverse)
 require(shinythemes)
-library(shinydashboard)
+require(shinydashboard)
 require(dplyr)
 require(ggplot2)
 require(stringr)
@@ -92,7 +92,7 @@ BF <- function(wk, yr, ccaas, age_groups, sexes) {
 
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
-factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:2019) {
+factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:max(YEAR)-1) {
     # Initializing vectors for the df
     wks <- c()
     yrs <- c()
@@ -125,6 +125,9 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
             metric <- c(metric, CMR(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
         }
         result <- data.frame(week=wks, year=yrs, cmr=metric)
+    } else if (type == 'deaths') {
+        result <- death %>% dplyr::filter(year %in% yr & week %in% wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        result <- aggregate(result, list(year = result$year, week = result$week), FUN=sum)
     }
     
     # returning the dataframe after converting the years to factor (for plots)
@@ -132,12 +135,10 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
     return(result)
 }
 
-df <- factors_df(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes, type=type)
-
 # PLOTTING FUNCTIONS
 # mortality plots
-plot_mortality <- function(df, week_range, type='crmr') {
-    plt <- ggplot(data=df %>% dplyr::filter(year %in% yr & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+plot_mortality <- function(df, week_range, yr_range, type='crmr') {
+    plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
     ggtitle(
         switch(type,
             'crmr'='Cumulative Relativel Mortality Rate',
@@ -151,7 +152,24 @@ plot_mortality <- function(df, week_range, type='crmr') {
 # SERVER
 shinyServer(
     function(input, output, session) {
-        
+        # PLOT OUTPUTS
+        # Mortality ratio plots
+        output$mortalityPlot <- renderPlot({
+            df <- factors_df(
+                wk=WEEK, 
+                yr=YEAR, 
+                ccaas=input$selectCCAAMortality,
+                age_groups=input$selectAgeMortality,
+                sexes=input$selectSexesMortality,
+                type=input$plotTypeMortality
+            )
+            plot_mortality(
+                df=df,
+                week_range=input$weekSliderSelectorMortality,
+                yr_range=input$yearSliderSelectorMortality,
+                type=input$plotTypeMortality
+            )
+        })
     } 
 )
 

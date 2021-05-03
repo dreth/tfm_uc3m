@@ -67,13 +67,19 @@ shinyUI(
                   label = h5(strong("Select Sex/Total")),
                   choices = SEXES
                 ),
-              sliderInput("weekSliderSelector",
+              sliderInput("weekSliderSelectorMortality",
                   label = h5(strong("Select week range to plot")),
                   min = 1,
                   max = 52,
                   value = c(1,52),
                   step = 1
-                )
+                ),
+              sliderInput("yearSliderSelectorMortality",
+                  label = h5(strong("Select year range to plot")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = c(min(YEAR), max(YEAR))
+              )
             ),
 
             mainPanel(
