@@ -1,20 +1,6 @@
 # IMPORTING LIBRARIES
 require(shiny)
-require(tidyverse)
-require(shinythemes)
 require(shinydashboard)
-require(dplyr)
-require(ggplot2)
-require(stringr)
-require(PerformanceAnalytics)
-require(foreach)
-require(MASS)
-require(gridExtra)
-require(plotly)
-
-# DATASETS
-pop = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
-death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv')
 
 # REUSABLE METRICS
 # years in pop dataset
@@ -125,7 +111,7 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
             metric <- c(metric, CMR(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
         }
         result <- data.frame(week=wks, year=yrs, cmr=metric)
-    } else if (type == 'deaths') {
+    } else if (type == 'em') {
         result <- death %>% dplyr::filter(year %in% yr & week %in% wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
         result <- aggregate(result, list(year = result$year, week = result$week), FUN=sum)
     }
@@ -141,35 +127,67 @@ plot_mortality <- function(df, week_range, yr_range, type='crmr') {
     plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
     ggtitle(
         switch(type,
-            'crmr'='Cumulative Relativel Mortality Rate',
+            'crmr'='Cumulative Relative Mortality Rate',
             'cmr'='Cumulative Mortality Rate',
             'bf'='Cumulative Improvement Factor'
         ))
     return(plt)
 }
 
-
 # SERVER
 shinyServer(
     function(input, output, session) {
+        # DYNAMIC UI CONTROLS
+        # Select total or selectize CCAA - Mortality
+        output$selectCCAAMortalityUIOutput <- renderUI({
+            if (input$selectCCAAMortalityTotal == 'select') {
+                selectizeInput("selectCCAAMortality",
+                  label = h5(strong("Select CCAAs")),
+                  choices = CCAA,
+                  options = list(maxItems = length(CCAA))
+                )
+            }
+        })
+
+        # Select total or selectize Age Groups - Mortality
+        output$selectAgeGroupsMortalityUIOutput <- renderUI({
+            if (input$selectAgeGroupsMortalityTotal == 'select') {
+                selectizeInput("selectAgeMortality",
+                  label = h5(strong("Select Age group(s)")),
+                  choices = AGE_GROUPS,
+                  options = list(maxItems = length(AGE_GROUPS))
+                )
+            }
+        })
+
         # PLOT OUTPUTS
-        # Mortality ratio plots
-        output$mortalityPlot <- renderPlot({
-            df <- factors_df(
+        # Action button to generate mortality plots
+        genMortPlot <- eventReactive(input$plotMortalityButton, {
+            mortPlotdf <- factors_df(
                 wk=WEEK, 
                 yr=YEAR, 
-                ccaas=input$selectCCAAMortality,
-                age_groups=input$selectAgeMortality,
+                ccaas=switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
+                age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
                 sexes=input$selectSexesMortality,
                 type=input$plotTypeMortality
             )
-            plot_mortality(
-                df=df,
-                week_range=input$weekSliderSelectorMortality,
-                yr_range=input$yearSliderSelectorMortality,
+            mortPlot <- plot_mortality(
+                df=mortPlotdf,
+                week_range=input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2],
+                yr_range=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2],
                 type=input$plotTypeMortality
             )
+            return(mortPlot)
         })
+
+        # Mortality ratio plots
+        output$mortalityPlot <- renderPlot({
+            genMortPlot()
+        },
+        # match width for a square plot
+        height = function () {
+            session$clientData$output_mortalityPlot_width
+      })
     } 
 )
 

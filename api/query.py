@@ -121,7 +121,6 @@ def query_INE_pop(df_id='9681', start='20100101', end=''):
 
 
 # %% GENERATE POPULATION DF
-
 def generate_pop_df(raw_data, date=False):
     """
     """
@@ -149,7 +148,7 @@ def generate_pop_df(raw_data, date=False):
         'Navarra, Comunidad Foral de': 'ES22',
         'Rioja, La': 'ES23',
         'Aragón': 'ES24',
-        'Madrid, Comunidad de': 'ES30',
+        'Madrid, Comunidad de': 'ES3',
         'Castilla y León': 'ES41',
         'Castilla - La Mancha': 'ES42',
         'Extremadura': 'ES43',
@@ -160,7 +159,7 @@ def generate_pop_df(raw_data, date=False):
         'Murcia, Región de': 'ES62',
         'Ceuta': 'ES63',
         'Melilla': 'ES64',
-        'Canarias': 'ES70'
+        'Canarias': 'ES7'
     }
 
     # Sex reference
