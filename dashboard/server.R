@@ -33,9 +33,9 @@ CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
     if (length(wk) > 1 | length(yr) > 1) {
         period_pop <- aggregate(period_pop$pop, list(year = period_pop$year), FUN=sum)
         if (cmr_c==TRUE) {
-            ratio <- mean(death_num / period_pop$x)
+            ratio <- tryCatch(mean(death_num / period_pop$x), warning=function(w) {return(c(mean(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1]),NA))})
         } else {
-            ratio <- death_num / period_pop$x
+            ratio <- tryCatch(death_num / period_pop$x, warning=function(w) {return(c(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1],NA))})
         }
     } else {
     # individual years+weeks
