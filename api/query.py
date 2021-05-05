@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import datetime as dt
 import numpy as np
+from copy import deepcopy
 
 # %% CCAA and Age groups to query
 # CCAA
@@ -121,7 +122,7 @@ def query_INE_pop(df_id='9681', start='20100101', end=''):
 
 
 # %% GENERATE POPULATION DF
-def generate_pop_df(raw_data, date=False):
+def generate_pop_df(raw_data, most_recent_week, date=False):
     """
     """
     # column fields
@@ -241,7 +242,14 @@ def generate_pop_df(raw_data, date=False):
 
     # obtain unique markers in a variable
     umarkers = df['marker'].unique()
-    uyears = df['year'].nunique()
+
+    # obtain amount of unique years, however, we add one if
+    # we end the last marker date in july (so that our 
+    # prediction continues until the following year)
+    if df.loc[df['marker'] == umarkers[0], 'date'].values[-1].month == 7:
+        uyears = df['year'].nunique() + 1
+    else:
+        uyears = df['year'].nunique()
 
     # indexes for df_array
     idx = {
@@ -256,8 +264,30 @@ def generate_pop_df(raw_data, date=False):
 
     # main loop
     for m in range(len(umarkers)):
-        # obtain array of values matching loop marker
+        # obtain array of values matching loop marker and converting it to a list
         dat = df.loc[df['marker'] == umarkers[m]].values
+        dat_copy = np.zeros((np.shape(dat)[0]+1,np.shape(dat)[1]), dtype=object)
+        dat_copy[0:len(dat_copy)-1,:] = dat
+
+        # add last element by modifying prev. last element values in order to predict a full year after last date
+        last_element = deepcopy(dat[-1])
+
+        # modifying last element's date to project to the next 6 month period
+        # modifying date
+        if last_element[2].month == 7:
+            last_element[2] = dt.date(last_element[2].year + 1, 1, last_element[2].day)
+            last_element[5] = last_element[5] + 1
+            last_element[6] = 1
+        else:
+            last_element[2] = dt.date(last_element[2].year, 7, last_element[2].day)
+            last_element[6] = 26
+
+        # projecting last population using the previous element's ratio
+        last_element[4] = int(last_element[4]* (last_element[4]/dat[-2][4]))
+                
+        # extending elements of dat to include this last modified data point
+        dat_copy[-1,:] = last_element
+        dat = dat_copy
 
         # reducing entries by one to simplify the code
         entries = len(dat)-1
@@ -325,6 +355,15 @@ def generate_pop_df(raw_data, date=False):
     df = df_array
     df = df.drop('marker',axis=1)
 
+    # removing empty spots
+    df = df[df['ccaa'] != 0]
+
+    # only keeping most recentl week
+    df.loc[df['year'] == 2021] = df.loc[df['week'] <= most_recent_week]
+
+    # removing nans
+    df = df[~df['week'].isnull()].reset_index(drop=True)
+
     # remove date if date is false
     if date == False:
         df = df.drop('date',axis=1)
@@ -346,12 +385,13 @@ for age in age_groups:
 # concatenating death datasets
 print('\nSTEP 2 - Creating death dataset...\n')
 death = pd.concat(death_datasets)
+most_recent_week = max(death.loc[death['year'] == max(death['year']), 'week'])
 death.to_csv('../data/death.csv')
 
 # obtain pop dataset
 print('STEP 3 - Creating pop dataset...\n')
 pop_raw = query_INE_pop()
-pop = generate_pop_df(pop_raw)
+pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week)
 pop.to_csv('../data/pop.csv')
 
 # Finished process
