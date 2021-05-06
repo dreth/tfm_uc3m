@@ -68,13 +68,26 @@ CRMR <- function(wk, yr, ccaas, age_groups, sexes, all=FALSE, cmr_c_yrs=2010:201
     return((cmr - cmr_c[1])/cmr_c[2])
 }
 
-# Betterness factor (cumulative)
+# Improvement factor (cumulative)
 BF <- function(wk, yr, ccaas, age_groups, sexes) {
     cmr_1 <- CMR(wk=wk, yr=yr-1, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
     cmr <- CMR(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
     end_cmr <- CMR(wk=52, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
     return((cmr_1-cmr)/end_cmr)
 }
+
+# Excess of mortality
+EM <- function(wk, yr, ccaas, age_groups, sexes) {
+    filtered <- death %>% dplyr::filter(year %in% (yr-5):yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+    agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+    actual <- agg[length(agg$x), 'x']
+    expected <- mean(agg[1:(length(agg$x)-1), 'x'])
+    return(actual-expected)
+}
+
+EM(1,2015:2020, CCAA, AGE_GROUPS, 'T')
+
+factors_df(1:52, 2015:2020, CCAA, AGE_GROUPS, 'T', type='em')
 
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
@@ -111,9 +124,20 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
             metric <- c(metric, CMR(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
         }
         result <- data.frame(week=wks, year=yrs, cmr=metric)
+    
+    # Excess mortality
     } else if (type == 'em') {
-        result <- death %>% dplyr::filter(year %in% yr & week %in% wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
-        result <- aggregate(result, list(year = result$year, week = result$week), FUN=sum)
+        # If lower bound is lower than 2015 return an error
+        if (yr[1] < 2015) {
+            result <- c('error', 'The lower bound for year must be greater than or equal to 2015')
+        } else {
+            for (j in wk) {
+            yrs <- c(yrs, yr)
+            wks <- c(wks, rep(j,length(yr)))
+            metric <- c(metric, EM(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+            }
+            result <- data.frame(week=wks, year=yrs, cmr=metric)
+        }
     }
     
     # returning the dataframe after converting the years to factor (for plots)
@@ -124,14 +148,19 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
 # PLOTTING FUNCTIONS
 # mortality plots
 plot_mortality <- function(df, week_range, yr_range, type='crmr') {
-    plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
-    ggtitle(
-        switch(type,
-            'crmr'='Cumulative Relative Mortality Rate',
-            'cmr'='Cumulative Mortality Rate',
-            'bf'='Cumulative Improvement Factor'
-        ))
-    return(plt)
+    if (suppressWarnings({df[1] == 'error'})) {
+        return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
+    } else {
+        plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+        ggtitle(
+            switch(type,
+                'crmr'='Cumulative Relative Mortality Rate',
+                'cmr'='Cumulative Mortality Rate',
+                'bf'='Cumulative Improvement Factor'
+            ))
+        return(plt)
+    }
+    
 }
 
 # SERVER
