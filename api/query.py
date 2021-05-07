@@ -28,8 +28,6 @@ query = {
 
 # %% QUERY EUROSTAT FUNCTION
 def query_eurostat(**kwargs):
-    """
-    """
     # Iterating through kwargs to fill URL fields
     for param, value in kwargs.items():
         # URL
@@ -415,3 +413,4 @@ print('\nDone!\n')
 with open('./logs/update_database_log.txt', 'r+') as f:
     contents = f.read()
     f.write('\nDone!\n')
+    f.truncate(0)

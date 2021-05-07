@@ -194,7 +194,7 @@ shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
         rv_stream <- reactiveValues(updateDatabaseLog = c(""),
-                                    timer = reactiveTimer(1000))
+                                    timer = reactiveTimer(Inf))
 
         # DYNAMIC UI CONTROLS
         # Select total or selectize CCAA - Mortality
@@ -253,7 +253,7 @@ shinyServer(
             rv_stream$timer <- reactiveTimer(1000)
             shinyjs::disable('updateDatabaseButton')
             shinyjs::show("processingUpdateDatabase")
-            system('bash ../api/update_database.sh')
+            system('bash ./www/update_database_app.sh')
             shinyjs::enable('updateDatabaseButton')
             shinyjs::hide("processingUpdateDatabase")
             rv_stream$timer <- reactiveTimer(Inf)
