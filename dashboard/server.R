@@ -79,13 +79,21 @@ BF <- function(wk, yr, ccaas, age_groups, sexes) {
 
 # Excess of mortality
 EM <- function(wk, yr, ccaas, age_groups, sexes) {
+    # If more than one year is desired to be calculated
     if (length(yr) > 1) {
+        # Filtering and aggregating the dataframe
         filtered <- death %>% dplyr::filter(year %in% (min(yr)-5):max(yr) & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
-        print(filtered)
         agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+
+        # If a year is incomplete, add a NA, to avoid plotting a straight line
+        if (length(agg[agg$year %in% yr,'x']) < length(yr)) {
+            agg <- rbind(agg, data.frame(year=max(yr), x=NA))
+        }
         agg$ma <- lag(movavg(agg$x, 5, type='s'))
-        result_df <- agg[agg$year >= min(yr),]
+        result_df <- agg[agg$year %in% yr,]
         return(result_df$x - result_df$ma)
+        
+    # If only a single value is desired to be calculated
     } else {
        filtered <- death %>% dplyr::filter(year %in% (yr-5):yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
         agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
@@ -95,8 +103,6 @@ EM <- function(wk, yr, ccaas, age_groups, sexes) {
         return(actual-expected)
     }
 }
-
-EM(40, 2020:2021, CCAA, AGE_GROUPS, 'T')
 
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
