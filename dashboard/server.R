@@ -1,6 +1,7 @@
 # IMPORTING LIBRARIES
 require(shiny)
 require(shinydashboard)
+library(pracma)
 
 # REUSABLE METRICS
 # years in pop dataset
@@ -78,16 +79,24 @@ BF <- function(wk, yr, ccaas, age_groups, sexes) {
 
 # Excess of mortality
 EM <- function(wk, yr, ccaas, age_groups, sexes) {
-    filtered <- death %>% dplyr::filter(year %in% (yr-5):yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
-    agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
-    actual <- agg[length(agg$x), 'x']
-    expected <- mean(agg[1:(length(agg$x)-1), 'x'])
-    return(actual-expected)
+    if (length(yr) > 1) {
+        filtered <- death %>% dplyr::filter(year %in% (min(yr)-5):max(yr) & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        print(filtered)
+        agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+        agg$ma <- lag(movavg(agg$x, 5, type='s'))
+        result_df <- agg[agg$year >= min(yr),]
+        return(result_df$x - result_df$ma)
+    } else {
+       filtered <- death %>% dplyr::filter(year %in% (yr-5):yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+        actual <- agg[length(agg$x), 'x']
+        expected <- mean(agg[1:(length(agg$x)-1), 'x'])
+        result <- actual
+        return(actual-expected)
+    }
 }
 
-EM(1,2015:2020, CCAA, AGE_GROUPS, 'T')
-
-factors_df(1:52, 2015:2020, CCAA, AGE_GROUPS, 'T', type='em')
+EM(40, 2020:2021, CCAA, AGE_GROUPS, 'T')
 
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
@@ -128,20 +137,22 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
     # Excess mortality
     } else if (type == 'em') {
         # If lower bound is lower than 2015 return an error
-        if (yr[1] < 2015) {
+        if (min(yr) < 2015) {
             result <- c('error', 'The lower bound for year must be greater than or equal to 2015')
         } else {
             for (j in wk) {
-            yrs <- c(yrs, yr)
-            wks <- c(wks, rep(j,length(yr)))
-            metric <- c(metric, EM(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+                yrs <- c(yrs, yr)
+                wks <- c(wks, rep(j,length(yr)))
+                metric <- c(metric, EM(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
             }
-            result <- data.frame(week=wks, year=yrs, cmr=metric)
+            result <- data.frame(week=wks, year=yrs, em=metric)
         }
     }
     
     # returning the dataframe after converting the years to factor (for plots)
-    result$year <- as.factor(result$year)
+    if (result[1] != 'error') {
+        result$year <- as.factor(result$year)
+    }
     return(result)
 }
 
@@ -154,13 +165,13 @@ plot_mortality <- function(df, week_range, yr_range, type='crmr') {
         plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
         ggtitle(
             switch(type,
+                'em'='Excess Mortality',
                 'crmr'='Cumulative Relative Mortality Rate',
                 'cmr'='Cumulative Mortality Rate',
                 'bf'='Cumulative Improvement Factor'
             ))
         return(plt)
-    }
-    
+    }    
 }
 
 # SERVER
@@ -194,7 +205,7 @@ shinyServer(
         genMortPlot <- eventReactive(input$plotMortalityButton, {
             mortPlotdf <- factors_df(
                 wk=WEEK, 
-                yr=YEAR, 
+                yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
                 ccaas=switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
                 age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
                 sexes=input$selectSexesMortality,
