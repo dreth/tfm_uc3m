@@ -78,7 +78,7 @@ BF <- function(wk, yr, ccaas, age_groups, sexes) {
 }
 
 # Excess of mortality
-EM <- function(wk, yr, ccaas, age_groups, sexes) {
+EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
     # If more than one year is desired to be calculated
     if (length(yr) > 1) {
         # Filtering and aggregating the dataframe
@@ -89,18 +89,27 @@ EM <- function(wk, yr, ccaas, age_groups, sexes) {
         if (length(agg[agg$year %in% yr,'x']) < length(yr)) {
             agg <- rbind(agg, data.frame(year=max(yr), x=NA))
         }
-        agg$ma <- lag(movavg(agg$x, 5, type='s'))
+
+        # generate moving average with a window of ma to calculate excess mortality
+        # and lag it to fit it to the dataframe (as the current year can't be part of the average)
+        agg$ma <- lag(movavg(agg$x, ma, type='s'))
         result_df <- agg[agg$year %in% yr,]
         return(result_df$x - result_df$ma)
-        
+
     # If only a single value is desired to be calculated
     } else {
-       filtered <- death %>% dplyr::filter(year %in% (yr-5):yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        # Filtering and aggregating the dataframe
+        filtered <- death %>% dplyr::filter(year %in% (yr-5):yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
         agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
-        actual <- agg[length(agg$x), 'x']
-        expected <- mean(agg[1:(length(agg$x)-1), 'x'])
-        result <- actual
-        return(actual-expected)
+
+        # If year is incomplete, return NA
+        if (agg[length(agg$x), 'year'] != yr) {
+            return(NA)
+        } else {
+            actual <- agg[length(agg$x), 'x']
+            expected <- mean(agg[1:(length(agg$x)-1), 'x'])
+            return(actual - expected)
+        }
     }
 }
 
@@ -156,7 +165,7 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
     }
     
     # returning the dataframe after converting the years to factor (for plots)
-    if (result[1] != 'error') {
+    if (suppressWarnings({result[1] != 'error'})) {
         result$year <- as.factor(result$year)
     }
     return(result)
@@ -183,6 +192,10 @@ plot_mortality <- function(df, week_range, yr_range, type='crmr') {
 # SERVER
 shinyServer(
     function(input, output, session) {
+        # REACTIVE VALUES
+        rv_stream <- reactiveValues(updateDatabaseLog = c(""),
+                                    timer = reactiveTimer(1000))
+
         # DYNAMIC UI CONTROLS
         # Select total or selectize CCAA - Mortality
         output$selectCCAAMortalityUIOutput <- renderUI({
@@ -230,10 +243,31 @@ shinyServer(
         output$mortalityPlot <- renderPlot({
             genMortPlot()
         },
-        # match width for a square plot
-        height = function () {
-            session$clientData$output_mortalityPlot_width
-      })
+            # match width for a square plot
+            height = function () {
+                session$clientData$output_mortalityPlot_width
+        })
+
+        # UPDATE DATABASE BUTTON
+        observeEvent(input$updateDatabaseButton, {
+            rv_stream$timer <- reactiveTimer(1000)
+            shinyjs::disable('updateDatabaseButton')
+            shinyjs::show("processingUpdateDatabase")
+            system('bash ../api/update_database.sh')
+            shinyjs::enable('updateDatabaseButton')
+            shinyjs::hide("processingUpdateDatabase")
+            rv_stream$timer <- reactiveTimer(Inf)
+        })
+        observe({
+            rv_stream$timer()
+            rv_stream$updateDatabaseLog <- paste(readLines('../api/logs/update_database_log.txt'), collapse="<br/>")
+        })
+
+        # log output from command in update database
+        output$consoleLogsUpdateDatabase <- renderUI({
+            HTML(rv_stream$updateDatabaseLog)
+        })
+
     } 
 )
 

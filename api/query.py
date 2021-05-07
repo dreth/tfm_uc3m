@@ -372,27 +372,46 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
     return df
 
 # %% QUERYING ALL DATASETS AND EXPORTING + DIAGNOSTIC MESSAGES
-# Create a list of death datasets for each age+sex to append all to one df
+# logging everything to text file
 print('\nSTEP 1 - Querying Eurostat...\n')
+with open('./logs/update_database_log.txt', 'w+') as f:
+    f.write('\nSTEP 1 - Querying Eurostat...\n')
+
+# Create a list of death datasets for each age+sex to append all to one df
 death_datasets = []
 for age in age_groups:
     for sex in sexes:
         print(f'Querying deaths for age group: {age}, sex: {sex}...')
+        with open('./logs/update_database_log.txt', 'r+') as f:
+            contents = f.read()
+            f.write(f'Querying deaths for age group: {age}, sex: {sex}...\n')
         new_query = {**query, **{'sex':sex, 'age':age}}
         new_df = generate_death_df(query_eurostat(**new_query))
         death_datasets.append(new_df)
 
 # concatenating death datasets
 print('\nSTEP 2 - Creating death dataset...\n')
+# logging to text file
+with open('./logs/update_database_log.txt', 'r+') as f:
+    contents = f.read()
+    f.write('\nSTEP 2 - Creating death dataset...\n')
 death = pd.concat(death_datasets)
 most_recent_week = max(death.loc[death['year'] == max(death['year']), 'week'])
 death.to_csv('../data/death.csv')
 
 # obtain pop dataset
 print('STEP 3 - Creating pop dataset...\n')
+# logging to text file
+with open('./logs/update_database_log.txt', 'r+') as f:
+    contents = f.read()
+    f.write('STEP 3 - Creating pop dataset...\n')
 pop_raw = query_INE_pop()
 pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week)
 pop.to_csv('../data/pop.csv')
 
 # Finished process
 print('\nDone!\n')
+# logging to text file and cleaning up
+with open('./logs/update_database_log.txt', 'r+') as f:
+    contents = f.read()
+    f.write('\nDone!\n')

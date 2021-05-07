@@ -1,6 +1,7 @@
 # IMPORTING LIBRARIES
 require(shiny)
 require(shinydashboard)
+require(shinyjs)
 
 # UI
 shinyUI(
@@ -12,7 +13,7 @@ shinyUI(
         menuItem("Mortality", tabName = "mortality", icon = icon("stats", lib="glyphicon")),
 
         # Second tab content
-        menuItem("Widgets", tabName = "widgets", icon = icon("th"))
+        menuItem("Update Database", tabName = "updateDatabase", icon = icon("refresh", lib="glyphicon"))
       )
     ),
     dashboardBody(id='dashboardBody',
@@ -67,8 +68,20 @@ shinyUI(
         ),
 
         # Second tab content
-        tabItem(tabName = "widgets",
-          h2("Widgets tab content")
+        tabItem(tabName = "updateDatabase",
+          sidebarLayout(
+            sidebarPanel(
+              useShinyjs(),
+              actionButton("updateDatabaseButton",
+                  label = h4(strong("Update Database"))
+              ),
+              shinyjs::hidden(h5(id = "processingUpdateDatabase", "Running database update..."))
+            ),
+
+            mainPanel(
+                htmlOutput(outputId = "consoleLogsUpdateDatabase")
+            )
+          )
         )
       )
     )
