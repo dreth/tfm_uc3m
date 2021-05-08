@@ -63,7 +63,7 @@ shinyServer(
 
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
-            rv_stream$timer <- reactiveTimer(10)
+            rv_stream$timer <- reactiveTimer(1000)
             shinyjs::disable('updateDatabaseButton')
             shinyjs::show("processingUpdateDatabase")
             system('bash ./www/update_database_app.sh')
