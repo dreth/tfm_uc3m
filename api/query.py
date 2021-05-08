@@ -112,7 +112,6 @@ def generate_death_df(raw_data, date=False):
 
 # %% QUERY INE DATA TABLES
 
-
 def query_INE_pop(df_id='9681', start='20100101', end=''):
     print(f'Querying INE table id: {df_id}, starting at: {start[0:4]}-{start[4:6]}-{start[6:]}...\n')
     url = f'https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/{df_id}?date={start}:{end}'
@@ -373,7 +372,7 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
 # logging everything to text file
 print('\nSTEP 1 - Querying Eurostat...\n')
 with open('./logs/update_database_log.txt', 'w+') as f:
-    f.write('\nSTEP 1 - Querying Eurostat...\n')
+    f.write('\n> DB UPDATE LOG:\n\n> STEP 1 - Querying Eurostat...\n\n')
 
 # Create a list of death datasets for each age+sex to append all to one df
 death_datasets = []
@@ -388,7 +387,7 @@ for age in age_groups:
         death_datasets.append(new_df)
 
 # concatenating death datasets
-print('\nSTEP 2 - Creating death dataset...\n')
+print('\n> STEP 2 - Creating death dataset...\n')
 # logging to text file
 with open('./logs/update_database_log.txt', 'r+') as f:
     contents = f.read()
@@ -398,11 +397,11 @@ most_recent_week = max(death.loc[death['year'] == max(death['year']), 'week'])
 death.to_csv('../data/death.csv')
 
 # obtain pop dataset
-print('STEP 3 - Creating pop dataset...\n')
+print('> STEP 3 - Creating pop dataset...\n')
 # logging to text file
 with open('./logs/update_database_log.txt', 'r+') as f:
     contents = f.read()
-    f.write('STEP 3 - Creating pop dataset...\n')
+    f.write('\nSTEP 3 - Creating pop dataset...\n')
 pop_raw = query_INE_pop()
 pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week)
 pop.to_csv('../data/pop.csv')
@@ -410,7 +409,5 @@ pop.to_csv('../data/pop.csv')
 # Finished process
 print('\nDone!\n')
 # logging to text file and cleaning up
-with open('./logs/update_database_log.txt', 'r+') as f:
-    contents = f.read()
-    f.write('\nDone!\n')
-    f.truncate(0)
+with open('./logs/update_database_log.txt', 'w+') as f:
+    f.write(f'\n\n> Database updated as of: {datetime.datetime.now().isoformat(" ")}\n')

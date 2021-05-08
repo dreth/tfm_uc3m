@@ -6,9 +6,8 @@ require(shinydashboard)
 shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
-        rv_stream <- reactiveValues(updateDatabaseLog = c(""),
-                                    timerStarted = FALSE,
-                                    timer = reactiveTimer(Inf))
+        # rv_stream <- reactiveValues()
+        updateDBLogs <- reactiveFileReader(intervalMillis=1000, session=session, filePath='./logs/update_database_log.txt', readFunc=paste_readLines)
 
         # DYNAMIC UI CONTROLS
         # Select total or selectize CCAA - Mortality
@@ -64,19 +63,16 @@ shinyServer(
 
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
-            rv_stream$timer <- reactiveTimer(1000)
             system('bash ./www/update_database_app.sh', wait=FALSE)
-        })
-        observe({
-            rv_stream$timer()
-            rv_stream$updateDatabaseLog <- paste(readLines('./logs/update_database_log.txt'), collapse="<br/>")
+            systime <- Sys.time()
+            shinyjs::show('processingUpdateDatabaseTime')
+            updateActionButton(session=session, inputId='updateDatabaseButton', label="Update Database (Again)")
         })
 
         # log output from command in update database
         output$consoleLogsUpdateDatabase <- renderUI({
-            HTML(rv_stream$updateDatabaseLog)
+            HTML(updateDBLogs())
         })
-
     } 
 )
 

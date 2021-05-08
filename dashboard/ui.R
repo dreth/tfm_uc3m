@@ -74,7 +74,8 @@ shinyUI(
             actionButton("updateDatabaseButton",
                 label = h4(strong("Update Database"))
             ),
-            shinyjs::hidden(h5(id = "processingUpdateDatabase", "Running database update...")),
+            shinyjs::hidden(h4(strong(id = "processingUpdateDatabaseTime", str_interp("Database update has been ran at ${systime}")))),
+            br(),
             br(),
             htmlOutput(outputId = "consoleLogsUpdateDatabase")
           )

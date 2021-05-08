@@ -10,7 +10,6 @@ require(foreach)
 require(MASS)
 require(gridExtra)
 require(plotly)
-require(future)
 
 # TRACE 
 options(shiny.trace=TRUE)
@@ -49,6 +48,8 @@ names(AGE_GROUPS_UI_SELECT) <- c('All Age groups', 'Select Age groups')
 # years in pop dataset
 years_pop <- unique(pop$year)
 
+# CURRENT SYSTEM TIME
+systime <- Sys.time()
 
 # MEASURES AND RATIOS
 # Cumulative mortality rate
@@ -230,4 +231,10 @@ plot_mortality <- function(df, week_range, yr_range, type='crmr') {
             ))
         return(plt)
     }    
+}
+
+# OTHER HELPER FUNCTIONS
+# Function to read lines and return a paste separated by an html line break
+paste_readLines <- function(text) {
+    return(paste(readLines(text), collapse='<br/>'))
 }
