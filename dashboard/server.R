@@ -7,6 +7,7 @@ shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
         rv_stream <- reactiveValues(updateDatabaseLog = c(""),
+                                    timerStarted = FALSE,
                                     timer = reactiveTimer(Inf))
 
         # DYNAMIC UI CONTROLS
@@ -64,12 +65,7 @@ shinyServer(
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
             rv_stream$timer <- reactiveTimer(1000)
-            shinyjs::disable('updateDatabaseButton')
-            shinyjs::show("processingUpdateDatabase")
-            system('bash ./www/update_database_app.sh')
-            shinyjs::enable('updateDatabaseButton')
-            shinyjs::hide("processingUpdateDatabase")
-            rv_stream$timer <- reactiveTimer(Inf)
+            system('bash ./www/update_database_app.sh', wait=FALSE)
         })
         observe({
             rv_stream$timer()

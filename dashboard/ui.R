@@ -75,7 +75,7 @@ shinyUI(
                 label = h4(strong("Update Database"))
             ),
             shinyjs::hidden(h5(id = "processingUpdateDatabase", "Running database update...")),
-            Br(),
+            br(),
             htmlOutput(outputId = "consoleLogsUpdateDatabase")
           )
         )

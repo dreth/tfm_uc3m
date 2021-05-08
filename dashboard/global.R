@@ -10,6 +10,7 @@ require(foreach)
 require(MASS)
 require(gridExtra)
 require(plotly)
+require(future)
 
 # TRACE 
 options(shiny.trace=TRUE)
