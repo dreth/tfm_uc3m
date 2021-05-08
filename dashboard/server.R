@@ -1,11 +1,14 @@
 # IMPORTING LIBRARIES
 require(shiny)
 require(shinydashboard)
-library(pracma)
+require(pracma)
 
 # REUSABLE METRICS
 # years in pop dataset
 years_pop <- unique(pop$year)
+
+# SET PYTHON ENVIRONMENT VARIABLE FOR DATABASE UPDATE
+Sys.setenv(PATH = paste(c("/home/dreth/anaconda3/bin/", Sys.getenv("PATH")), collapse = .Platform$path.sep))
 
 # MEASURES AND RATIOS
 # Cumulative mortality rate
@@ -250,7 +253,7 @@ shinyServer(
 
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
-            rv_stream$timer <- reactiveTimer(1000)
+            rv_stream$timer <- reactiveTimer(10)
             shinyjs::disable('updateDatabaseButton')
             shinyjs::show("processingUpdateDatabase")
             system('bash ./www/update_database_app.sh')
@@ -260,7 +263,7 @@ shinyServer(
         })
         observe({
             rv_stream$timer()
-            rv_stream$updateDatabaseLog <- paste(readLines('../api/logs/update_database_log.txt'), collapse="<br/>")
+            rv_stream$updateDatabaseLog <- paste(readLines('./logs/update_database_log.txt'), collapse="<br/>")
         })
 
         # log output from command in update database
