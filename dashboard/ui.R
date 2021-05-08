@@ -69,18 +69,14 @@ shinyUI(
 
         # Second tab content
         tabItem(tabName = "updateDatabase",
-          sidebarLayout(
-            sidebarPanel(
-              useShinyjs(),
-              actionButton("updateDatabaseButton",
-                  label = h4(strong("Update Database"))
-              ),
-              shinyjs::hidden(h5(id = "processingUpdateDatabase", "Running database update..."))
+          fluidPage(
+            useShinyjs(),
+            actionButton("updateDatabaseButton",
+                label = h4(strong("Update Database"))
             ),
-
-            mainPanel(
-                htmlOutput(outputId = "consoleLogsUpdateDatabase")
-            )
+            shinyjs::hidden(h5(id = "processingUpdateDatabase", "Running database update...")),
+            Br(),
+            htmlOutput(outputId = "consoleLogsUpdateDatabase")
           )
         )
       )

@@ -13,7 +13,7 @@ else
   exit 64
 fi
 
-python -m query.py
+python3 query.py
 echo 'commit database up to' $date
 git commit -m "Update database ${date}" '../data/*'
 git push

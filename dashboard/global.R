@@ -1,6 +1,7 @@
 # IMPORTING LIBRARIES
 require(tidyverse)
 require(shinythemes)
+require(pracma)
 require(dplyr)
 require(ggplot2)
 require(stringr)
@@ -12,6 +13,9 @@ require(plotly)
 
 # TRACE 
 options(shiny.trace=TRUE)
+
+# SET PYTHON ENVIRONMENT VARIABLE FOR DATABASE UPDATE
+Sys.setenv(PATH = paste(c("/home/dreth/anaconda3/bin/", Sys.getenv("PATH")), collapse = .Platform$path.sep))
 
 # DATASETS
 pop = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
@@ -39,3 +43,190 @@ names(CCAA_UI_SELECT) <- c('All CCAAs', 'Select CCAAs')
 # AGE GROUP UI SELECTOR
 AGE_GROUPS_UI_SELECT <- c('all', 'select')
 names(AGE_GROUPS_UI_SELECT) <- c('All Age groups', 'Select Age groups')
+
+# REUSABLE METRICS
+# years in pop dataset
+years_pop <- unique(pop$year)
+
+
+# MEASURES AND RATIOS
+# Cumulative mortality rate
+CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
+    # initialize number of deaths
+    death_num <- 0
+
+    # assuming multiple years+weeks
+    # cumulative deaths
+    numerator <- death %>% dplyr::filter(year %in% yr & week %in% 1:wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+
+    if (length(wk) > 1 | length(yr) > 1) {
+        # multiple years+weeks
+        numerator <- aggregate(numerator$death, list(year = numerator$year), FUN=sum)
+        death_num <- numerator$x
+    } else {
+        # individual years+weeks
+        numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week), FUN=sum)
+        death_num <- sum(numerator$x)
+    }    
+    
+    # pop for week wk
+    period_pop <- pop %>% dplyr::filter(year %in% yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+
+    # assuming multiple years+weeks
+    if (length(wk) > 1 | length(yr) > 1) {
+        period_pop <- aggregate(period_pop$pop, list(year = period_pop$year), FUN=sum)
+        if (cmr_c==TRUE) {
+            ratio <- tryCatch(mean(death_num / period_pop$x), warning=function(w) {return(c(mean(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1]),NA))})
+        } else {
+            ratio <- tryCatch(death_num / period_pop$x, warning=function(w) {return(c(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1],NA))})
+        }
+    } else {
+    # individual years+weeks
+        period_pop <- aggregate(period_pop$pop, list(year = period_pop$year, week = period_pop$week), FUN=sum)
+        ratio <- death_num / sum(period_pop$x)
+    }
+    
+    return(ratio)
+} 
+
+# Cumulative mortality rate for a group of years (weekly)
+CMR_C <- function(ccaas, age_groups, sexes, all=FALSE, sel_week=FALSE, yrs=2010:2019) {
+    if (all == TRUE) {
+        all_weeks <- list()
+        for (i in 1:52) {
+            all_weeks[[i]] <- CMR(wk=i, yr=yrs, ccaas=ccaas, age_groups=age_groups, sexes=sexes, cmr_c=TRUE)
+        }
+        return(all_weeks)
+    } else {
+        med_cmr_wk <- mean(sapply(yrs, function(y) CMR(wk=sel_week, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
+        last_cmr_wk <- mean(sapply(yrs, function(y) CMR(wk=52, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
+        return(c(med_cmr_wk, last_cmr_wk))
+    }
+}
+
+# Cumulative relative mortality rate
+CRMR <- function(wk, yr, ccaas, age_groups, sexes, all=FALSE, cmr_c_yrs=2010:2019) {    
+    cmr <- CMR(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    cmr_c <- CMR_C(sel_week=wk, all=FALSE, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    return((cmr - cmr_c[1])/cmr_c[2])
+}
+
+# Improvement factor (cumulative)
+BF <- function(wk, yr, ccaas, age_groups, sexes) {
+    cmr_1 <- CMR(wk=wk, yr=yr-1, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    cmr <- CMR(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    end_cmr <- CMR(wk=52, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    return((cmr_1-cmr)/end_cmr)
+}
+
+# Excess of mortality
+EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
+    # If more than one year is desired to be calculated
+    if (length(yr) > 1) {
+        # Filtering and aggregating the dataframe
+        filtered <- death %>% dplyr::filter(year %in% (min(yr)-5):max(yr) & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+
+        # If a year is incomplete, add a NA, to avoid plotting a straight line
+        if (length(agg[agg$year %in% yr,'x']) < length(yr)) {
+            agg <- rbind(agg, data.frame(year=max(yr), x=NA))
+        }
+
+        # generate moving average with a window of ma to calculate excess mortality
+        # and lag it to fit it to the dataframe (as the current year can't be part of the average)
+        agg$ma <- lag(movavg(agg$x, ma, type='s'))
+        result_df <- agg[agg$year %in% yr,]
+        return(result_df$x - result_df$ma)
+
+    # If only a single value is desired to be calculated
+    } else {
+        # Filtering and aggregating the dataframe
+        filtered <- death %>% dplyr::filter(year %in% (yr-5):yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+
+        # If year is incomplete, return NA
+        if (agg[length(agg$x), 'year'] != yr) {
+            return(NA)
+        } else {
+            actual <- agg[length(agg$x), 'x']
+            expected <- mean(agg[1:(length(agg$x)-1), 'x'])
+            return(actual - expected)
+        }
+    }
+}
+
+# DATAFRAME GENERATING FUNCTIONS
+# historical cmr, crmr and bf
+factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:max(YEAR)-1) {
+    # Initializing vectors for the df
+    wks <- c()
+    yrs <- c()
+    metric <- c()
+
+    # Loop for cumulative relative mortality rate
+    if (type == 'crmr') {
+        cmr_c <- CMR_C(ccaas=ccaas, age_groups=age_groups, sexes=sexes, all=TRUE, sel_week=FALSE, yrs=cmr_c_yrs)
+        for (j in wk) {
+            yrs <- c(yrs, yr)
+            wks <- c(wks, rep(j,length(yr)))
+            metric <- c(metric, (CMR(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)-cmr_c[[j]])/cmr_c[[52]])
+        }
+        result <- data.frame(week=wks, year=yrs, crmr=metric)
+    
+    # Loop for betterness factor
+    } else if (type == 'bf') {
+        for (j in wk) {
+            yrs <- c(yrs, yr)
+            wks <- c(wks, rep(j,length(yr)))
+            metric <- c(metric, BF(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+        }
+        result <- data.frame(week=wks, year=yrs, bf=metric)
+    
+    # Loop for cumulative mortality rate
+    } else if (type == 'cmr') {
+        for (j in wk) {
+            yrs <- c(yrs, yr)
+            wks <- c(wks, rep(j,length(yr)))
+            metric <- c(metric, CMR(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+        }
+        result <- data.frame(week=wks, year=yrs, cmr=metric)
+    
+    # Excess mortality
+    } else if (type == 'em') {
+        # If lower bound is lower than 2015 return an error
+        if (min(yr) < 2015) {
+            result <- c('error', 'The lower bound for year must be greater than or equal to 2015')
+        } else {
+            for (j in wk) {
+                yrs <- c(yrs, yr)
+                wks <- c(wks, rep(j,length(yr)))
+                metric <- c(metric, EM(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+            }
+            result <- data.frame(week=wks, year=yrs, em=metric)
+        }
+    }
+    
+    # returning the dataframe after converting the years to factor (for plots)
+    if (suppressWarnings({result[1] != 'error'})) {
+        result$year <- as.factor(result$year)
+    }
+    return(result)
+}
+
+# PLOTTING FUNCTIONS
+# mortality plots
+plot_mortality <- function(df, week_range, yr_range, type='crmr') {
+    if (suppressWarnings({df[1] == 'error'})) {
+        return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
+    } else {
+        plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+        ggtitle(
+            switch(type,
+                'em'='Excess Mortality',
+                'crmr'='Cumulative Relative Mortality Rate',
+                'cmr'='Cumulative Mortality Rate',
+                'bf'='Cumulative Improvement Factor'
+            ))
+        return(plt)
+    }    
+}
