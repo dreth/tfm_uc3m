@@ -371,15 +371,15 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
 # %% QUERYING ALL DATASETS AND EXPORTING + DIAGNOSTIC MESSAGES
 # logging everything to text file
 print('\nSTEP 1 - Querying Eurostat...\n')
-with open('./logs/update_database_log.txt', 'w+') as f:
-    f.write('\n> DB UPDATE LOG:\n\n> STEP 1 - Querying Eurostat...\n\n')
+with open('./logs/update_database.log', 'w+') as f:
+    f.write('> DB UPDATE LOG:\n\n> STEP 1 - Querying Eurostat...\n\n')
 
 # Create a list of death datasets for each age+sex to append all to one df
 death_datasets = []
 for age in age_groups:
     for sex in sexes:
         print(f'Querying deaths for age group: {age}, sex: {sex}...')
-        with open('./logs/update_database_log.txt', 'r+') as f:
+        with open('./logs/update_database.log', 'r+') as f:
             contents = f.read()
             f.write(f'Querying deaths for age group: {age}, sex: {sex}...\n')
         new_query = {**query, **{'sex':sex, 'age':age}}
@@ -389,7 +389,7 @@ for age in age_groups:
 # concatenating death datasets
 print('\n> STEP 2 - Creating death dataset...\n')
 # logging to text file
-with open('./logs/update_database_log.txt', 'r+') as f:
+with open('./logs/update_database.log', 'r+') as f:
     contents = f.read()
     f.write('\nSTEP 2 - Creating death dataset...\n')
 death = pd.concat(death_datasets)
@@ -399,7 +399,7 @@ death.to_csv('../data/death.csv')
 # obtain pop dataset
 print('> STEP 3 - Creating pop dataset...\n')
 # logging to text file
-with open('./logs/update_database_log.txt', 'r+') as f:
+with open('./logs/update_database.log', 'r+') as f:
     contents = f.read()
     f.write('\nSTEP 3 - Creating pop dataset...\n')
 pop_raw = query_INE_pop()
@@ -409,5 +409,10 @@ pop.to_csv('../data/pop.csv')
 # Finished process
 print('\nDone!\n')
 # logging to text file and cleaning up
-with open('./logs/update_database_log.txt', 'w+') as f:
-    f.write(f'\n\n> Database updated as of: {datetime.datetime.now().isoformat(" ")}\n')
+with open('./logs/update_database.log', 'w+') as f:
+    f.write(f'> Database updated as of: {dt.datetime.now().isoformat(" ")}\n')
+
+# adding update information to the update history log
+with open('./logs/update.history.log', 'w+') as f:
+    contents = f.read()
+    f.write(f'\n> Last database update ran: {dt.datetime.now().isoformat(" ")}\n')

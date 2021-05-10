@@ -43,6 +43,9 @@ names(CCAA_UI_SELECT) <- c('All CCAAs', 'Select CCAAs')
 # AGE GROUP UI SELECTOR
 AGE_GROUPS_UI_SELECT <- c('all', 'select')
 names(AGE_GROUPS_UI_SELECT) <- c('All Age groups', 'Select Age groups')
+# PLOTTING DEVICE TO USE
+PLOT_DEVICE_UI_SELECT <- c('ggplot2','plotly')
+names(PLOT_DEVICE_UI_SELECT) <- c('ggplot2', 'plotly')
 
 # REUSABLE METRICS
 # years in pop dataset

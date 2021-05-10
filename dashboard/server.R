@@ -7,7 +7,7 @@ shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
         # rv_stream <- reactiveValues()
-        updateDBLogs <- reactiveFileReader(intervalMillis=1000, session=session, filePath='./logs/update_database_log.txt', readFunc=paste_readLines)
+        updateDBLogs <- reactiveFileReader(intervalMillis=1000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
 
         # DYNAMIC UI CONTROLS
         # Select total or selectize CCAA - Mortality
@@ -15,7 +15,8 @@ shinyServer(
             if (input$selectCCAAMortalityTotal == 'select') {
                 selectizeInput("selectCCAAMortality",
                   label = h5(strong("Select CCAAs")),
-                  choices = CCAA,
+                  choices = c("",CCAA),
+                  selected = NULL,
                   options = list(maxItems = length(CCAA))
                 )
             }
@@ -26,7 +27,8 @@ shinyServer(
             if (input$selectAgeGroupsMortalityTotal == 'select') {
                 selectizeInput("selectAgeMortality",
                   label = h5(strong("Select Age group(s)")),
-                  choices = AGE_GROUPS,
+                  choices = c("",AGE_GROUPS),
+                  selected = NULL,
                   options = list(maxItems = length(AGE_GROUPS))
                 )
             }
@@ -65,7 +67,6 @@ shinyServer(
         observeEvent(input$updateDatabaseButton, {
             system('bash ./www/update_database_app.sh', wait=FALSE)
             systime <- Sys.time()
-            shinyjs::show('processingUpdateDatabaseTime')
             updateActionButton(session=session, inputId='updateDatabaseButton', label="Update Database (Again)")
         })
 

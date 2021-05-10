@@ -1,0 +1,5 @@
+eurostat query: http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/
+
+glyphicons bootstrap: https://getbootstrap.com/docs/3.4/components/#glyphicons
+
+cat ../api/update_database.sh

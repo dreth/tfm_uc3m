@@ -26,6 +26,11 @@ shinyUI(
                   label = h5(strong("Select content to plot")),
                   choices = MORTALITY_PLOT_TYPE
                 ),
+              radioButtons("usePlotlyOrGgplotMortality",
+                  label = h5(strong("Plotting library")),
+                  choices = PLOT_DEVICE_UI_SELECT,
+                  selected = 'ggplot2'
+              ),
               radioButtons("selectCCAAMortalityTotal",
                   label = h5(strong("Select CCAAs or Total")),
                   choices = CCAA_UI_SELECT,
@@ -74,8 +79,6 @@ shinyUI(
             actionButton("updateDatabaseButton",
                 label = h4(strong("Update Database"))
             ),
-            shinyjs::hidden(h4(strong(id = "processingUpdateDatabaseTime", str_interp("Database update has been ran at ${systime}")))),
-            br(),
             br(),
             htmlOutput(outputId = "consoleLogsUpdateDatabase")
           )
