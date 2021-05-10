@@ -14,7 +14,7 @@ shinyServer(
         plot_mortality <- function(df, week_range, yr_range, type='crmr') {
             if (suppressWarnings({df[1] == 'error'})) {
                 return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
-            } else if (reactive(input$usePlotlyOrGgplotMortality) == 'ggplot2') {
+            } else if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
                 plt <- ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
                 ggtitle(
@@ -25,7 +25,7 @@ shinyServer(
                         'bf'='Cumulative Improvement Factor'
                     ))
                 return(plt)
-            } else if (reactive(input$usePlotlyOrGgplotMortality) == 'plotly') {
+            } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
                 plotTitle <- switch(type,
                                 'em'='Excess Mortality',
                                 'crmr'='Cumulative Relative Mortality Rate',
@@ -74,7 +74,9 @@ shinyServer(
             if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
                 plotOutput(outputId = "mortalityPlot")
             } else {
-                plotly::plotlyOutput(outputId = "mortalityPlot")
+                plotly::plotlyOutput(outputId = "mortalityPlot",
+                                    # match width for a square plot
+                                    height = session$clientData$output_mortalityPlot_width)
             }
         })
 
@@ -99,12 +101,18 @@ shinyServer(
         })
 
         # Mortality ratio plots
-        output$mortalityPlot <- renderPlot({
-            genMortPlot()
-        },
-            # match width for a square plot
-            height = function () {
-                session$clientData$output_mortalityPlot_width
+        observeEvent(input$usePlotlyOrGgplotMortality, {
+            if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
+                output$mortalityPlot <- renderPlot(
+                                            {genMortPlot()},
+                                            # match width for a square plot
+                                            height = function () {session$clientData$output_mortalityPlot_width}
+                                        )
+            } else {
+                output$mortalityPlot <- renderPlotly(
+                                            {genMortPlot()},
+                                        )
+            }
         })
 
         # UPDATE DATABASE BUTTON
