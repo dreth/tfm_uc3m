@@ -14,8 +14,9 @@ shinyServer(
         plot_mortality <- function(df, week_range, yr_range, type='crmr') {
             if (suppressWarnings({df[1] == 'error'})) {
                 return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
-            } if (reactive(input$usePlotlyOrGgplotMortality == 'ggplot2')) {
-                plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+            } else if (reactive(input$usePlotlyOrGgplotMortality) == 'ggplot2') {
+                fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
+                plt <- ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
                 ggtitle(
                     switch(type,
                         'em'='Excess Mortality',
@@ -24,9 +25,20 @@ shinyServer(
                         'bf'='Cumulative Improvement Factor'
                     ))
                 return(plt)
+            } else if (reactive(input$usePlotlyOrGgplotMortality) == 'plotly') {
+                plotTitle <- switch(type,
+                                'em'='Excess Mortality',
+                                'crmr'='Cumulative Relative Mortality Rate',
+                                'cmr'='Cumulative Mortality Rate',
+                                'bf'='Cumulative Improvement Factor'
+                            )
+                fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
+                fig <- plot_ly(df, x = 'week', y = type, color='year', title=plotTitle) 
+                fug <- fig %>% add_lines()
+                return(fig)
             } else {
-
-            }
+                return(text(x=0.5, y=0.5, col="black", cex=2, 'Unknown error'))
+            }   
         }
 
 
@@ -60,7 +72,7 @@ shinyServer(
         # selected plotting library/device
         output$ggplotOrPlotlyMortalityUIOutput <- renderUI({
             if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
-                plotOutput(outputId = "mortalityPlot"))
+                plotOutput(outputId = "mortalityPlot")
             } else {
                 plotly::plotlyOutput(outputId = "mortalityPlot")
             }
