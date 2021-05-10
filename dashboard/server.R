@@ -33,8 +33,8 @@ shinyServer(
                                 'bf'='Cumulative Improvement Factor'
                             )
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
-                fig <- plot_ly(df, x = 'week', y = type, color='year', title=plotTitle) 
-                fug <- fig %>% add_lines()
+                fig <- plot_ly(fig_df, x =~week, y = ~fig_df[[type]], color=~year, group=~year, type = 'scatter', mode='lines')
+                fug <- fig %>% layout(title = plotTitle)
                 return(fig)
             } else {
                 return(text(x=0.5, y=0.5, col="black", cex=2, 'Unknown error'))
@@ -73,7 +73,7 @@ shinyServer(
         output$ggplotOrPlotlyMortalityUIOutput <- renderUI({
             if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
                 plotOutput(outputId = "mortalityPlot")
-            } else {
+            } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
                 plotly::plotlyOutput(outputId = "mortalityPlot",
                                     # match width for a square plot
                                     height = session$clientData$output_mortalityPlot_width)
@@ -108,7 +108,7 @@ shinyServer(
                                             # match width for a square plot
                                             height = function () {session$clientData$output_mortalityPlot_width}
                                         )
-            } else {
+            } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
                 output$mortalityPlot <- renderPlotly(
                                             {genMortPlot()},
                                         )
