@@ -218,23 +218,6 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
     return(result)
 }
 
-# PLOTTING FUNCTIONS
-# mortality plots
-plot_mortality <- function(df, week_range, yr_range, type='crmr') {
-    if (suppressWarnings({df[1] == 'error'})) {
-        return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
-    } else {
-        plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
-        ggtitle(
-            switch(type,
-                'em'='Excess Mortality',
-                'crmr'='Cumulative Relative Mortality Rate',
-                'cmr'='Cumulative Mortality Rate',
-                'bf'='Cumulative Improvement Factor'
-            ))
-        return(plt)
-    }    
-}
 
 # OTHER HELPER FUNCTIONS
 # Function to read lines and return a paste separated by an html line break

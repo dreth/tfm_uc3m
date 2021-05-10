@@ -7,10 +7,32 @@ shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
         # rv_stream <- reactiveValues()
-        updateDBLogs <- reactiveFileReader(intervalMillis=1000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
+        updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
+        
+        # PLOTTING FUNCTIONS
+        # mortality plots
+        plot_mortality <- function(df, week_range, yr_range, type='crmr') {
+            if (suppressWarnings({df[1] == 'error'})) {
+                return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
+            } if (reactive(input$usePlotlyOrGgplotMortality == 'ggplot2')) {
+                plt <- ggplot(data=df %>% dplyr::filter(year %in% yr_range & week %in% week_range), aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+                ggtitle(
+                    switch(type,
+                        'em'='Excess Mortality',
+                        'crmr'='Cumulative Relative Mortality Rate',
+                        'cmr'='Cumulative Mortality Rate',
+                        'bf'='Cumulative Improvement Factor'
+                    ))
+                return(plt)
+            } else {
+
+            }
+        }
+
 
         # DYNAMIC UI CONTROLS
-        # Select total or selectize CCAA - Mortality
+        # MORTALITY TAB
+        # Select total or selectize CCAA
         output$selectCCAAMortalityUIOutput <- renderUI({
             if (input$selectCCAAMortalityTotal == 'select') {
                 selectizeInput("selectCCAAMortality",
@@ -22,7 +44,7 @@ shinyServer(
             }
         })
 
-        # Select total or selectize Age Groups - Mortality
+        # Select total or selectize Age Groups
         output$selectAgeGroupsMortalityUIOutput <- renderUI({
             if (input$selectAgeGroupsMortalityTotal == 'select') {
                 selectizeInput("selectAgeMortality",
@@ -31,6 +53,16 @@ shinyServer(
                   selected = NULL,
                   options = list(maxItems = length(AGE_GROUPS))
                 )
+            }
+        })
+
+        # Output plotly or ggplot2 plotoutput depending on the
+        # selected plotting library/device
+        output$ggplotOrPlotlyMortalityUIOutput <- renderUI({
+            if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
+                plotOutput(outputId = "mortalityPlot"))
+            } else {
+                plotly::plotlyOutput(outputId = "mortalityPlot")
             }
         })
 

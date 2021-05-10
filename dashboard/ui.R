@@ -29,7 +29,7 @@ shinyUI(
               radioButtons("usePlotlyOrGgplotMortality",
                   label = h5(strong("Plotting library")),
                   choices = PLOT_DEVICE_UI_SELECT,
-                  selected = 'ggplot2'
+                  selected = 'plotly'
               ),
               radioButtons("selectCCAAMortalityTotal",
                   label = h5(strong("Select CCAAs or Total")),
@@ -67,7 +67,7 @@ shinyUI(
             ),
 
             mainPanel(
-              plotOutput(outputId = "mortalityPlot")
+              uiOutput('ggplotOrPlotlyMortalityUIOutput')
             )
           )
         ),
