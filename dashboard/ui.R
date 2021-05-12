@@ -67,7 +67,9 @@ shinyUI(
             ),
 
             mainPanel(
-              uiOutput('ggplotOrPlotlyMortalityUIOutput')
+              plotOutput(outputId = "mortalityPlot"),
+              uiOutput('plotlyUIGenMortality')
+
             )
           )
         ),
