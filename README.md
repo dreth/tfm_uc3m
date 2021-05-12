@@ -11,12 +11,15 @@ Repository for my final master project at UC3M titled "Development of an automat
 
 Temporarily, a way you can run this is by running the following lines in your R console:
 
-> library(shiny)
-> 
-> runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard')
+```R
+library(shiny)
+runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard')
+```
 
 Optionally, if R is not in your PATH (R does this automatically during install), you could add the following line to your .bashrc or .bash_profile file:
 
-> export PATH="$PATH:**PATH TO R BINARY**"
+```bash
+export PATH="$PATH:**PATH TO R BINARY**"
+```
 
 In the bold part, just replace with the location of your R binary.
