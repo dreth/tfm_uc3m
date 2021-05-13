@@ -224,9 +224,10 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
 
     # Removing age, as we now have age groups
     df = df.drop('age', axis=1)
+    df = df.rename({'age_group':'age'},axis=1)
 
     # Performing aggregation on corresponding fields to sum values among same age groups
-    df = df.groupby(['ccaa','sex','date','age_group']).sum().reset_index()
+    df = df.groupby(['ccaa','sex','date','age']).sum().reset_index()
 
     # appending year
     df['year'] = df['date'].apply(lambda x: x.year)
@@ -235,7 +236,7 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
     df['week'] = df['date'].apply(lambda x: week_dict[x.month])
 
     # creating marker for unique pop. identifier
-    df['marker'] = df['ccaa'] + df['sex'] + df['age_group']
+    df['marker'] = df['ccaa'] + df['sex'] + df['age']
 
     # obtain unique markers in a variable
     umarkers = df['marker'].unique()
@@ -365,6 +366,9 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
     if date == False:
         df = df.drop('date',axis=1)
 
+    # reorder columns
+    df = df[['year','week','ccaa','sex','age','pop']]
+
     # Returning the resulting dataframe
     return df
 
@@ -413,6 +417,7 @@ with open('./logs/update_database.log', 'w+') as f:
     f.write(f'> Database updated as of: {dt.datetime.now().isoformat(" ")}\n')
 
 # adding update information to the update history log
-with open('./logs/update.history.log', 'w+') as f:
+with open('./logs/update_history.log', 'r+') as f:
     contents = f.read()
-    f.write(f'\n> Last database update ran: {dt.datetime.now().isoformat(" ")}\n')
+    f.seek(0)
+    f.write(f'> Database updated at: {dt.datetime.now().isoformat(" ")}\n')

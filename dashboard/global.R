@@ -46,6 +46,13 @@ names(AGE_GROUPS_UI_SELECT) <- c('All Age groups', 'Select Age groups')
 # PLOTTING DEVICE TO USE
 PLOT_DEVICE_UI_SELECT <- c('ggplot2','plotly')
 names(PLOT_DEVICE_UI_SELECT) <- c('ggplot2', 'plotly')
+# DATABASE TABLES
+DATABASE_TABLES <- c('death','pop')
+names(DATABASE_TABLES) <- c('Deaths table', 'Population table')
+
+# DATABASE VECTOR
+# contains databases indexed by string
+DBs <- list(death=death, pop=pop)
 
 # REUSABLE METRICS
 # years in pop dataset
@@ -75,7 +82,7 @@ CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
     }    
     
     # pop for week wk
-    period_pop <- pop %>% dplyr::filter(year %in% yr & week == wk & sex == sexes & age_group %in% age_groups & ccaa %in% ccaas)
+    period_pop <- pop %>% dplyr::filter(year %in% yr & week == wk & sex == sexes & age %in% age_groups & ccaa %in% ccaas)
 
     # assuming multiple years+weeks
     if (length(wk) > 1 | length(yr) > 1) {
@@ -216,6 +223,12 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
         result$year <- as.factor(result$year)
     }
     return(result)
+}
+
+# Filtering the tables with given params
+filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
+    filtered_df <- db %>% dplyr::filter(year %in% yr & week %in% wk & ccaa %in% ccaas & age %in% age_groups & sex %in% sexes)
+    return(filtered_df)
 }
 
 

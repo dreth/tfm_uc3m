@@ -89,17 +89,30 @@ shinyServer(
             }
         })
 
-        # Output plotly or ggplot2 plotoutput depending on the
-        # selected plotting library/device
-        # output$ggplotOrPlotlyMortalityUIOutput <- renderUI({
-        #     if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
-        #         plotOutput(outputId = "mortalityPlot")
-        #     } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
-        #         plotly::plotlyOutput(outputId = "mortalityPlot",
-        #                             # match width for a square plot
-        #                             height = session$clientData$output_mortalityPlot_width)
-        #     }
-        # })
+        # DB TABLE TAB
+        # Select total or selectize CCAA
+        output$selectCCAADBTableUIOutput <- renderUI({
+            if (input$selectCCAADBTableTotal == 'select') {
+                selectizeInput("selectCCAADBTable",
+                  label = h5(strong("Select CCAAs")),
+                  choices = c("",CCAA),
+                  selected = NULL,
+                  options = list(maxItems = length(CCAA))
+                )
+            }
+        })
+
+        # Select total or selectize Age Groups
+        output$selectAgeGroupsDBTableUIOutput <- renderUI({
+            if (input$selectAgeGroupsDBTableTotal == 'select') {
+                selectizeInput("selectAgeDBTable",
+                  label = h5(strong("Select Age group(s)")),
+                  choices = c("",AGE_GROUPS),
+                  selected = NULL,
+                  options = list(maxItems = length(AGE_GROUPS))
+                )
+            }
+        })
 
         # PLOT OUTPUTS
         # Action button to generate mortality plots
@@ -153,6 +166,18 @@ shinyServer(
         # log output from command in update database
         output$consoleLogsUpdateDatabase <- renderUI({
             HTML(updateDBLogs())
+        })
+
+        # DATABASE TABLE OUTPUTS
+        output$showDBTable <- renderTable({
+            filter_df_table(
+                db=DBs[[input$selectDBTable]],
+                wk=input$weekSliderSelectorDBTable[1]:input$weekSliderSelectorDBTable[2],
+                yr=input$yearSliderSelectorDBTable[1]:input$yearSliderSelectorDBTable[2],
+                ccaas=switch(input$selectCCAADBTableTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
+                age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
+                sexes=input$selectSexesDBTable
+            )
         })
     } 
 )
