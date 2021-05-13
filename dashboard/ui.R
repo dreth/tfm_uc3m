@@ -62,13 +62,14 @@ shinyUI(
               actionButton("plotMortalityButton",
                   label = h5(strong("Generate plot"))
               )
+              br(),
+              h5(strong("Last DB update:")),
+              uiOutput('lastUpdatedLogMortality')
             ),
 
             mainPanel(
               plotOutput(outputId = "mortalityPlot"),
               uiOutput('plotlyUIGenMortality'),
-              br(),
-              uiOutput('lastUpdatedLogMortality')
             )
           )
         ),
