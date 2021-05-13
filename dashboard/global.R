@@ -1,4 +1,7 @@
 # IMPORTING LIBRARIES
+require(shiny)
+require(shinydashboard)
+require(shinyjs)
 require(tidyverse)
 require(shinythemes)
 require(pracma)
@@ -18,8 +21,11 @@ options(shiny.trace=TRUE)
 Sys.setenv(PATH = paste(c("/home/dreth/anaconda3/bin/", Sys.getenv("PATH")), collapse = .Platform$path.sep))
 
 # DATASETS
-pop = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
-death = read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv')
+pop <- read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
+death <- read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv')
+# Removing X-column imported from read.csv
+pop <- pop[,2:length(pop)]
+death <- death[,2:length(death)]
 
 # OPTION LISTS
 # CCAAs
@@ -57,9 +63,6 @@ DBs <- list(death=death, pop=pop)
 # REUSABLE METRICS
 # years in pop dataset
 years_pop <- unique(pop$year)
-
-# CURRENT SYSTEM TIME
-systime <- Sys.time()
 
 # MEASURES AND RATIOS
 # Cumulative mortality rate
@@ -230,7 +233,6 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
     filtered_df <- db %>% dplyr::filter(year %in% yr & week %in% wk & ccaa %in% ccaas & age %in% age_groups & sex %in% sexes)
     return(filtered_df)
 }
-
 
 # OTHER HELPER FUNCTIONS
 # Function to read lines and return a paste separated by an html line break

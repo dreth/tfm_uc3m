@@ -1,8 +1,3 @@
-# IMPORTING LIBRARIES
-require(shiny)
-require(shinydashboard)
-require(shinyjs)
-
 # UI
 shinyUI(
   dashboardPage(
@@ -72,7 +67,6 @@ shinyUI(
             mainPanel(
               plotOutput(outputId = "mortalityPlot"),
               uiOutput('plotlyUIGenMortality')
-
             )
           )
         ),
@@ -92,51 +86,46 @@ shinyUI(
         # Third tab content
         tabItem(tabName = "databaseTable",
           fluidPage(
-            sidebarLayout(
-              sidebarPanel(
-                # Table filters
-                selectInput("selectDBTable",
-                  label = h5(strong("Select database table to show")),
-                  choices = DATABASE_TABLES
-                ),
-                radioButtons("selectCCAADBTableTotal",
-                  label = h5(strong("Select CCAAs or Total")),
-                  choices = CCAA_UI_SELECT,
-                  selected = 'all'
-                ),
-                uiOutput("selectCCAADBTableUIOutput"),
-                radioButtons("selectAgeGroupsDBTableTotal",
-                    label = h5(strong("Select Age group or Total")),
-                    choices = AGE_GROUPS_UI_SELECT,
-                    selected = 'all'
-                ),
-                uiOutput("selectAgeGroupsDBTableUIOutput"),
-                selectInput("selectSexesDBTable",
-                    label = h5(strong("Select Sex/Total")),
-                    choices = SEXES
-                ),
-                sliderInput("weekSliderSelectorDBTable",
-                    label = h5(strong("Select week range to filter")),
-                    min = 1,
-                    max = 52,
-                    value = c(1,52),
-                    step = 1
-                ),
-                sliderInput("yearSliderSelectorDBTable",
-                    label = h5(strong("Select year range to filter")),
-                    min = min(YEAR),
-                    max = max(YEAR),
-                    value = c(2015, max(YEAR)),
-                    step = 1
-                ),
-                downloadButton("downloadDBTable",
-                  label=h5(strong("Download the filtered data"))
-                )
+            wellPanel(
+              # Table filters
+              selectInput("selectDBTable",
+                label = h5(strong("Select database table to generate")),
+                choices = DATABASE_TABLES
               ),
-
-              # Table output
-              mainPanel(
-                tableOutput(outputId = "showDBTable")
+              radioButtons("selectCCAADBTableTotal",
+                label = h5(strong("Select CCAAs or Total")),
+                choices = CCAA_UI_SELECT,
+                selected = 'all'
+              ),
+              uiOutput("selectCCAADBTableUIOutput"),
+              radioButtons("selectAgeGroupsDBTableTotal",
+                  label = h5(strong("Select Age group or Total")),
+                  choices = AGE_GROUPS_UI_SELECT,
+                  selected = 'all'
+              ),
+              uiOutput("selectAgeGroupsDBTableUIOutput"),
+              selectInput("selectSexesDBTable",
+                  label = h5(strong("Select Sex/Total")),
+                  choices = SEXES,
+                  selected = 'T'
+              ),
+              sliderInput("weekSliderSelectorDBTable",
+                  label = h5(strong("Select week range to filter")),
+                  min = 1,
+                  max = 52,
+                  value = c(1,52),
+                  step = 1
+              ),
+              sliderInput("yearSliderSelectorDBTable",
+                  label = h5(strong("Select year range to filter")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = c(min(YEAR), max(YEAR)),
+                  step = 1
+              ),
+              br(),
+              downloadButton("downloadDBTable",
+                label=h4(strong("Download the filtered data"))
               )
             )
           )

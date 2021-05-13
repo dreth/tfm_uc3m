@@ -1,7 +1,3 @@
-# IMPORTING LIBRARIES
-require(shiny)
-require(shinydashboard)
-
 # SERVER
 shinyServer(
     function(input, output, session) {
@@ -89,6 +85,14 @@ shinyServer(
             }
         })
 
+        # plotly output
+        # rendering the plotly UI to pass on the height from the session object
+        output$plotlyUIGenMortality <- renderUI ({
+            plotly::plotlyOutput(outputId = "mortalityPlotly",
+                            # match width for a square plot
+                            height = session$clientData$output_mortalityPlotly_width)
+        })
+
         # DB TABLE TAB
         # Select total or selectize CCAA
         output$selectCCAADBTableUIOutput <- renderUI({
@@ -142,12 +146,6 @@ shinyServer(
                                             height = function () {session$clientData$output_mortalityPlot_width}
                                         )
             } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
-                # rendering the plotly UI to pass on the height from the session object
-                output$plotlyUIGenMortality <- renderUI ({
-                    plotly::plotlyOutput(outputId = "mortalityPlotly",
-                                    # match width for a square plot
-                                    height = session$clientData$output_mortalityPlotly_width)
-                })
                 shinyjs::show('mortalityPlotly')
                 shinyjs::hide('mortalityPlot')
                 output$mortalityPlotly <- renderPlotly(
@@ -168,17 +166,23 @@ shinyServer(
             HTML(updateDBLogs())
         })
 
-        # DATABASE TABLE OUTPUTS
-        output$showDBTable <- renderTable({
-            filter_df_table(
-                db=DBs[[input$selectDBTable]],
-                wk=input$weekSliderSelectorDBTable[1]:input$weekSliderSelectorDBTable[2],
-                yr=input$yearSliderSelectorDBTable[1]:input$yearSliderSelectorDBTable[2],
-                ccaas=switch(input$selectCCAADBTableTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
-                age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
-                sexes=input$selectSexesDBTable
-            )
-        })
+        # DATABASE TABLE DOWNLOADER
+        filtered_download_df <- reactive({filter_df_table(
+                                            db=DBs[[input$selectDBTable]],
+                                            wk=input$weekSliderSelectorDBTable[1]:input$weekSliderSelectorDBTable[2],
+                                            yr=input$yearSliderSelectorDBTable[1]:input$yearSliderSelectorDBTable[2],
+                                            ccaas=switch(input$selectCCAADBTableTotal, 'all'=CCAA, 'select'=input$selectCCAADBTable),
+                                            age_groups=switch(input$selectAgeGroupsDBTableTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeDBTable),
+                                            sexes=input$selectSexesDBTable
+                                        )})
+        output$downloadDBTable <- downloadHandler(
+            filename = function() {
+                str_interp('Filtered_data-${Sys.Date()}.csv')
+            },
+            content = function(file){
+                write.csv(filtered_download_df(),file)
+            }
+        )
     } 
 )
 
