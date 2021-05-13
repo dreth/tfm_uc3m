@@ -1,7 +1,7 @@
 # UI
 shinyUI(
   dashboardPage(
-    dashboardHeader(title = "Demographic dashboard"),
+    dashboardHeader(title = "Dashboard"),
     dashboardSidebar(
       sidebarMenu(
         # First tab content
@@ -66,7 +66,9 @@ shinyUI(
 
             mainPanel(
               plotOutput(outputId = "mortalityPlot"),
-              uiOutput('plotlyUIGenMortality')
+              uiOutput('plotlyUIGenMortality'),
+              br(),
+              uiOutput('lastUpdatedLogMortality')
             )
           )
         ),

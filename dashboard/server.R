@@ -2,8 +2,9 @@
 shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
-        # rv_stream <- reactiveValues()
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
+        updateDBLogsLast <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
+
         
         # PLOTTING FUNCTIONS
         # mortality plots
@@ -83,6 +84,12 @@ shinyServer(
                   options = list(maxItems = length(AGE_GROUPS))
                 )
             }
+        })
+
+        # UI output for 
+        # log output from command in update database
+        output$lastUpdatedLogMortality <- renderUI({
+            HTML(updateDBLogsLast())
         })
 
         # plotly output
