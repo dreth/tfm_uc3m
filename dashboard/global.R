@@ -8,11 +8,13 @@ require(pracma)
 require(dplyr)
 require(ggplot2)
 require(stringr)
-require(PerformanceAnalytics)
-require(foreach)
 require(MASS)
-require(gridExtra)
 require(plotly)
+
+# SELECTED PORT AND HOST
+local({
+    options(shiny.port = 3838, shiny.host = "0.0.0.0")
+})
 
 # TRACE 
 options(shiny.trace=TRUE)
