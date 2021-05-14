@@ -3,7 +3,7 @@ shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
-        # updateDBLogsLast <- reactiveFileReader(intervalMillis=Inf, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
+        updateDBLogsLast <- reactiveFileReader(intervalMillis=Inf, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
 
         # PLOTTING FUNCTIONS
         # mortality plots
