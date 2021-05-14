@@ -188,7 +188,7 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
         }
         result <- data.frame(week=wks, year=yrs, crmr=metric)
     
-    # Loop for betterness factor
+    # Loop for improvement factor
     } else if (type == 'bf') {
         for (j in wk) {
             yrs <- c(yrs, yr)
