@@ -35,13 +35,13 @@ shinyUI(
               radioButtons("selectCCAAMortalityTotal",
                   label = h5(strong("Select CCAAs or Total")),
                   choices = CCAA_UI_SELECT,
-                  selected = 'select'
+                  selected = 'all'
               ),
               uiOutput("selectCCAAMortalityUIOutput"),
               radioButtons("selectAgeGroupsMortalityTotal",
                   label = h5(strong("Select Age group or Total")),
                   choices = AGE_GROUPS_UI_SELECT,
-                  selected = 'select'
+                  selected = 'all'
               ),
               uiOutput("selectAgeGroupsMortalityUIOutput"),
               selectInput("selectSexesMortality",
