@@ -11,11 +11,6 @@ require(stringr)
 require(MASS)
 require(plotly)
 
-# SELECTED PORT AND HOST
-local({
-    options(shiny.port = 3838, shiny.host = "0.0.0.0")
-})
-
 # TRACE 
 options(shiny.trace=TRUE)
 
