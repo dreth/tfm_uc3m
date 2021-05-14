@@ -18,11 +18,11 @@ require(plotly)
 options(shiny.trace=TRUE)
 
 # SET PYTHON ENVIRONMENT VARIABLE FOR DATABASE UPDATE
-Sys.setenv(PATH = paste(c("/home/dreth/anaconda3/bin/", Sys.getenv("PATH")), collapse = .Platform$path.sep))
+# Sys.setenv(PATH = paste(c("/home/dreth/anaconda3/bin/", Sys.getenv("PATH")), collapse = .Platform$path.sep))
 
 # DATASETS
-pop <- read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/pop.csv')
-death <- read.csv('https://raw.githubusercontent.com/dreth/tfm_uc3m/main/data/death.csv')
+pop <- read.csv('../data/pop.csv')
+death <- read.csv('../data/death.csv')
 # Removing X-column imported from read.csv
 pop <- pop[,2:length(pop)]
 death <- death[,2:length(death)]
