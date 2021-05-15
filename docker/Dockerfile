@@ -41,7 +41,4 @@ RUN R -e "install.packages('plotly', repos='http://cran.rstudio.com/')"
 EXPOSE 3838
 
 # running app from repo
-# RUN cd /home
-# RUN git clone 'https://github.com/dreth/tfm_uc3m.git'
-# RUN R -e "setwd('./tfm_uc3m/dashboard'); shiny::runApp(host = '0.0.0.0', port = 3838, launch.browser=FALSE)"
 CMD ["R", "-e", "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard', host = '0.0.0.0', port = 3838, launch.browser=FALSE)"]
