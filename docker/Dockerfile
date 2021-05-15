@@ -1,5 +1,4 @@
 FROM rocker/shiny:latest
-ENV DEBIAN_FRONTEND=noninteractive
 
 # Get required packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,7 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssh2-1-dev \
     unixodbc-dev \
     libcurl4-openssl-dev \
-    libssl-dev
+    libssl-dev \
+    git
 
 # installing python libraries
 RUN pip3 install pandas
@@ -26,7 +26,6 @@ RUN pip3 install datetime
 RUN pip3 install requests
 
 # installing r libraries
-RUN R -e "install.packages('shiny', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('shinydashboard', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('shinyjs', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('tidyverse', repos='http://cran.rstudio.com/')"
@@ -42,4 +41,7 @@ RUN R -e "install.packages('plotly', repos='http://cran.rstudio.com/')"
 EXPOSE 3838
 
 # running app from repo
-RUN R -e "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard', host = '0.0.0.0', port = 3838, launch.browser=FALSE)"
+# RUN cd /home
+# RUN git clone 'https://github.com/dreth/tfm_uc3m.git'
+# RUN R -e "setwd('./tfm_uc3m/dashboard'); shiny::runApp(host = '0.0.0.0', port = 3838, launch.browser=FALSE)"
+CMD ["R", "-e", "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard', host = '0.0.0.0', port = 3838, launch.browser=FALSE)"]
