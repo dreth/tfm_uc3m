@@ -13,13 +13,19 @@ Repository for my final master project at UC3M titled "Development of an automat
 
 I have created a docker container for the application, this way we avoid any requirements needing to be installed in your OS. This is the recommended approach to run it, as the application has important requirements to run.
 
+You can download docker [here](https://www.docker.com/products/docker-desktop) if you don't have it installed yet, it is the only requirement to run the application.
+
 #### Docker hub
 
-The container will be uploaded to Docker hub soon, alternatively, you can build the container, as explained in the next section.
+Given docker is installed, the app can be launched by running the following lines of code. This will pull the contents from Docker hub and run the application:
+
+```bash
+docker run -p 3838:3838/tcp dreth/tfm_uc3m:latest
+```
 
 #### Building
 
-The repository contains a Dockerfile which can be built and run as follows given [docker](https://www.docker.com/products/docker-desktop) is installed:
+In case you prefer to build the container yourself, the repository contains a Dockerfile from which it can be built and run as follows:
 
 ```bash
 docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t tfm_app
@@ -53,6 +59,8 @@ require(stringr)
 require(MASS)
 require(plotly)
 ```
+
+
 
 #### Python requirements
 

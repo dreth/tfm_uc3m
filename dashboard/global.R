@@ -167,6 +167,10 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
     }
 }
 
+#tests
+EM(5, 2015:2021, CCAA, AGE_GROUPS, 'T')
+CRMR(10,2021,CCAA,AGE_GROUPS,'T')
+
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
 factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:max(YEAR)-1) {
