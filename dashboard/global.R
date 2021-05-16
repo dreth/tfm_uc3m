@@ -14,9 +14,6 @@ require(plotly)
 # TRACE 
 options(shiny.trace=TRUE)
 
-# SET PYTHON ENVIRONMENT VARIABLE FOR DATABASE UPDATE
-# Sys.setenv(PATH = paste(c("/home/dreth/anaconda3/bin/", Sys.getenv("PATH")), collapse = .Platform$path.sep))
-
 # DATASETS
 pop <- read.csv('../data/pop.csv')
 death <- read.csv('../data/death.csv')
@@ -147,6 +144,8 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
         # generate moving average with a window of ma to calculate excess mortality
         # and lag it to fit it to the dataframe (as the current year can't be part of the average)
         agg$ma <- lag(movavg(agg$x, ma, type='s'))
+        # isolating 2021, as it is still within the COVID-19 pandemic period
+        agg[agg$year == 2021,'ma'] <-  agg[agg$year == 2020,'ma']
         result_df <- agg[agg$year %in% yr,]
         return(result_df$x - result_df$ma)
 
@@ -166,10 +165,6 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
         }
     }
 }
-
-#tests
-EM(5, 2015:2021, CCAA, AGE_GROUPS, 'T')
-CRMR(10,2021,CCAA,AGE_GROUPS,'T')
 
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
