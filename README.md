@@ -46,7 +46,7 @@ You might require administrative privileges to build docker containers. If on sh
 
 ### Running directly on R
 
-It is recommended to use the docker approach described above, however, if you want to do so otherwise, it is possible to run the full-featured application as follows:
+It is recommended to use the docker approach described above, nevertheless, if you want to do so otherwise, it is possible to run the full-featured application as follows:
 
 #### R requirements
 
