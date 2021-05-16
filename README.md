@@ -9,7 +9,19 @@ Repository for my final master project at UC3M titled "Development of an automat
 
 ## How to run:
 
-Given your system meets the requirements
+### Docker image
+
+The repository contains a Dockerfile which can be built and run as follows given [docker](https://www.docker.com/products/docker-desktop) is installed:
+
+```bash
+sudo docker build https://github.com/dreth/tfm_uc3m.git#main:docker
+```
+
+After building, copy the name of the docker container just built ()
+
+Given your system meets the following requirements:
+
+
 
 ```R
 library(shiny)
