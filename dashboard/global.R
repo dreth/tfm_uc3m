@@ -124,7 +124,7 @@ CRMR <- function(wk, yr, ccaas, age_groups, sexes, all=FALSE, cmr_c_yrs=2010:201
 BF <- function(wk, yr, ccaas, age_groups, sexes) {
     cmr_1 <- CMR(wk=wk, yr=yr-1, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
     cmr <- CMR(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
-    end_cmr <- CMR(wk=52, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    end_cmr <- CMR(wk=52, yr=yr-1, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
     return((cmr_1-cmr)/end_cmr)
 }
 
