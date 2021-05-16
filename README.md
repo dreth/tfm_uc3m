@@ -36,7 +36,9 @@ docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t tfm_app
 docker run -p 3838:3838/tcp tfm_app
 ```
 
-This approach is OS-agnostic and allows you to run the application without installing any requirements other than *docker* itself.
+This approach will always guarantee you're pulling the latest version of the container, as I might take slightly longer to push changes to the container to docker hub unless they're significant, however, since the container always pulls the latest version of the app from github, any version of it will work fine for running the latest version of the app after installed.
+
+That said, changes to the container won't happen very often.
 
 You might require administrative privileges to build docker containers. If on sh/zsh/bash, you can use ```sudo```.
 
