@@ -7,9 +7,11 @@ Repository for my final master project at UC3M titled "Development of an automat
 - [María Luz Durbán Reguera](https://researchportal.uc3m.es/display/inv18373)
 - [Bernardo D'Auria](https://portal.uc3m.es/portal/page/portal/dpto_estadistica/home/members/bernardo_d_auria)
 
-## How to run
+## Running the application
 
 ### Docker
+
+I have created a docker container for the application, this way we avoid any requirements needing to be installed in your OS. This is the recommended approach to run it, as the application has important requirements to run.
 
 #### Docker hub
 
@@ -28,7 +30,9 @@ This approach is OS-agnostic and allows you to run the application without insta
 
 You might require administrative privileges to build docker containers. If on sh/zsh/bash, you can use ```sudo```.
 
-### R
+---
+
+### Running directly on R
 
 It is recommended to use the docker approach described above, however, if you want to do so otherwise, it is possible to run the full-featured application as follows:
 
