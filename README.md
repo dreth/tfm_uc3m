@@ -9,7 +9,7 @@ Repository for my final master project at UC3M titled "Development of an automat
 
 ## How to run:
 
-Temporarily, a way you can run this is by running the following lines in your R console:
+Given your system meets the requirements
 
 ```R
 library(shiny)
