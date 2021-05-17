@@ -12,13 +12,13 @@ The repository name comes from the commonly used acronym "tfm" meaning "Trabajo 
 
 ### Docker
 
-I have created a docker container for the application, this way we avoid any requirements needing to be installed in your OS. This is the recommended approach to run it, as the application has important requirements to run.
+I have created a docker container for the application, this way we avoid any requirements needing to be installed in your OS. This is the recommended approach to run it.
 
 You can download docker [here](https://www.docker.com/products/docker-desktop) if you don't have it installed yet, it is the only requirement to run the application.
 
 #### Docker hub
 
-Given docker is installed, the app can be launched by running the following lines of code. This will pull the contents from Docker hub and run the application:
+Given docker is installed, the app can be launched by running the following lines of code. This will pull the container from Docker hub and run the application:
 
 ```bash
 docker run -p 3838:3838/tcp dreth/tfm_uc3m:latest
