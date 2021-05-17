@@ -51,20 +51,10 @@ It is recommended to use the docker approach described above, nevertheless, if y
 
 #### R requirements
 
-To be able to use every feature in the app, a series of requirements must be met, all the R libraries used can be found in the first few lines of the *global.R* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/global.R). And are the following:
+To be able to use every feature in the app, a series of requirements must be met, all the R libraries used can be found in the first few lines of the *global.R* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/global.R). Which can be installed as follows:
 
 ```R
-require(shiny)
-require(shinydashboard)
-require(shinyjs)
-require(tidyverse)
-require(shinythemes)
-require(pracma)
-require(dplyr)
-require(ggplot2)
-require(stringr)
-require(MASS)
-require(plotly)
+install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes','pracma','dplyr','ggplot2','stringr','MASS','plotly'))
 ```
 
 
@@ -74,12 +64,12 @@ require(plotly)
 Also, in order to be able to update the database, Python 3.8 must be installed along with the following libraries:
 
 ```Python
-import requests
-import json
-import pandas
-import datetime
-import numpy
-import copy
+pip3 install requests
+pip3 install json
+pip3 install pandas
+pip3 install datetime
+pip3 install numpy
+pip3 install copy
 ```
 
 As shown in the *query.py* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py).
