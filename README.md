@@ -57,8 +57,6 @@ To be able to use every feature in the app, a series of requirements must be met
 install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes','pracma','dplyr','ggplot2','stringr','MASS','plotly'))
 ```
 
-
-
 #### Python requirements
 
 Also, in order to be able to update the database, Python 3.8 must be installed along with the following libraries:
