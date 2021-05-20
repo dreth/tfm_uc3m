@@ -14,6 +14,9 @@ require(plotly)
 # TRACE 
 options(shiny.trace=TRUE)
 
+# adm
+ADM <- 'false'
+
 # DATASETS
 pop <- read.csv('../data/pop.csv')
 death <- read.csv('../data/death.csv')
@@ -25,15 +28,17 @@ death <- death[,2:length(death)]
 # CCAAs
 CCAA <- unique(pop$ccaa)
 names(CCAA) <- c("Galicia","Principado de Asturias","Cantabria","País Vasco","Comunidad Floral de Navarra","La Rioja","Aragón","Comunidad de Madrid","Castilla y León","Castilla-la Mancha","Extremadura","Cataluña","Comunitat Valenciana","Illes Balears","Andalucía","Región de Murcia","Ciudad de Ceuta","Ciudad de Melilla","Canarias")
+CCAA_SHORT <- c("Galicia", "Asturias", "Cantabria", "Euskadi", "Navarra", "La Rioja", "Aragón", "Madrid", "Castilla y León", "Castilla-la Mancha", "Extremadura", "Cataluña", "Valencia", "Baleares", "Andalucía", "Murcia", "Ceuta", "Melilla", "Canarias")
 # AGE GROUPS
 AGE_GROUPS <- c("Y_LT5","Y10-14","Y15-19","Y20-24","Y25-29","Y30-34","Y35-39","Y40-44","Y45-49","Y5-9","Y50-54","Y55-59","Y60-64","Y65-69","Y70-74","Y75-79","Y80-84","Y85-89","Y_GE90")
 names(AGE_GROUPS) <- c('Less than 5 years old', 'From 10 to 14 years old', 'From 15 to 19 years old', 'From 20 to 24 years old', 'From 25 to 29 years old', 'From 30 to 34 years old', 'From 35 to 39 years old', 'From 40 to 44 years old', 'From 45 to 49 years old', 'From 5 to 9 years old', 'From 50 to 54 years old', 'From 55 to 59 years old', 'From 60 to 64 years old', 'From 65 to 69 years old', 'From 70 to 74 years old', 'From 75 to 79 years old', 'From 80 to 84 years old', 'From 85 to 89 years old', '90+ years old')
+AGE_GROUP_RANGES <- c(" Less than 5 ",c(10,14),c(15,19),c(20,24),c(25,29),c(30,34),c(35,39),c(40,44),c(45,49),c(5,9),c(50,54),c(55,59),c(60,64),c(65,69),c(70,74),c(75,79),c(80,84),c(85,89),c(90," More than 90 "))
 # SEXES
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
 # OPTIONS TO PLOT
-MORTALITY_PLOT_TYPE <- c("em", "cmr", "crmr", "bf")
-names(MORTALITY_PLOT_TYPE) <- c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor')
+MORTALITY_PLOT_TYPE <- switch(ADM, true=c("em", "cmr", "crmr", "bf", "dc"), false=c("em", "cmr", "crmr", "bf"))
+names(MORTALITY_PLOT_TYPE) <- switch(ADM, true=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), false=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
 # DATE
 YEAR <- unique(pop$year)
 WEEK <- unique(death$week)
@@ -135,6 +140,7 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
         # Filtering and aggregating the dataframe
         filtered <- death %>% dplyr::filter(year %in% (min(yr)-5):max(yr) & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
         agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+        print(agg)
 
         # If a year is incomplete, add a NA, to avoid plotting a straight line
         if (length(agg[agg$year %in% yr,'x']) < length(yr)) {
@@ -148,6 +154,7 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
         agg[agg$year == 2021,'ma'] <-  agg[agg$year == 2020,'ma']
         # appending results to df
         result_df <- agg[agg$year %in% yr,]
+        print(result_df)
         return(result_df$x - result_df$ma)
 
     # If only a single value is desired to be calculated
@@ -167,6 +174,39 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
     }
 }
 
+# Death count
+DC <- function(wk, yr, ccaas, age_groups, sexes) {
+    # If more than one year is desired to be calculated
+    if (length(yr) > 1) {
+        # Filtering and aggregating the dataframe
+        filtered <- death %>% dplyr::filter(year %in% yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+
+        # If a year is incomplete, add a NA, to avoid plotting a straight line
+        if (length(agg[agg$year %in% yr,'x']) < length(yr)) {
+            agg <- rbind(agg, data.frame(year=max(yr), x=NA))
+        }
+
+        # appending results to df
+        return(agg$x)
+
+    # If only a single value is desired to be calculated
+    } else {
+        # Filtering and aggregating the dataframe
+        filtered <- death %>% dplyr::filter(year %in% yr & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+        agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
+
+        # If year is incomplete, return NA
+        if (agg[length(agg$x), 'year'] != yr) {
+            return(NA)
+        } else {
+            return(agg$x)
+        }
+    }
+}
+
+# EM(1, 2017:2019, CCAA, AGE_GROUPS, 'T')
+
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
 factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:max(YEAR)-1) {
@@ -175,7 +215,7 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
     yrs <- c()
     metric <- c()
 
-    # Loop for cumulative relative mortality rate
+    # Cumulative relative mortality rate
     if (type == 'crmr') {
         cmr_c <- CMR_C(ccaas=ccaas, age_groups=age_groups, sexes=sexes, all=TRUE, sel_week=FALSE, yrs=cmr_c_yrs)
         for (j in wk) {
@@ -185,7 +225,7 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
         }
         result <- data.frame(week=wks, year=yrs, crmr=metric)
     
-    # Loop for improvement factor
+    # Improvement factor
     } else if (type == 'bf') {
         for (j in wk) {
             yrs <- c(yrs, yr)
@@ -194,7 +234,7 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
         }
         result <- data.frame(week=wks, year=yrs, bf=metric)
     
-    # Loop for cumulative mortality rate
+    # Cumulative mortality rate
     } else if (type == 'cmr') {
         for (j in wk) {
             yrs <- c(yrs, yr)
@@ -216,6 +256,15 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
             }
             result <- data.frame(week=wks, year=yrs, em=metric)
         }
+
+    # Death count
+    } else if (type == 'dc') {
+        for (j in wk) {
+            yrs <- c(yrs, yr)
+            wks <- c(wks, rep(j,length(yr)))
+            metric <- c(metric, DC(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+        }
+        result <- data.frame(week=wks, year=yrs, dc=metric)
     }
     
     # returning the dataframe after converting the years to factor (for plots)

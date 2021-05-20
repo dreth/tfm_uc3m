@@ -51,7 +51,7 @@ def query_eurostat(**kwargs):
     return json.loads(requests.get(url).text)
 
 # %% GENERATE DEATH DF
-def generate_death_df(raw_data, date=False):
+def generate_death_df(raw_data, date=False, convert_53=0):
     """
     """
     # column fields
@@ -94,13 +94,19 @@ def generate_death_df(raw_data, date=False):
     else:
         grouping = ['year_week','year','week','ccaa','sex','age']
 
-    # summing marking 53rd weeks to remove
-    for idx,w in zip(df.index,df['week']):
+    # summing 53rd week with 1st week of following year
+    for idx,y,w in zip(df.index,df['year'], df['week']):
         if w == 53:
-            df.iloc[idx,5] = 0
-    
-    # removing 53rd week
-    df = df[df['year'] != 0]
+            if convert_53 == 52:
+                df.iloc[idx,0] = f'{y+1}W52'
+                df.iloc[idx,5] = y
+                df.iloc[idx,6] = 52
+            elif convert_53 == 1:
+                df.iloc[idx,0] = f'{y+1}W01'
+                df.iloc[idx,5] = y+1
+                df.iloc[idx,6] = 1
+            else:
+                break
 
     # grouping in order to aggregate W53 with corresponding W01
     df = df.groupby(grouping).sum().reset_index()
@@ -120,7 +126,7 @@ def query_INE_pop(df_id='9681', start='20100101', end=''):
 
 
 # %% GENERATE POPULATION DF
-def generate_pop_df(raw_data, most_recent_week, date=False):
+def generate_pop_df(raw_data, most_recent_week, fifty_three_week_years, date=False):
     """
     """
     # column fields
@@ -259,7 +265,7 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
     # weekly population prediction
     # Size of the new df will be 52 (weeks in a year) times amount of ccaa+sex+age group times amount of
     # unique years
-    df_array = np.zeros((52*len(umarkers)*uyears,8), dtype=object)
+    df_array = np.zeros((54*len(umarkers)*uyears,8), dtype=object)
 
     # main loop
     for m in range(len(umarkers)):
@@ -291,6 +297,9 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
         # reducing entries by one to simplify the code
         entries = len(dat)-1
 
+        # offset index
+        offset = 0
+
         # looping through the matched values for marker m
         for i in range(entries):
             # obtaining the prediction range (rolling window of 2)
@@ -298,30 +307,43 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
 
             # obtaining starting week (either 1 or 26)
             week_start = dat[i,idx['week']]
-            
-            # creating a new array for the current marker selection
-            new_p = np.repeat(pred_range[0,:][np.newaxis,:], 26, 0)
 
             # if week starts at one we assign week numbers from 1-26, else 27-52
             if week_start == 1:
+                # creating a new array for the current marker selection
+                new_p = np.repeat(pred_range[0,:][np.newaxis,:], 27, 0)
+
                 # assigning week number
-                new_p[:,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
+                new_p[:-1,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
 
                 # estimating the population
                 pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 26, dtype=np.int64)
+
+                # replace column of new_p with the estimated population
+                new_p[:-1,idx['pop']] = pop_est
+                
+                # replace last row with zeros
+                new_p[-1,:] = np.zeros(8, dtype=np.int64)
             else:
+                # creating a new array for the current marker selection
+                new_p = np.repeat(pred_range[0,:][np.newaxis,:], 27, 0)
+
                 # assigning week number
-                new_p[:,idx['week']] = np.linspace(27,52,26, dtype=np.int64)
+                new_p[:,idx['week']] = np.linspace(27,53,27, dtype=np.int64)
 
                 # estimating the population, we do not intend to repeat 26th week's value, so we select from index
                 # 1 and onwards
-                pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 28, dtype=np.int64)[1:27]
+                pop_est = np.linspace(pred_range[0,idx['pop']], pred_range[1,idx['pop']], 28, dtype=np.int64)[1:28]
 
-            # replace column of new_p with the estimated population
-            new_p[:,idx['pop']] = pop_est
+                # replace column of new_p with the estimated population
+                new_p[:,idx['pop']] = pop_est
+
+            # increase offset index
+            offset += 1
 
             # We index the element of the array corresponding to the marker in question 
-            df_array[52*uyears*m+26*i:52*uyears*m+26*(i+1),:] = new_p
+            df_array[53*uyears*m+27*i+offset:53*uyears*m+27*(i+1)+offset,:] = new_p
+                
 
         # we obtain the last entry (as there will always be at least one period to predict on)
         last_val = dat[entries]
@@ -333,20 +355,21 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
         ratios_forward = pop_est/pop_est[0]
 
         # obtain the ratios forward and obtain the mean for the last one (as to avoid repetition of the previous value)
-        new_p = np.repeat(last_val[np.newaxis,:], 26, 0)
+        new_p = np.repeat(last_val[np.newaxis,:], 27, 0)
         ratios_forward[0:len(ratios_forward)-2] = ratios_forward[1:len(ratios_forward)-1]
         ratios_forward[len(ratios_forward)-1] = np.mean(ratios_forward[0:len(ratios_forward)-2])
 
-        # if week ends at one we assign week numbers from 1-26, else 27-52
+        # if week ends at one we assign week numbers from 1-26, else 27-53
         if week_end == 1:   
-            new_p[:,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
+            new_p[:-1,idx['week']] = np.linspace(1,26,26, dtype=np.int64)
+            new_p[-1,idx['week']] = 0
         else:
-            new_p[:,idx['week']] = np.linspace(27,52,26, dtype=np.int64)
+            new_p[:,idx['week']] = np.linspace(27,53,27, dtype=np.int64)
 
         # add the population estimation to the last section of each marker (as it is a forecast)
         pop_est = (ratios_forward*last_val[idx['pop']]).astype('int64')
         new_p[:,idx['pop']] = pop_est
-        df_array[52*uyears*m+26*entries:52*uyears*m+26*(entries+1),:] = new_p
+        df_array[53*uyears*m+27*entries+offset:53*uyears*m+27*(entries+1)+offset,:] = new_p
     
     # making df_array a dataframe
     df_array = pd.DataFrame(df_array)
@@ -355,7 +378,7 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
     df = df.drop('marker',axis=1)
 
     # removing empty spots
-    df = df[df['ccaa'] != 0]
+    df = df[(df['ccaa'] != 0) & (df['week'] != 0)]
 
     # only keeping most recentl week
     df.loc[df['year'] == 2021] = df.loc[df['week'] <= most_recent_week]
@@ -399,6 +422,7 @@ with open('./logs/update_database.log', 'r+') as f:
     f.write('\nSTEP 2 - Creating death dataset...\n')
 death = pd.concat(death_datasets)
 most_recent_week = max(death.loc[death['year'] == max(death['year']), 'week'])
+fifty_three_week_years = death.loc[death['week'] == 53, 'year'].unique()
 death.to_csv('../data/death.csv')
 
 # obtain pop dataset
@@ -408,7 +432,7 @@ with open('./logs/update_database.log', 'r+') as f:
     contents = f.read()
     f.write('\nSTEP 3 - Creating pop dataset...\n')
 pop_raw = query_INE_pop()
-pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week)
+pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week, fifty_three_week_years=fifty_three_week_years)
 pop.to_csv('../data/pop.csv')
 
 # Finished process

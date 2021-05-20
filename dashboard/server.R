@@ -8,6 +8,7 @@ shinyServer(
         # PLOTTING FUNCTIONS
         # mortality plots
         plot_mortality <- function(df, week_range, yr_range, type='crmr', device='ggplot2') {
+            print(df)
             if (suppressWarnings({df[1] == 'error'})) {
                 return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
             # Condition for when user uses ggplot as plot device
@@ -19,7 +20,8 @@ shinyServer(
                         'em'='Excess Mortality',
                         'crmr'='Cumulative Relative Mortality Rate',
                         'cmr'='Cumulative Mortality Rate',
-                        'bf'='Cumulative Improvement Factor'
+                        'bf'='Cumulative Improvement Factor',
+                        'dc'='Death count'
                     ))
                 return(plt)
             # Condition for when the user uses plotly as plot device
@@ -28,7 +30,8 @@ shinyServer(
                                 'em'='Excess Mortality',
                                 'crmr'='Cumulative Relative Mortality Rate',
                                 'cmr'='Cumulative Mortality Rate',
-                                'bf'='Cumulative Improvement Factor'
+                                'bf'='Cumulative Improvement Factor',
+                                'dc'='Death count'
                             )
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
                 fig <- plot_ly(fig_df, x =~week, y = ~fig_df[[type]], color=~year, group=~year, type = 'scatter', mode='lines')
