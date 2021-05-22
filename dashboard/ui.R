@@ -68,7 +68,9 @@ shinyUI(
               ),
               br(),
               h5(strong("Last DB update:")),
-              uiOutput('lastUpdatedLogMortality')
+              uiOutput('lastUpdatedLogMortality'),
+              h5(strong("Data is provisional since:")),
+              verbatimTextOutput('provisionalDataIndicatorMortality')
             ),
 
             mainPanel(
@@ -131,9 +133,12 @@ shinyUI(
                   step = 1
               ),
               br(),
+              h5(strong("Data is provisional since:")),
+              verbatimTextOutput('provisionalDataIndicatorDBTables'),
+              br(),
               downloadButton("downloadDBTable",
                 label=h4(strong("Download the filtered data"))
-              )
+              )              
             )
           )
         )

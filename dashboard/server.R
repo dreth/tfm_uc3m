@@ -99,6 +99,19 @@ shinyServer(
             HTML(updateDBLogsLast())
         })
 
+        # UI output for
+        # Indicator of provisional data
+        # Mortality tab
+        output$provisionalDataIndicatorMortality <- renderText({
+            year <- as.numeric(format(Sys.time(),'%Y')) - 1
+            str_interp("${year}-01-01")
+        })
+        # DB Tables tab
+        output$provisionalDataIndicatorDBTables <- renderText({
+            year <- as.numeric(format(Sys.time(),'%Y')) - 1
+            str_interp("${year}-01-01")
+        })
+
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
         output$plotlyUIGenMortality <- renderUI ({

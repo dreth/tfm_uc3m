@@ -14,8 +14,8 @@ require(plotly)
 # TRACE 
 options(shiny.trace=TRUE)
 
-# adm
-ADM <- 'false'
+# DIAGNOSTIC FEATURES ENABLE/DISABLE
+death_count <- FALSE
 
 # DATASETS
 pop <- read.csv('../data/pop.csv')
@@ -39,8 +39,8 @@ names(AGE_GROUP_RANGES) <- AGE_GROUPS
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
 # OPTIONS TO PLOT
-MORTALITY_PLOT_TYPE <- switch(ADM, true=c("em", "cmr", "crmr", "bf", "dc"), false=c("em", "cmr", "crmr", "bf"))
-names(MORTALITY_PLOT_TYPE) <- switch(ADM, true=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), false=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
+MORTALITY_PLOT_TYPE <-ifelse(death_count, c("em", "cmr", "crmr", "bf", "dc"), c("em", "cmr", "crmr", "bf"))
+names(MORTALITY_PLOT_TYPE) <-ifelse(death_count, c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
 # DATE
 YEAR <- unique(pop$year)
 WEEK <- unique(death$week)
