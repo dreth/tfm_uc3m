@@ -3,40 +3,45 @@ shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
-        updateDBLogsLast <- reactiveFileReader(intervalMillis=Inf, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
+        updateDBLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
 
         # PLOTTING FUNCTIONS
         # mortality plots
         plot_mortality <- function(df, week_range, yr_range, type='crmr', device='ggplot2') {
-            print(df)
-            if (suppressWarnings({df[1] == 'error'})) {
-                return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
-            # Condition for when user uses ggplot as plot device
-            } else if (device == 'ggplot2') {
-                fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
-                plt <- ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
-                ggtitle(
-                    switch(type,
-                        'em'='Excess Mortality',
-                        'crmr'='Cumulative Relative Mortality Rate',
-                        'cmr'='Cumulative Mortality Rate',
-                        'bf'='Cumulative Improvement Factor',
-                        'dc'='Death count'
-                    ))
-                return(plt)
-            # Condition for when the user uses plotly as plot device
-            } else if (device == 'plotly') {
-                plotTitle <- switch(type,
+            # plot title construction
+            selectedCCAAs <- switch(input$selectCCAAMortalityTotal, all='All', select=CCAA_SHORT[input$selectCCAAMortality])
+            selectedAgeGroups <- switch(input$selectAgeGroupsMortalityTotal, all='All', select=AGE_GROUP_RANGES[input$selectAgeMortality])
+            print(selectedCCAAs)
+            plotTitle <- switch(type,
                                 'em'='Excess Mortality',
                                 'crmr'='Cumulative Relative Mortality Rate',
                                 'cmr'='Cumulative Mortality Rate',
                                 'bf'='Cumulative Improvement Factor',
                                 'dc'='Death count'
-                            )
+                                )
+            plotTitle <- str_interp('${plotTitle} for CCAA(s): ${paste(selectedCCAAs,collapse=", ")}, and Age Groups: ${paste(selectedAgeGroups,collapse=", ")}')
+
+            # Condition in case of error
+            if (suppressWarnings({df[1] == 'error'})) {
+                return(text(x=0.5, y=0.5, col="black", cex=2, df[2]))
+
+            # Condition for when user uses ggplot as plot device
+            } else if (device == 'ggplot2') {
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
-                fig <- plot_ly(fig_df, x =~week, y = ~fig_df[[type]], color=~year, group=~year, type = 'scatter', mode='lines')
-                fug <- fig %>% layout(title = plotTitle)
-                return(fig)
+                plt <- ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+                ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15))
+                return(plt)
+
+            # Condition for when the user uses plotly as plot device
+            } else if (device == 'plotly') {
+                fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
+                plt <- ggplotly(
+                    ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
+                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10))
+                )
+                return(plt)
+            
+            # Condition in case of an unexpected error
             } else {
                 return(text(x=0.5, y=0.5, col="black", cex=2, 'Unknown error'))
             }   

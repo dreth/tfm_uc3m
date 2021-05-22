@@ -23,6 +23,7 @@ shinyUI(
         tabItem(tabName = "mortality",
           sidebarLayout(
             sidebarPanel(
+              tags$head(tags$script(src = "dimension.js")),
               selectInput("plotTypeMortality",
                   label = h5(strong("Select content to plot")),
                   choices = MORTALITY_PLOT_TYPE
