@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     python3-setuptools \
     python3-dev \
-    libssl-dev
+    libudunits2-dev \
+    libgdal-dev
 
 # installing python libraries
 RUN pip3 install pandas
@@ -25,6 +26,7 @@ RUN R -e "install.packages('ggplot2')"
 RUN R -e "install.packages('stringr')"
 RUN R -e "install.packages('MASS')"
 RUN R -e "install.packages('plotly')"
+RUN R -e "install.packages('sf')"
 
 # select port
 EXPOSE 3838/tcp

@@ -10,6 +10,7 @@ require(ggplot2)
 require(stringr)
 require(MASS)
 require(plotly)
+require(sf)
 
 # TRACE 
 options(shiny.trace=TRUE)
