@@ -47,7 +47,8 @@ shinyUI(
               uiOutput("selectAgeGroupsMortalityUIOutput"),
               selectInput("selectSexesMortality",
                   label = h5(strong("Select Sex/Total")),
-                  choices = SEXES
+                  choices = SEXES,
+                  selected = 'T'
               ),
               sliderInput("weekSliderSelectorMortality",
                   label = h5(strong("Select week range to plot")),
@@ -139,6 +140,51 @@ shinyUI(
               downloadButton("downloadDBTable",
                 label=h4(strong("Download the filtered data"))
               )              
+            )
+          )
+        ),
+
+        # Fourth tab content
+        tabItem(tabName = "maps",
+          sidebarLayout(
+            sidebarPanel(
+              radioButtons("selectAgeGroupsMapsTotal",
+                  label = h5(strong("Select Age group or Total")),
+                  choices = AGE_GROUPS_UI_SELECT,
+                  selected = 'all'
+              ),
+              uiOutput("selectAgeGroupsMapsUIOutput"),
+              selectInput("selectSexesMaps",
+                  label = h5(strong("Select Sex/Total")),
+                  choices = SEXES,
+                  selected = 'T'
+              ),
+              sliderInput("weekSliderSelectorMaps",
+                  label = h5(strong("Select week range to plot")),
+                  min = 1,
+                  max = 52,
+                  value = 1,
+                  step = 1
+              ),
+              sliderInput("yearSliderSelectorMaps",
+                  label = h5(strong("Select year to plot")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = max(YEAR),
+                  step = 1
+              ),
+              actionButton("plotMapsButton",
+                  label = h5(strong("Generate map"))
+              ),
+              br(),
+              h5(strong("Last DB update:")),
+              uiOutput('lastUpdatedLogMaps'),
+              h5(strong("Data is provisional since:")),
+              verbatimTextOutput('provisionalDataIndicatorMaps')
+            ),
+
+            mainPanel(
+              leafletOutput("mapsPlot")
             )
           )
         )

@@ -93,11 +93,25 @@ shinyServer(
             }
         })
 
+        # plotly output
+        # rendering the plotly UI to pass on the height from the session object
+        output$plotlyUIGenMortality <- renderUI ({
+            plotly::plotlyOutput(outputId = "mortalityPlotly",
+                            # match width for a square plot
+                            height = session$clientData$output_mortalityPlotly_width)
+        })
+
         # UI output for 
         # log output from command in update database
+        # Mortality tab
         output$lastUpdatedLogMortality <- renderUI({
             HTML(updateDBLogsLast())
         })
+        # Maps tab
+        output$lastUpdatedLogMaps <- renderUI({
+            HTML(updateDBLogsLast())
+        })
+
 
         # UI output for
         # Indicator of provisional data
@@ -111,13 +125,22 @@ shinyServer(
             year <- as.numeric(format(Sys.time(),'%Y')) - 1
             str_interp("${year}-01-01")
         })
+        # Maps tab
+        output$provisionalDataIndicatorMaps <- renderText({
+            year <- as.numeric(format(Sys.time(),'%Y')) - 1
+            str_interp("${year}-01-01")
+        })
 
-        # plotly output
-        # rendering the plotly UI to pass on the height from the session object
-        output$plotlyUIGenMortality <- renderUI ({
-            plotly::plotlyOutput(outputId = "mortalityPlotly",
-                            # match width for a square plot
-                            height = session$clientData$output_mortalityPlotly_width)
+        # Select total or selectize Age Groups
+        output$selectAgeGroupsMortalityUIOutput <- renderUI({
+            if (input$selectAgeGroupsMortalityTotal == 'select') {
+                selectizeInput("selectAgeMortality",
+                  label = h5(strong("Select Age group(s)")),
+                  choices = c("",AGE_GROUPS),
+                  selected = NULL,
+                  options = list(maxItems = length(AGE_GROUPS))
+                )
+            }
         })
 
         # DB TABLE TAB
@@ -137,6 +160,19 @@ shinyServer(
         output$selectAgeGroupsDBTableUIOutput <- renderUI({
             if (input$selectAgeGroupsDBTableTotal == 'select') {
                 selectizeInput("selectAgeDBTable",
+                  label = h5(strong("Select Age group(s)")),
+                  choices = c("",AGE_GROUPS),
+                  selected = NULL,
+                  options = list(maxItems = length(AGE_GROUPS))
+                )
+            }
+        })
+
+        # MAPS TAB
+        # Dynamic age group control, for all age groups, or selected
+        output$selectAgeGroupsMapsUIOutput <- renderUI({
+            if (input$selectAgeGroupsMapsTotal == 'select') {
+                selectizeInput("selectAgeMaps",
                   label = h5(strong("Select Age group(s)")),
                   choices = c("",AGE_GROUPS),
                   selected = NULL,
@@ -181,6 +217,8 @@ shinyServer(
             }
         })
 
+        # Action button to generate map
+       
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
             system('bash ./www/update_database_app.sh', wait=FALSE)

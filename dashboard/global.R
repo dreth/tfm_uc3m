@@ -282,6 +282,10 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
     return(filtered_df)
 }
 
+# GENERATE MAP
+
+
+
 # OTHER HELPER FUNCTIONS
 # Function to read lines and return a paste separated by an html line break
 paste_readLines <- function(text) {
@@ -289,12 +293,12 @@ paste_readLines <- function(text) {
 }
 
 
-esp <- readOGR(dsn = './www/map_shapefiles', encoding='UTF-8')
-esp@data$rand = runif(19,0,1)
-pal <- colorQuantile("YlGn", NULL, n = 5)
-leaflet(data = esp) %>%
-  addProviderTiles("CartoDB.Positron") %>%
-  addPolygons(fillColor = ~pal(rand), 
-              fillOpacity = 0.8, 
-              color = "#BDBDC3", 
-              weight = 1)
+# esp <- readOGR(dsn = './www/map_shapefiles', encoding='UTF-8')
+# esp@data$rand = runif(19,0,1)
+# pal <- colorQuantile("YlGn", NULL, n = 5)
+# leaflet(data = esp) %>%
+#   addProviderTiles("CartoDB.Positron") %>%
+#   addPolygons(fillColor = ~pal(rand), 
+#               fillOpacity = 0.8, 
+#               color = "#BDBDC3", 
+#               weight = 1)
