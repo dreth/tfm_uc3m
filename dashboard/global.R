@@ -10,7 +10,8 @@ require(ggplot2)
 require(stringr)
 require(MASS)
 require(plotly)
-require(sf)
+require(leaflet)
+require(rgdal)
 
 # TRACE 
 options(shiny.trace=TRUE)
@@ -286,3 +287,14 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
 paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
+
+
+esp <- readOGR(dsn = './www/map_shapefiles', encoding='UTF-8')
+esp@data$rand = runif(19,0,1)
+pal <- colorQuantile("YlGn", NULL, n = 5)
+leaflet(data = esp) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = ~pal(rand), 
+              fillOpacity = 0.8, 
+              color = "#BDBDC3", 
+              weight = 1)

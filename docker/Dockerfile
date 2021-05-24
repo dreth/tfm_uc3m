@@ -26,7 +26,9 @@ RUN R -e "install.packages('ggplot2')"
 RUN R -e "install.packages('stringr')"
 RUN R -e "install.packages('MASS')"
 RUN R -e "install.packages('plotly')"
-RUN R -e "install.packages('sf')"
+RUN R -e "install.packages('leaflet')"
+RUN R -e "install.packages('rgdal')"
+
 
 # select port
 EXPOSE 3838/tcp
