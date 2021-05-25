@@ -188,7 +188,7 @@ shinyUI(
             ),
 
             mainPanel(
-              leafletOutput("mapsPlot")
+              uiOutput('mapsPlotUIOutput')
             )
           )
         )
