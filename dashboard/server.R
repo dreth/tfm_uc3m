@@ -102,27 +102,23 @@ shinyServer(
                             height = session$clientData$output_mortalityPlotly_width)
         })
 
+        # UPDATE DATABASE TAB
         # UI output for 
         # log output from command in update database
         output$lastUpdatedLog <- renderText({
             updateDBLogsLast()
         })
-
-
         # UI output for
         # Indicator of provisional data
-        # Update database tab
         output$provisionalDataIndicator <- renderText({
             year <- as.numeric(format(Sys.time(),'%Y')) - 1
             str_interp("${year}-01-01")
         })
-
         # UI output for
         # log output from last eurostat update script
         output$lastEurostatWeek <- renderText({
             updateEurostatLogsLast()
         })
-
          # UI output for
         # last repo week available, eurostat data (deaths)
         output$lastEurostatWeekRepo <- renderText({
@@ -130,19 +126,6 @@ shinyServer(
             last_avail_year <- max(death$year)
             last_avail_week <- max(death %>% dplyr::filter(year == curr_year) %>% dplyr::select(week))
             str_interp('Last date available from the repository: ${last_avail_year}, week: ${last_avail_week}')
-        })
-        
-
-        # Select total or selectize Age Groups
-        output$selectAgeGroupsMortalityUIOutput <- renderUI({
-            if (input$selectAgeGroupsMortalityTotal == 'select') {
-                selectizeInput("selectAgeMortality",
-                  label = h5(strong("Select Age group(s)")),
-                  choices = c("",AGE_GROUPS),
-                  selected = NULL,
-                  options = list(maxItems = length(AGE_GROUPS))
-                )
-            }
         })
 
         # DB TABLE TAB
@@ -157,7 +140,6 @@ shinyServer(
                 )
             }
         })
-
         # Select total or selectize Age Groups
         output$selectAgeGroupsDBTableUIOutput <- renderUI({
             if (input$selectAgeGroupsDBTableTotal == 'select') {
@@ -181,6 +163,13 @@ shinyServer(
                   options = list(maxItems = length(AGE_GROUPS))
                 )
             }
+        })
+        # leaflet output
+        # rendering the plotly UI to pass on the height from the session object
+        output$plotlyUIGenMortality <- renderUI ({
+            leafletOutput(outputId = "mapsPlot",
+                            # match width for a square plot
+                            height = session$clientData$output_mapsPlot_width)
         })
 
         # PLOT OUTPUTS
