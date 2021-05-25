@@ -217,7 +217,19 @@ shinyServer(
             }
         })
 
-        # Action button to generate map
+        # Generate chloropleth map event
+        genChloropleth <- eventReactive(input$plotMapsButton, {
+            gen_chloropleth(
+                wk=input$weekSliderSelectorMaps, 
+                yr=input$yearSliderSelectorMaps, 
+                age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
+                sexes=input$selectSexesMaps,
+                metric=input$plotMetricMaps
+            )
+        })
+
+        # output for map
+        output$mapsPlot <- renderLeaflet({genChloropleth()})
        
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {

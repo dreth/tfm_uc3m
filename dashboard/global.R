@@ -289,21 +289,26 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
 }
 
 # GENERATE MAP
-
+gen_chloropleth <- function(wk, yr, age_groups, sexes, metric) {
+    esp@data$metric <- switch(metric, 
+    'crmr'=sapply(esp@data$ccaa, function(ccaa) {CRMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'cmr'=sapply(esp@data$ccaa, function(ccaa) {CMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'bf'=sapply(esp@data$ccaa, function(ccaa) {BF(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'em'=sapply(esp@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'dc'=sapply(esp@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
+    print(esp@data)
+    pal <- colorNumeric("Blues", domain = esp@data$metric)
+    map <- leaflet(data = esp) %>%
+        addProviderTiles("CartoDB.Positron") %>%
+        addPolygons(fillColor = ~pal(metric), 
+                    fillOpacity = 0.8, 
+                    color = "#BDBDC3", 
+                    weight = 1)
+    map
+}
 
 # OTHER HELPER FUNCTIONS
 # Function to read lines and return a paste separated by an html line break
 paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
-
-
-
-esp@data$rand = runif(19,0,1)
-pal <- colorQuantile("YlGn", NULL, n = 5)
-leaflet(data = esp) %>%
-  addProviderTiles("CartoDB.Positron") %>%
-  addPolygons(fillColor = ~pal(rand), 
-              fillOpacity = 0.8, 
-              color = "#BDBDC3", 
-              weight = 1)

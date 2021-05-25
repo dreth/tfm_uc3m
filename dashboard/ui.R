@@ -148,6 +148,10 @@ shinyUI(
         tabItem(tabName = "maps",
           sidebarLayout(
             sidebarPanel(
+              selectInput("plotMetricMaps",
+                  label = h5(strong("Select metric to plot")),
+                  choices = MORTALITY_PLOT_TYPE
+              ),
               radioButtons("selectAgeGroupsMapsTotal",
                   label = h5(strong("Select Age group or Total")),
                   choices = AGE_GROUPS_UI_SELECT,
