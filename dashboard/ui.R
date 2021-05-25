@@ -160,7 +160,7 @@ shinyUI(
                   selected = 'T'
               ),
               sliderInput("weekSliderSelectorMaps",
-                  label = h5(strong("Select week range to plot")),
+                  label = h5(strong("Select week to plot")),
                   min = 1,
                   max = 52,
                   value = 1,
