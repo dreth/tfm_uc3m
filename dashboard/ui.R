@@ -66,12 +66,7 @@ shinyUI(
               ),
               actionButton("plotMortalityButton",
                   label = h5(strong("Generate plot"))
-              ),
-              br(),
-              h5(strong("Last DB update:")),
-              uiOutput('lastUpdatedLogMortality'),
-              h5(strong("Data is provisional since:")),
-              verbatimTextOutput('provisionalDataIndicatorMortality')
+              )
             ),
 
             mainPanel(
@@ -85,11 +80,24 @@ shinyUI(
         tabItem(tabName = "updateDatabase",
           fluidPage(
             useShinyjs(),
-            actionButton("updateDatabaseButton",
-                label = h4(strong("Update Database"))
+            wellPanel(
+              h5(strong("Last DB update:")),
+              verbatimTextOutput('lastUpdatedLog'),
+              h5(strong("Latest Eurostat date available (deaths):")),
+              verbatimTextOutput('lastEurostatWeek'),
+              h5(strong("Latest date available in the repository (deaths):")),
+              verbatimTextOutput('lastEurostatWeekRepo'),
+              h5(strong("Data is provisional since:")),
+              verbatimTextOutput('provisionalDataIndicator'),
+              actionButton("updateDatabaseButton",
+                  label = h4(strong("Update Database"))
+              ),
             ),
-            br(),
-            htmlOutput("consoleLogsUpdateDatabase")
+            wellPanel(
+              h4(strong("Logs:")),
+              br(),
+              htmlOutput("consoleLogsUpdateDatabase")
+            )
           )
         ),
 
@@ -134,9 +142,6 @@ shinyUI(
                   step = 1
               ),
               br(),
-              h5(strong("Data is provisional since:")),
-              verbatimTextOutput('provisionalDataIndicatorDBTables'),
-              br(),
               downloadButton("downloadDBTable",
                 label=h4(strong("Download the filtered data"))
               )              
@@ -179,12 +184,7 @@ shinyUI(
               ),
               actionButton("plotMapsButton",
                   label = h5(strong("Generate map"))
-              ),
-              br(),
-              h5(strong("Last DB update:")),
-              uiOutput('lastUpdatedLogMaps'),
-              h5(strong("Data is provisional since:")),
-              verbatimTextOutput('provisionalDataIndicatorMaps')
+              )
             ),
 
             mainPanel(

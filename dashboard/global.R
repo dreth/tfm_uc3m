@@ -12,6 +12,7 @@ require(MASS)
 require(plotly)
 require(leaflet)
 require(rgdal)
+require(RColorBrewer)
 
 # TRACE 
 options(shiny.trace=TRUE)
@@ -289,7 +290,7 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
 }
 
 # GENERATE MAP
-gen_chloropleth <- function(wk, yr, age_groups, sexes, metric) {
+gen_chloropleth <- function(wk, yr, age_groups, sexes, metric, provider="CartoDB.DarkMatterNoLabels") {
     esp@data$metric <- switch(metric, 
     'crmr'=sapply(esp@data$ccaa, function(ccaa) {CRMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'cmr'=sapply(esp@data$ccaa, function(ccaa) {CMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
@@ -297,14 +298,13 @@ gen_chloropleth <- function(wk, yr, age_groups, sexes, metric) {
     'em'=sapply(esp@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'dc'=sapply(esp@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
     print(esp@data)
-    pal <- colorNumeric("Blues", domain = esp@data$metric)
-    map <- leaflet(data = esp) %>%
-        addProviderTiles("CartoDB.Positron") %>%
+    pal <- colorNumeric("RdBu", domain = esp@data$metric)
+    leaflet(data = esp) %>%
+        addProviderTiles(provider) %>%
         addPolygons(fillColor = ~pal(metric), 
-                    fillOpacity = 0.8, 
-                    color = "#BDBDC3", 
+                    fillOpacity = 1, 
+                    color = "#FFFFFF", 
                     weight = 1)
-    map
 }
 
 # OTHER HELPER FUNCTIONS
@@ -312,3 +312,6 @@ gen_chloropleth <- function(wk, yr, age_groups, sexes, metric) {
 paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
+
+# Running last eurostat update check
+system('bash ./www/scripts/check_eurostat.sh', wait=FALSE)

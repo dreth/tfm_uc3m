@@ -4,6 +4,7 @@ shinyServer(
         # REACTIVE VALUES
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
         updateDBLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
+        updateEurostatLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
 
         # PLOTTING FUNCTIONS
         # mortality plots
@@ -103,33 +104,34 @@ shinyServer(
 
         # UI output for 
         # log output from command in update database
-        # Mortality tab
-        output$lastUpdatedLogMortality <- renderUI({
-            HTML(updateDBLogsLast())
-        })
-        # Maps tab
-        output$lastUpdatedLogMaps <- renderUI({
-            HTML(updateDBLogsLast())
+        output$lastUpdatedLog <- renderText({
+            updateDBLogsLast()
         })
 
 
         # UI output for
         # Indicator of provisional data
-        # Mortality tab
-        output$provisionalDataIndicatorMortality <- renderText({
+        # Update database tab
+        output$provisionalDataIndicator <- renderText({
             year <- as.numeric(format(Sys.time(),'%Y')) - 1
             str_interp("${year}-01-01")
         })
-        # DB Tables tab
-        output$provisionalDataIndicatorDBTables <- renderText({
-            year <- as.numeric(format(Sys.time(),'%Y')) - 1
-            str_interp("${year}-01-01")
+
+        # UI output for
+        # log output from last eurostat update script
+        output$lastEurostatWeek <- renderText({
+            updateEurostatLogsLast()
         })
-        # Maps tab
-        output$provisionalDataIndicatorMaps <- renderText({
-            year <- as.numeric(format(Sys.time(),'%Y')) - 1
-            str_interp("${year}-01-01")
+
+         # UI output for
+        # last repo week available, eurostat data (deaths)
+        output$lastEurostatWeekRepo <- renderText({
+            curr_year <- as.numeric(format(Sys.time(),'%Y'))
+            last_avail_year <- max(death$year)
+            last_avail_week <- max(death %>% dplyr::filter(year == curr_year) %>% dplyr::select(week))
+            str_interp('Last date available from the repository: ${last_avail_year}, week: ${last_avail_week}')
         })
+        
 
         # Select total or selectize Age Groups
         output$selectAgeGroupsMortalityUIOutput <- renderUI({
@@ -233,7 +235,7 @@ shinyServer(
        
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
-            system('bash ./www/update_database_app.sh', wait=FALSE)
+            system('bash ./www/scripts/update_database_app.sh', wait=FALSE)
             systime <- Sys.time()
             updateActionButton(session=session, inputId='updateDatabaseButton', label="Update Database (Again)")
         })
