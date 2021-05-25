@@ -4,6 +4,7 @@ shinyServer(
         # REACTIVE VALUES
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
         updateDBLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
+        updateEurostatLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
 
         # PLOTTING FUNCTIONS
         # mortality plots
@@ -93,31 +94,55 @@ shinyServer(
             }
         })
 
-        # UI output for 
-        # log output from command in update database
-        output$lastUpdatedLogMortality <- renderUI({
-            HTML(updateDBLogsLast())
-        })
-
-        # UI output for
-        # Indicator of provisional data
-        # Mortality tab
-        output$provisionalDataIndicatorMortality <- renderText({
-            year <- as.numeric(format(Sys.time(),'%Y')) - 1
-            str_interp("${year}-01-01")
-        })
-        # DB Tables tab
-        output$provisionalDataIndicatorDBTables <- renderText({
-            year <- as.numeric(format(Sys.time(),'%Y')) - 1
-            str_interp("${year}-01-01")
-        })
-
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
         output$plotlyUIGenMortality <- renderUI ({
             plotly::plotlyOutput(outputId = "mortalityPlotly",
                             # match width for a square plot
                             height = session$clientData$output_mortalityPlotly_width)
+        })
+
+        # UI output for 
+        # log output from command in update database
+        output$lastUpdatedLog <- renderText({
+            updateDBLogsLast()
+        })
+
+
+        # UI output for
+        # Indicator of provisional data
+        # Update database tab
+        output$provisionalDataIndicator <- renderText({
+            year <- as.numeric(format(Sys.time(),'%Y')) - 1
+            str_interp("${year}-01-01")
+        })
+
+        # UI output for
+        # log output from last eurostat update script
+        output$lastEurostatWeek <- renderText({
+            updateEurostatLogsLast()
+        })
+
+         # UI output for
+        # last repo week available, eurostat data (deaths)
+        output$lastEurostatWeekRepo <- renderText({
+            curr_year <- as.numeric(format(Sys.time(),'%Y'))
+            last_avail_year <- max(death$year)
+            last_avail_week <- max(death %>% dplyr::filter(year == curr_year) %>% dplyr::select(week))
+            str_interp('Last date available from the repository: ${last_avail_year}, week: ${last_avail_week}')
+        })
+        
+
+        # Select total or selectize Age Groups
+        output$selectAgeGroupsMortalityUIOutput <- renderUI({
+            if (input$selectAgeGroupsMortalityTotal == 'select') {
+                selectizeInput("selectAgeMortality",
+                  label = h5(strong("Select Age group(s)")),
+                  choices = c("",AGE_GROUPS),
+                  selected = NULL,
+                  options = list(maxItems = length(AGE_GROUPS))
+                )
+            }
         })
 
         # DB TABLE TAB
@@ -137,6 +162,19 @@ shinyServer(
         output$selectAgeGroupsDBTableUIOutput <- renderUI({
             if (input$selectAgeGroupsDBTableTotal == 'select') {
                 selectizeInput("selectAgeDBTable",
+                  label = h5(strong("Select Age group(s)")),
+                  choices = c("",AGE_GROUPS),
+                  selected = NULL,
+                  options = list(maxItems = length(AGE_GROUPS))
+                )
+            }
+        })
+
+        # MAPS TAB
+        # Dynamic age group control, for all age groups, or selected
+        output$selectAgeGroupsMapsUIOutput <- renderUI({
+            if (input$selectAgeGroupsMapsTotal == 'select') {
+                selectizeInput("selectAgeMaps",
                   label = h5(strong("Select Age group(s)")),
                   choices = c("",AGE_GROUPS),
                   selected = NULL,
@@ -181,9 +219,23 @@ shinyServer(
             }
         })
 
+        # Generate chloropleth map event
+        genChloropleth <- eventReactive(input$plotMapsButton, {
+            gen_chloropleth(
+                wk=input$weekSliderSelectorMaps, 
+                yr=input$yearSliderSelectorMaps, 
+                age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
+                sexes=input$selectSexesMaps,
+                metric=input$plotMetricMaps
+            )
+        })
+
+        # output for map
+        output$mapsPlot <- renderLeaflet({genChloropleth()})
+       
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
-            system('bash ./www/update_database_app.sh', wait=FALSE)
+            system('bash ./www/scripts/update_database_app.sh', wait=FALSE)
             systime <- Sys.time()
             updateActionButton(session=session, inputId='updateDatabaseButton', label="Update Database (Again)")
         })

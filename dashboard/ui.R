@@ -47,7 +47,8 @@ shinyUI(
               uiOutput("selectAgeGroupsMortalityUIOutput"),
               selectInput("selectSexesMortality",
                   label = h5(strong("Select Sex/Total")),
-                  choices = SEXES
+                  choices = SEXES,
+                  selected = 'T'
               ),
               sliderInput("weekSliderSelectorMortality",
                   label = h5(strong("Select week range to plot")),
@@ -65,12 +66,7 @@ shinyUI(
               ),
               actionButton("plotMortalityButton",
                   label = h5(strong("Generate plot"))
-              ),
-              br(),
-              h5(strong("Last DB update:")),
-              uiOutput('lastUpdatedLogMortality'),
-              h5(strong("Data is provisional since:")),
-              verbatimTextOutput('provisionalDataIndicatorMortality')
+              )
             ),
 
             mainPanel(
@@ -84,11 +80,24 @@ shinyUI(
         tabItem(tabName = "updateDatabase",
           fluidPage(
             useShinyjs(),
-            actionButton("updateDatabaseButton",
-                label = h4(strong("Update Database"))
+            wellPanel(
+              h5(strong("Last DB update:")),
+              verbatimTextOutput('lastUpdatedLog'),
+              h5(strong("Latest Eurostat date available (deaths):")),
+              verbatimTextOutput('lastEurostatWeek'),
+              h5(strong("Latest date available in the repository (deaths):")),
+              verbatimTextOutput('lastEurostatWeekRepo'),
+              h5(strong("Data is provisional since:")),
+              verbatimTextOutput('provisionalDataIndicator'),
+              actionButton("updateDatabaseButton",
+                  label = h4(strong("Update Database"))
+              ),
             ),
-            br(),
-            htmlOutput("consoleLogsUpdateDatabase")
+            wellPanel(
+              h4(strong("Logs:")),
+              br(),
+              htmlOutput("consoleLogsUpdateDatabase")
+            )
           )
         ),
 
@@ -133,12 +142,53 @@ shinyUI(
                   step = 1
               ),
               br(),
-              h5(strong("Data is provisional since:")),
-              verbatimTextOutput('provisionalDataIndicatorDBTables'),
-              br(),
               downloadButton("downloadDBTable",
                 label=h4(strong("Download the filtered data"))
               )              
+            )
+          )
+        ),
+
+        # Fourth tab content
+        tabItem(tabName = "maps",
+          sidebarLayout(
+            sidebarPanel(
+              selectInput("plotMetricMaps",
+                  label = h5(strong("Select metric to plot")),
+                  choices = MORTALITY_PLOT_TYPE
+              ),
+              radioButtons("selectAgeGroupsMapsTotal",
+                  label = h5(strong("Select Age group or Total")),
+                  choices = AGE_GROUPS_UI_SELECT,
+                  selected = 'all'
+              ),
+              uiOutput("selectAgeGroupsMapsUIOutput"),
+              selectInput("selectSexesMaps",
+                  label = h5(strong("Select Sex/Total")),
+                  choices = SEXES,
+                  selected = 'T'
+              ),
+              sliderInput("weekSliderSelectorMaps",
+                  label = h5(strong("Select week to plot")),
+                  min = 1,
+                  max = 52,
+                  value = 1,
+                  step = 1
+              ),
+              sliderInput("yearSliderSelectorMaps",
+                  label = h5(strong("Select year to plot")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = max(YEAR),
+                  step = 1
+              ),
+              actionButton("plotMapsButton",
+                  label = h5(strong("Generate map"))
+              )
+            ),
+
+            mainPanel(
+              leafletOutput("mapsPlot")
             )
           )
         )

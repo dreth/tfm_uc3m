@@ -10,12 +10,15 @@ require(ggplot2)
 require(stringr)
 require(MASS)
 require(plotly)
+require(leaflet)
+require(rgdal)
+require(RColorBrewer)
 
 # TRACE 
 options(shiny.trace=TRUE)
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
-death_count <- FALSE
+death_count <- 'FALSE'
 
 # DATASETS
 pop <- read.csv('../data/pop.csv')
@@ -39,8 +42,8 @@ names(AGE_GROUP_RANGES) <- AGE_GROUPS
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
 # OPTIONS TO PLOT
-MORTALITY_PLOT_TYPE <-ifelse(death_count, c("em", "cmr", "crmr", "bf", "dc"), c("em", "cmr", "crmr", "bf"))
-names(MORTALITY_PLOT_TYPE) <-ifelse(death_count, c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
+MORTALITY_PLOT_TYPE <-switch(death_count, 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
+names(MORTALITY_PLOT_TYPE) <-switch(death_count, 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
 # DATE
 YEAR <- unique(pop$year)
 WEEK <- unique(death$week)
@@ -64,6 +67,12 @@ DBs <- list(death=death, pop=pop)
 # REUSABLE METRICS
 # years in pop dataset
 years_pop <- unique(pop$year)
+
+# MAPS CCAA INDEX
+# reading map shapefile
+esp <- readOGR(dsn = './www/maps/map_shapefiles', encoding='UTF-8')
+# creating index for CCAAs
+esp@data$ccaa <- c("ES7","ES61","ES24","ES12","ES53","ES13","ES41","ES42","ES51","ES52","ES43","ES11","ES3","ES62","ES22","ES21","ES23","ES63","ES64")
 
 # MEASURES AND RATIOS
 # Cumulative mortality rate
@@ -280,8 +289,29 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
     return(filtered_df)
 }
 
+# GENERATE MAP
+gen_chloropleth <- function(wk, yr, age_groups, sexes, metric, provider="CartoDB.DarkMatterNoLabels") {
+    esp@data$metric <- switch(metric, 
+    'crmr'=sapply(esp@data$ccaa, function(ccaa) {CRMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'cmr'=sapply(esp@data$ccaa, function(ccaa) {CMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'bf'=sapply(esp@data$ccaa, function(ccaa) {BF(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'em'=sapply(esp@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'dc'=sapply(esp@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
+    print(esp@data)
+    pal <- colorNumeric("RdBu", domain = esp@data$metric)
+    leaflet(data = esp) %>%
+        addProviderTiles(provider) %>%
+        addPolygons(fillColor = ~pal(metric), 
+                    fillOpacity = 1, 
+                    color = "#FFFFFF", 
+                    weight = 1)
+}
+
 # OTHER HELPER FUNCTIONS
 # Function to read lines and return a paste separated by an html line break
 paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
+
+# Running last eurostat update check
+system('bash ./www/scripts/check_eurostat.sh', wait=FALSE)

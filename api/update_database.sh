@@ -14,6 +14,7 @@ else
 fi
 
 python3 query.py
+python3 eurostat_check.py
 echo 'commit database up to' $date
 git commit -m "Update database ${date}" '../data/*'
 git commit -m "Update logs ${date}" '../api/logs/*'
