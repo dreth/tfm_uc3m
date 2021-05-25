@@ -169,7 +169,7 @@ shinyServer(
         output$plotlyUIGenMortality <- renderUI ({
             leafletOutput(outputId = "mapsPlot",
                             # match width for a square plot
-                            height = session$clientData$output_mapsPlot_width)
+                            height = session$clientData$output_mortalityPlot_width)
         })
 
         # PLOT OUTPUTS
