@@ -10,13 +10,26 @@ The repository name comes from the commonly used acronym "tfm" meaning "Trabajo 
 
 ## Sources
 
+### Data sources
+
+All data within this project is originally obtained from the [INE (Instituto Nacional de Estadística)](https://ine.es/) official data sources. 
+
+The dataset for [deaths](https://github.com/dreth/tfm_uc3m/blob/main/data/death.csv) contained in the repository was sourced from [Eurostat's **demo_r_mwk2_05** dataset.](https://ec.europa.eu/eurostat/databrowser/view/demo_r_mwk2_05/default/table?lang=en). Which is originally sourced from INE's measurements.
+
+The dataset for [population](https://github.com/dreth/tfm_uc3m/blob/main/data/pop.csv) was obtained from [INE's dataset ID: 9681](https://www.ine.es/jaxiT3/Tabla.htm?t=9681&L=0), titled: "Resultados por comunidades autónomas / Población residente por fecha, sexo y edad" (Original source in Spanish).
+
+Both were obtained directly from each respective institution's API:
+
+- [Eurostat's JSON and Unicode web services](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/query-builder)
+- [INE's JSON API service](https://www.ine.es/dyngs/DataLab/manual.html?cid=45)
+
 ### Map polygon layer
 
 The map polygon layer was obtained from [ArcGIS' website](https://www.arcgis.com/home/item.html?id=e75892d1a49646d8a29705ac6680f981), it was produced by the [IGN (Instituto Geográfico Nacional de España)](https://www.ign.es).
 
 ### Base docker image
 
-The docker image used as base was created by [rocker-org](https://github.com/rocker-org). It's called shiny-verse, and it's a base image that includes shiny and tidyverse, I built mine on top of this one.
+The docker image used as base was created by [rocker-org](https://github.com/rocker-org). The docker hub tag is **rocker/shiny-verse**, and it's a base image that includes *shiny* and *tidyverse*, I built mine on top of this one.
 
 You can find the base image source in the following [repository folder](https://github.com/rocker-org/shiny/tree/master/shiny-verse). Or you can also find it in Docker hub in the following [repository](https://hub.docker.com/r/rocker/shiny-verse).
 
