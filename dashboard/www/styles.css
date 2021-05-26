@@ -9,3 +9,7 @@ html {
 #updateDatabaseButton {
     color: red;
 }
+
+td {
+    width: 100%;
+}

@@ -128,6 +128,7 @@ CMR_C <- function(ccaas, age_groups, sexes, all=FALSE, sel_week=FALSE, yrs=2010:
     } else {
         med_cmr_wk <- mean(sapply(yrs, function(y) CMR(wk=sel_week, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
         last_cmr_wk <- mean(sapply(yrs, function(y) CMR(wk=52, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
+        print(c(med_cmr_wk, last_cmr_wk))
         return(c(med_cmr_wk, last_cmr_wk))
     }
 }
@@ -135,7 +136,7 @@ CMR_C <- function(ccaas, age_groups, sexes, all=FALSE, sel_week=FALSE, yrs=2010:
 # Cumulative relative mortality rate
 CRMR <- function(wk, yr, ccaas, age_groups, sexes, all=FALSE, cmr_c_yrs=2010:2019) {    
     cmr <- CMR(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
-    cmr_c <- CMR_C(sel_week=wk, all=FALSE, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
+    cmr_c <- CMR_C(sel_week=wk, all=all, ccaas=ccaas, age_groups=age_groups, sexes=sexes, yrs=cmr_c_yrs)
     return((cmr - cmr_c[1])/cmr_c[2])
 }
 
@@ -292,25 +293,31 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
     return(filtered_df)
 }
 
-# GENERATE MAP
-gen_chloropleth <- function(wk, yr, age_groups, sexes, metric, provider="CartoDB.DarkMatterNoLabels", palette="RdBu") {
+# GENERATE MAP DATA
+gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp) {
     # iterating over ccaas to calculate indexes for selected data
-    esp@data$metric <- switch(metric, 
-    'crmr'=sapply(esp@data$ccaa, function(ccaa) {CRMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'cmr'=sapply(esp@data$ccaa, function(ccaa) {CMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'bf'=sapply(esp@data$ccaa, function(ccaa) {BF(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'em'=sapply(esp@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'dc'=sapply(esp@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
+    shape_data@data$metric <- switch(metric, 
+    'crmr'=sapply(shape_data@data$ccaa, function(ccaa) {CRMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'cmr'=sapply(shape_data@data$ccaa, function(ccaa) {CMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'bf'=sapply(shape_data@data$ccaa, function(ccaa) {BF(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'em'=sapply(shape_data@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
+    'dc'=sapply(shape_data@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
 
+    # returning the data
+    return(shape_data)
+}
+
+# GENERATE MAP
+gen_chloropleth <- function(dataset, metric, provider="CartoDB.DarkMatterNoLabels", palette="RdBu") {
     # colours
-    pal <- colorNumeric(palette=palette, domain = esp@data$metric)
+    pal <- colorNumeric(palette=palette, domain = dataset$metric)
 
     # pop up with data
     metric_name <- MORTALITY_PLOT_TYPE_R[metric]
-    popup <- paste("<strong>CCAA:</strong>",CCAA_SHORT[esp@data$ccaa],str_interp("<br><strong>${metric_name}</strong>"),round(esp@data$metric,1))
+    popup <- paste("<strong>CCAA:</strong>",CCAA_SHORT[dataset$ccaa],str_interp("<br><strong>${metric_name}:</strong>"),round(dataset$metric,5))
 
     # creating map
-    leaflet(data = esp) %>%
+    leaflet(data = dataset) %>%
         addProviderTiles(provider) %>%
         addPolygons(fillColor = ~pal(metric), 
                     fillOpacity = 1, 

@@ -8,6 +8,18 @@ The repository name comes from the commonly used acronym "tfm" meaning "Trabajo 
 - [María Luz Durbán Reguera](https://researchportal.uc3m.es/display/inv18373)
 - [Bernardo D'Auria](https://portal.uc3m.es/portal/page/portal/dpto_estadistica/home/members/bernardo_d_auria)
 
+## Sources
+
+### Map polygon layer
+
+The map polygon layer was obtained from [ArcGIS' website](https://www.arcgis.com/home/item.html?id=e75892d1a49646d8a29705ac6680f981), it was produced by the [IGN (Instituto Geográfico Nacional de España)](https://www.ign.es).
+
+### Base docker image
+
+The docker image used as base was created by [rocker-org](https://github.com/rocker-org). It's called shiny-verse, and it's a base image that includes shiny and tidyverse, I built mine on top of this one.
+
+You can find the base image source in the following [repository folder](https://github.com/rocker-org/shiny/tree/master/shiny-verse). Or you can also find it in Docker hub in the following [repository](https://hub.docker.com/r/rocker/shiny-verse).
+
 ## Running the application
 
 ### Docker

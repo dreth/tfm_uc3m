@@ -164,6 +164,10 @@ shinyServer(
                 )
             }
         })
+        # Map data table output
+        output$mapDataOutput <- renderTable({
+            genChloroplethTable()
+        }, digits=10)
         
         # PLOT OUTPUTS
         # Action button to generate mortality plots
@@ -203,13 +207,32 @@ shinyServer(
 
         # Generate chloropleth map event
         genChloropleth <- eventReactive(input$plotMapsButton, {
-            gen_chloropleth(
+            df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 
                 age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
                 sexes=input$selectSexesMaps,
                 metric=input$plotMetricMaps
             )
+            gen_chloropleth(
+                dataset=df,
+                metric=input$plotMetricMaps
+            )
+        })
+
+        # Generate chloropleth map TABLE event
+        genChloroplethTable <- eventReactive(input$plotMapsButton, {
+            df <- gen_map_data(
+                wk=input$weekSliderSelectorMaps, 
+                yr=input$yearSliderSelectorMaps, 
+                age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
+                sexes=input$selectSexesMaps,
+                metric=input$plotMetricMaps
+            )@data
+            metric <- df$metric
+            df <- data.frame(CCAA=CCAA_SHORT[df$ccaa])
+            df[,MORTALITY_PLOT_TYPE_R[input$plotMetricMaps]] <- metric
+            df
         })
 
         # output for map
