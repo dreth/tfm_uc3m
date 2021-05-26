@@ -23,6 +23,7 @@ shinyUI(
         tabItem(tabName = "mortality",
           sidebarLayout(
             sidebarPanel(
+              tags$head(includeCSS("./www/styles.css")),
               tags$head(tags$script(src = "dimension.js")),
               selectInput("plotTypeMortality",
                   label = h5(strong("Select content to plot")),
@@ -79,6 +80,7 @@ shinyUI(
         # Second tab content
         tabItem(tabName = "updateDatabase",
           fluidPage(
+            tags$head(includeCSS("./www/styles.css")),
             useShinyjs(),
             wellPanel(
               h4(strong("Database information:")),
@@ -107,6 +109,7 @@ shinyUI(
         # Third tab content
         tabItem(tabName = "databaseTable",
           fluidPage(
+            tags$head(includeCSS("./www/styles.css")),
             wellPanel(
               # Table filters
               selectInput("selectDBTable",
@@ -156,6 +159,7 @@ shinyUI(
         tabItem(tabName = "maps",
           sidebarLayout(
             sidebarPanel(
+              tags$head(includeCSS("./www/styles.css")),
               selectInput("plotMetricMaps",
                   label = h5(strong("Select metric to plot")),
                   choices = MORTALITY_PLOT_TYPE

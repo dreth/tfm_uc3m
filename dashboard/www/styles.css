@@ -2,11 +2,6 @@ html {
     font-family: ubuntu, sans-serif;
 }
 
-#dashboardBody {
-    color: white;
-    background-color: black;
-}
-
 #mapsPlot {
     height: 95vh;
 }
