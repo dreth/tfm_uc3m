@@ -8,5 +8,9 @@ html {
 }
 
 #mapsPlot {
-    height: 95vh
+    height: 95vh;
+}
+
+#updateDatabaseButton {
+    color: red;
 }

@@ -81,6 +81,8 @@ shinyUI(
           fluidPage(
             useShinyjs(),
             wellPanel(
+              h4(strong("Database information:")),
+              hr(),
               h5(strong("Last DB update:")),
               verbatimTextOutput('lastUpdatedLog'),
               h5(strong("Latest Eurostat date available (deaths):")),
@@ -89,11 +91,12 @@ shinyUI(
               verbatimTextOutput('lastEurostatWeekRepo'),
               h5(strong("Data is provisional since:")),
               verbatimTextOutput('provisionalDataIndicator'),
+            ),
+            wellPanel(
               actionButton("updateDatabaseButton",
                   label = h4(strong("Update Database"))
               ),
-            ),
-            wellPanel(
+              hr(),
               h4(strong("Logs:")),
               br(),
               htmlOutput("consoleLogsUpdateDatabase")

@@ -49,7 +49,7 @@ def check_last_date_eurostat(sex='T', age='Y80-84', ccaa=['ES3','ES51']):
     # check last week
     weeks_queried = list(response['dimension']['time']['category']['index'].keys())
     weeks_of_interest = [y for y in [int(x[-2:]) for x in weeks_queried] if y >= 1 and y <= 52]
-    return f'Last date obtainable from Eurostat: {curr_year}, week: {max(weeks_of_interest)}'
+    return f'Last date obtainable from Eurostat: {curr_year}, week: {max(weeks_of_interest)}\n'
 
 # %% RUN SCRIPT AND UPDATE LOG FILE
 with open('./logs/last_eurostat_update.log', 'w+') as f:
