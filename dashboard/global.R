@@ -303,7 +303,7 @@ gen_chloropleth <- function(wk, yr, age_groups, sexes, metric, provider="CartoDB
         addProviderTiles(provider) %>%
         addPolygons(fillColor = ~pal(metric), 
                     fillOpacity = 1, 
-                    color = "#FFFFFF", 
+                    color = "#000000", 
                     weight = 1)
 }
 
