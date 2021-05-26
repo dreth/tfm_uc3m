@@ -15,7 +15,7 @@ require(rgdal)
 require(RColorBrewer)
 
 # TRACE 
-options(shiny.trace=TRUE)
+options(shiny.trace=FALSE)
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
 death_count <- 'FALSE'
