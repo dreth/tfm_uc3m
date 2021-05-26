@@ -44,6 +44,9 @@ names(SEXES) <- c("Females","Males","Total")
 # OPTIONS TO PLOT
 MORTALITY_PLOT_TYPE <-switch(death_count, 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
 names(MORTALITY_PLOT_TYPE) <-switch(death_count, 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
+# reverse options for reference
+MORTALITY_PLOT_TYPE_R <- names(MORTALITY_PLOT_TYPE)
+names(MORTALITY_PLOT_TYPE_R) <- MORTALITY_PLOT_TYPE
 # DATE
 YEAR <- unique(pop$year)
 WEEK <- unique(death$week)
@@ -290,20 +293,30 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
 }
 
 # GENERATE MAP
-gen_chloropleth <- function(wk, yr, age_groups, sexes, metric, provider="CartoDB.DarkMatterNoLabels") {
+gen_chloropleth <- function(wk, yr, age_groups, sexes, metric, provider="CartoDB.DarkMatterNoLabels", palette="RdBu") {
+    # iterating over ccaas to calculate indexes for selected data
     esp@data$metric <- switch(metric, 
     'crmr'=sapply(esp@data$ccaa, function(ccaa) {CRMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'cmr'=sapply(esp@data$ccaa, function(ccaa) {CMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'bf'=sapply(esp@data$ccaa, function(ccaa) {BF(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'em'=sapply(esp@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'dc'=sapply(esp@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
-    pal <- colorNumeric("RdBu", domain = esp@data$metric)
+
+    # colours
+    pal <- colorNumeric(palette=palette, domain = esp@data$metric)
+
+    # pop up with data
+    metric_name <- MORTALITY_PLOT_TYPE_R[metric]
+    popup <- paste("<strong>CCAA:</strong>",CCAA_SHORT[esp@data$ccaa],str_interp("<br><strong>${metric_name}</strong>"),round(esp@data$metric,1))
+
+    # creating map
     leaflet(data = esp) %>%
         addProviderTiles(provider) %>%
         addPolygons(fillColor = ~pal(metric), 
                     fillOpacity = 1, 
                     color = "#000000", 
-                    weight = 1)
+                    weight = 1,
+                    popup = popup)
 }
 
 # OTHER HELPER FUNCTIONS
