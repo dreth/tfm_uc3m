@@ -65,7 +65,7 @@ shinyUI(
                   step = 1
               ),
               actionButton("plotMortalityButton",
-                  label = h5(strong("Generate plot"))
+                  label = h4(strong("Generate plot"))
               )
             ),
 
@@ -186,7 +186,7 @@ shinyUI(
                   step = 1
               ),
               actionButton("plotMapsButton",
-                  label = h5(strong("Generate map"))
+                  label = h4(strong("Generate map"))
               )
             ),
 
