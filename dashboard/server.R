@@ -167,7 +167,7 @@ shinyServer(
         # Map data table output
         output$mapDataOutput <- renderTable({
             genChloroplethTable()
-        }, digits=10)
+        }, digits=SIG_FIGURES(input$plotMetricMaps))
         
         # PLOT OUTPUTS
         # Action button to generate mortality plots

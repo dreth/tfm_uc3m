@@ -77,6 +77,9 @@ esp <- readOGR(dsn = './www/maps/map_shapefiles', encoding='UTF-8')
 # creating index for CCAAs
 esp@data$ccaa <- c("ES7","ES61","ES24","ES12","ES53","ES13","ES41","ES42","ES51","ES52","ES43","ES11","ES3","ES62","ES22","ES21","ES23","ES63","ES64")
 
+# SIGNIFICANT FIGURES FOR EACH METRIC
+SIG_FIGURES <- function(m) {switch(m, "em"=2, "cmr"=3, "crmr"=10, "bf"=10, "dc"=2)}
+
 # MEASURES AND RATIOS
 # Cumulative mortality rate
 CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
