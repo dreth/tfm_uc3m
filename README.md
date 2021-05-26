@@ -2,7 +2,7 @@
 
 This is the repository for my final master project at UC3M titled "Development of an automatic tool for periodic surveillance of actuarial and demographic indicators".
 
-The repository name comes from the commonly used acronym "tfm" meaning "Trabajo de Fin de Master" (final master project in spanish) and where I coursed the master, [UC3M](https://uc3m.es).
+The repository name comes from the commonly used acronym "tfm" meaning "*Trabajo de Fin de Master*" (final master project in Spanish) and where I coursed the master, [UC3M](https://uc3m.es).
 ## Tutors
 
 - [María Luz Durbán Reguera](https://researchportal.uc3m.es/display/inv18373)
