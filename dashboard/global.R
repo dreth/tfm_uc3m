@@ -297,7 +297,7 @@ gen_chloropleth <- function(wk, yr, age_groups, sexes, metric, provider="CartoDB
     'bf'=sapply(esp@data$ccaa, function(ccaa) {BF(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'em'=sapply(esp@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
     'dc'=sapply(esp@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
-    pal <- colorNumeric("BuRd", domain = esp@data$metric)
+    pal <- colorNumeric("RdBu", domain = esp@data$metric)
     leaflet(data = esp) %>%
         addProviderTiles(provider) %>%
         addPolygons(fillColor = ~pal(metric), 
