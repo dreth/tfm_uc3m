@@ -46,11 +46,23 @@ def check_last_date_eurostat(sex='T', age='Y80-84', ccaa=['ES3','ES51']):
     # obtain response from eurostat using query function
     response = query_eurostat(**query)
 
-    # check last week
-    weeks_queried = list(response['dimension']['time']['category']['index'].keys())
-    weeks_of_interest = [y for y in [int(x[-2:]) for x in weeks_queried] if y >= 1 and y <= 52]
-    return f'Last date obtainable from Eurostat: {curr_year}, week: {max(weeks_of_interest)-1}\n'
+    # obtain weeks and status from the response object
+    weeks = response['dimension']['time']['category']['index']
+
+    # obtain only weeks of interest and their respective index
+    weeks_of_interest = [x for x in weeks.keys() if int(x[-2:]) >= 1 and int(x[-2:]) <= 52 and int(x[:4]) == curr_year]
+    weeks_of_interest_num = [int(x[-2:]) for x in weeks_of_interest]
+    weeks_queried_idx = [weeks[x] for x in weeks_of_interest]
+
+    # fixing status dict in order to have keys as int
+    status_value = {weeks_of_interest_num[int(x)-1]:y for x,y in response['status'].items() if int(x) in weeks_queried_idx}
+    
+    # check maximum week that corresponds with an element different to ':', as this represents an empty point
+    last_week = max([x for x,y in status_value.items() if y != ':'])
+
+    # return diagnostic string
+    return f'Last date obtainable from Eurostat: {curr_year}, week: {last_week}'
 
 # %% RUN SCRIPT AND UPDATE LOG FILE
 with open('./logs/last_eurostat_update.log', 'w+') as f:
-    f.write(check_last_date_eurostat())
+    f.write(f'{check_last_date_eurostat()}\n')
