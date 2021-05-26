@@ -200,7 +200,7 @@ shinyUI(
               leafletOutput("mapsPlot"),
               br(),
               h4(strong("Data for selected parameters:")),
-              tableOutput("mapDataOutput")
+              tableOutput("mapDataUIOutput")
             )
           )
         )
