@@ -6,3 +6,7 @@ html {
     color: white;
     background-color: black;
 }
+
+#mapsPlot {
+    height: 95vh
+}

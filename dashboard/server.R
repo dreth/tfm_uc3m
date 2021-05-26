@@ -164,14 +164,7 @@ shinyServer(
                 )
             }
         })
-        # leaflet output
-        # rendering the plotly UI to pass on the height from the session object
-        output$plotlyUIGenMortality <- renderUI ({
-            leafletOutput(outputId = "mapsPlot",
-                            # match width for a square plot
-                            height = session$clientData$output_mortalityPlot_width)
-        })
-
+        
         # PLOT OUTPUTS
         # Action button to generate mortality plots
         genMortPlot <- eventReactive(input$plotMortalityButton, {
