@@ -16,7 +16,7 @@ All data within this project is originally obtained from the [INE (Instituto Nac
 
 The dataset for [deaths](https://github.com/dreth/tfm_uc3m/blob/main/data/death.csv) contained in the repository was sourced from [Eurostat's **demo_r_mwk2_05** dataset.](https://ec.europa.eu/eurostat/databrowser/view/demo_r_mwk2_05/default/table?lang=en). Which is originally sourced from INE's measurements.
 
-The dataset for [population](https://github.com/dreth/tfm_uc3m/blob/main/data/pop.csv) was obtained from [INE's dataset ID: 9681](https://www.ine.es/jaxiT3/Tabla.htm?t=9681&L=0), titled: "Resultados por comunidades autónomas / Población residente por fecha, sexo y edad" (Original source in Spanish).
+The dataset for [population](https://github.com/dreth/tfm_uc3m/blob/main/data/pop.csv) was obtained from [INE's dataset ID: 9681](https://www.ine.es/jaxiT3/Tabla.htm?t=9681&L=0), titled: "*Resultados por comunidades autónomas / Población residente por fecha, sexo y edad*" (Original source in Spanish).
 
 Both were obtained directly from each respective institution's API:
 
