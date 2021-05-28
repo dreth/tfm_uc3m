@@ -89,12 +89,7 @@ install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes',
 Also, in order to be able to update the database, Python 3.8 must be installed along with the following libraries:
 
 ```Python
-pip3 install requests
-pip3 install json
-pip3 install pandas
-pip3 install datetime
-pip3 install numpy
-pip3 install copy
+pip3 install requests json numpy pandas datetime copy
 ```
 
 As shown in the *query.py* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py).
