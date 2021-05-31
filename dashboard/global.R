@@ -17,6 +17,9 @@ require(RColorBrewer)
 # TRACE 
 options(shiny.trace=FALSE)
 
+# Running last eurostat update check
+system('bash ./www/scripts/check_eurostat.sh', wait=FALSE)
+
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
 death_count <- 'FALSE'
 
@@ -335,5 +338,6 @@ paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
 
-# Running last eurostat update check
-system('bash ./www/scripts/check_eurostat.sh', wait=FALSE)
+
+
+
