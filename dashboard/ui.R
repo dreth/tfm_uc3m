@@ -203,7 +203,7 @@ shinyUI(
               tableOutput("mapDataOutput")
             )
           )
-        ),
+        )
 
         # Fifth tab content
         
