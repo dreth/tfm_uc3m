@@ -8,13 +8,16 @@ shinyUI(
         menuItem("Mortality", tabName = "mortality", icon = icon("stats", lib="glyphicon")),
 
         # Second tab content
-        menuItem("Update Database", tabName = "updateDatabase", icon = icon("refresh", lib="glyphicon")),
+        menuItem("Maps", tabName = "maps", icon = icon("map-marker", lib="glyphicon")),
 
         # Third tab content
-        menuItem("Database Tables", tabName = "databaseTable", icon = icon("hdd", lib="glyphicon")),
+        menuItem("Life expectancy (soon)", tabName = "lifeExp", icon = icon("grain", lib="glyphicon")),
 
         # Fourth tab content
-        menuItem("Maps", tabName = "maps", icon = icon("map-marker", lib="glyphicon"))
+        menuItem("Database Tables", tabName = "databaseTable", icon = icon("hdd", lib="glyphicon")),
+
+        # Fifth tab content
+        menuItem("Update Database", tabName = "updateDatabase", icon = icon("refresh", lib="glyphicon"))
       )
     ),
     dashboardBody(id='dashboardBody',
@@ -78,35 +81,59 @@ shinyUI(
         ),
 
         # Second tab content
-        tabItem(tabName = "updateDatabase",
-          fluidPage(
-            tags$head(includeCSS("./www/styles.css")),
-            useShinyjs(),
-            wellPanel(
-              h4(strong("Database information:")),
-              hr(),
-              h5(strong("Last DB update:")),
-              verbatimTextOutput('lastUpdatedLog'),
-              h5(strong("Latest Eurostat date available (deaths):")),
-              verbatimTextOutput('lastEurostatWeek'),
-              h5(strong("Latest date available in the repository (deaths):")),
-              verbatimTextOutput('lastEurostatWeekRepo'),
-              h5(strong("Data is provisional since:")),
-              verbatimTextOutput('provisionalDataIndicator'),
-            ),
-            wellPanel(
-              actionButton("updateDatabaseButton",
-                  label = h4(strong("Update Database"))
+        tabItem(tabName = "maps"),
+
+        # Third tab content
+        tabItem(tabName = "maps",
+          sidebarLayout(
+            sidebarPanel(
+              tags$head(includeCSS("./www/styles.css")),
+              selectInput("plotMetricMaps",
+                  label = h5(strong("Select metric to plot")),
+                  choices = MORTALITY_PLOT_TYPE
               ),
-              hr(),
-              h4(strong("Logs:")),
+              radioButtons("selectAgeGroupsMapsTotal",
+                  label = h5(strong("Select Age group or Total")),
+                  choices = AGE_GROUPS_UI_SELECT,
+                  selected = 'all'
+              ),
+              uiOutput("selectAgeGroupsMapsUIOutput"),
+              selectInput("selectSexesMaps",
+                  label = h5(strong("Select Sex/Total")),
+                  choices = SEXES,
+                  selected = 'T'
+              ),
+              sliderInput("weekSliderSelectorMaps",
+                  label = h5(strong("Select week to plot")),
+                  min = 1,
+                  max = 52,
+                  value = 1,
+                  step = 1
+              ),
+              sliderInput("yearSliderSelectorMaps",
+                  label = h5(strong("Select year to plot")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = max(YEAR),
+                  step = 1
+              ),
+              actionButton("plotMapsButton",
+                  label = h4(strong("Generate map"))
+              )
+            ),
+
+            mainPanel(
+              h4(strong("Resulting map:")),
               br(),
-              htmlOutput("consoleLogsUpdateDatabase")
+              leafletOutput("mapsPlot"),
+              br(),
+              h4(strong("Data for selected parameters:")),
+              tableOutput("mapDataOutput")
             )
           )
         ),
 
-        # Third tab content
+        # Fourth tab content
         tabItem(tabName = "databaseTable",
           fluidPage(
             tags$head(includeCSS("./www/styles.css")),
@@ -155,58 +182,34 @@ shinyUI(
           )
         ),
 
-        # Fourth tab content
-        tabItem(tabName = "maps",
-          sidebarLayout(
-            sidebarPanel(
-              tags$head(includeCSS("./www/styles.css")),
-              selectInput("plotMetricMaps",
-                  label = h5(strong("Select metric to plot")),
-                  choices = MORTALITY_PLOT_TYPE
-              ),
-              radioButtons("selectAgeGroupsMapsTotal",
-                  label = h5(strong("Select Age group or Total")),
-                  choices = AGE_GROUPS_UI_SELECT,
-                  selected = 'all'
-              ),
-              uiOutput("selectAgeGroupsMapsUIOutput"),
-              selectInput("selectSexesMaps",
-                  label = h5(strong("Select Sex/Total")),
-                  choices = SEXES,
-                  selected = 'T'
-              ),
-              sliderInput("weekSliderSelectorMaps",
-                  label = h5(strong("Select week to plot")),
-                  min = 1,
-                  max = 52,
-                  value = 1,
-                  step = 1
-              ),
-              sliderInput("yearSliderSelectorMaps",
-                  label = h5(strong("Select year to plot")),
-                  min = min(YEAR),
-                  max = max(YEAR),
-                  value = max(YEAR),
-                  step = 1
-              ),
-              actionButton("plotMapsButton",
-                  label = h4(strong("Generate map"))
-              )
+        # Fifth tab content
+        tabItem(tabName = "updateDatabase",
+          fluidPage(
+            tags$head(includeCSS("./www/styles.css")),
+            useShinyjs(),
+            wellPanel(
+              h4(strong("Database information:")),
+              hr(),
+              h5(strong("Last DB update:")),
+              verbatimTextOutput('lastUpdatedLog'),
+              h5(strong("Latest Eurostat date available (deaths):")),
+              verbatimTextOutput('lastEurostatWeek'),
+              h5(strong("Latest date available in the repository (deaths):")),
+              verbatimTextOutput('lastEurostatWeekRepo'),
+              h5(strong("Data is provisional since:")),
+              verbatimTextOutput('provisionalDataIndicator'),
             ),
-
-            mainPanel(
-              h4(strong("Resulting map:")),
+            wellPanel(
+              actionButton("updateDatabaseButton",
+                  label = h4(strong("Update Database"))
+              ),
+              hr(),
+              h4(strong("Logs:")),
               br(),
-              leafletOutput("mapsPlot"),
-              br(),
-              h4(strong("Data for selected parameters:")),
-              tableOutput("mapDataOutput")
+              htmlOutput("consoleLogsUpdateDatabase")
             )
           )
         )
-
-        # Fifth tab content
-        
       )
     )
   )
