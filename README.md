@@ -92,7 +92,7 @@ Also, in order to be able to update the database, Python 3.8 must be installed a
 pip3 install requests json numpy pandas datetime copy
 ```
 
-As shown in the *query.py* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py).
+As shown in the *functions.py* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py).
 
 #### Bash scripts
 

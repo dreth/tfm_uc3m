@@ -5,6 +5,8 @@ shinyServer(
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
         updateDBLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
         updateEurostatLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
+        updateEurostatLogsEarliestProvisional <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/earliest_eurostat_provisional.log', readFunc=readLines)
+        updateINELogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/last_ine_update.log', readFunc=readLines)
 
         # PLOTTING FUNCTIONS
         # mortality plots
@@ -29,16 +31,16 @@ shinyServer(
             # Condition for when user uses ggplot as plot device
             } else if (device == 'ggplot2') {
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
-                plt <- ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
-                ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15))
+                plt <- ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
+                ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
                 return(plt)
 
             # Condition for when the user uses plotly as plot device
             } else if (device == 'plotly') {
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
                 plt <- ggplotly(
-                    ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(colour=year)) +
-                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10))
+                    ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
+                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
                 )
                 return(plt)
             
@@ -103,23 +105,23 @@ shinyServer(
         })
 
         # UPDATE DATABASE TAB
-        # UI output for 
+        # Text output for 
         # log output from command in update database
         output$lastUpdatedLog <- renderText({
             updateDBLogsLast()
         })
-        # UI output for
+        # DEATH DB
+        # Text output for
         # Indicator of provisional data
         output$provisionalDataIndicator <- renderText({
-            year <- as.numeric(format(Sys.time(),'%Y')) - 1
-            str_interp("${year}-01-01")
+            updateEurostatLogsEarliestProvisional()
         })
-        # UI output for
+        # Text output for
         # log output from last eurostat update script
         output$lastEurostatWeek <- renderText({
             updateEurostatLogsLast()
         })
-         # UI output for
+        # Text output for
         # last repo week available, eurostat data (deaths)
         output$lastEurostatWeekRepo <- renderText({
             curr_year <- as.numeric(format(Sys.time(),'%Y'))
@@ -127,6 +129,21 @@ shinyServer(
             last_avail_week <- max(death %>% dplyr::filter(year == curr_year) %>% dplyr::select(week))
             str_interp('Last date available from the repository: ${last_avail_year}, week: ${last_avail_week}')
         })
+        # DB ID for eurostat Death DB
+        output$eurostatDBID <- renderText({
+            EurostatDBID
+        })
+        # POP DB
+        # Text output for
+        # log output from last INE update script
+        output$lastINEWeek <- renderText({
+            updateINELogsLast()
+        })
+        # DB ID for INE population DB
+        output$INEDBID <- renderText({
+            INEDBID
+        })
+        
 
         # DB TABLE TAB
         # Select total or selectize CCAA

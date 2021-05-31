@@ -15,4 +15,4 @@ fi
 
 cd '../api'
 python3 './query.py'
-python3 './eurostat_check.py'
+python3 './dbs_check.py'

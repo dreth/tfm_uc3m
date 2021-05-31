@@ -18,7 +18,7 @@ require(RColorBrewer)
 options(shiny.trace=FALSE)
 
 # Running last eurostat update check
-system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
+system('bash ./www/scripts/check_dbs.sh', wait=TRUE)
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
 death_count <- 'FALSE'
@@ -29,6 +29,9 @@ death <- read.csv('../data/death.csv')
 # Removing X-column imported from read.csv
 pop <- pop[,2:length(pop)]
 death <- death[,2:length(death)]
+# Original IDs for reference
+EurostatDBID <- 'demo_r_mwk2_05'
+INEDBID <- '9681'
 
 # OPTION LISTS
 # CCAAs
