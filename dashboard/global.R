@@ -15,7 +15,7 @@ require(rgdal)
 require(RColorBrewer)
 
 # TRACE 
-options(shiny.trace=TRUE)
+options(shiny.trace=FALSE)
 
 # Running last eurostat update check
 system('bash ./www/scripts/check_eurostat.sh', wait=FALSE)
