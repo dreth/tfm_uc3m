@@ -18,14 +18,6 @@ age_groups = ['Y10-14', 'Y15-19', 'Y20-24', 'Y25-29', 'Y30-34', 'Y35-39', 'Y40-4
 # Sexes
 sexes = ['M','F','T']
 
-# %% Basic boilerplate query dict
-query = {
-    'dataset': 'demo_r_mwk2_05',  # Name of the dataset
-    'sinceTimePeriod': '2010W01',  # Starting week of the study
-    'geo': ccaa_list,                  # CCAAs
-    'unit': 'NR'                  # Units (NR = number)
-}
-
 # %% QUERY EUROSTAT FUNCTION
 def query_eurostat(**kwargs):
     # Iterating through kwargs to fill URL fields
@@ -36,7 +28,10 @@ def query_eurostat(**kwargs):
         elif param == 'sinceTimePeriod':
             field = f'sinceTimePeriod={value}&'
         elif param == 'geo':
-            field = ''.join([f'geo={x}&' for x in value])
+            if type(value) == list:
+                field = ''.join([f'geo={x}&' for x in value])
+            else:
+                field = f'geo={value}&'
         elif param == 'age':
             field = f'age={value}'
         elif param == 'unit':
@@ -49,6 +44,62 @@ def query_eurostat(**kwargs):
 
     # appending to URL
     return json.loads(requests.get(url).text)
+
+# %% CHECK LAST WEEK UPDATED IN EUROSTAT DEATH DATASET
+# checks the last updated week in eurostat and logs it to a log file
+def check_earliest_provisional(sex='T', age='Y80-84', ccaa='ES3'):
+    # check current year
+    curr_year = dt.datetime.now().year
+
+    # generate query dict
+    query = {
+        'dataset': 'demo_r_mwk2_05',  # Name of the dataset
+        'sinceTimePeriod': f'{curr_year-2}W01',  # Starting week of the study
+        'geo': ccaa,                  # CCAAs
+        'unit': 'NR',                  # Units (NR = number)
+        'sex': sex,
+        'age': age
+    }
+
+    # obtain response from eurostat using query function
+    response = query_eurostat(**query)
+
+    # generate empty df to add elements from query
+    df = {
+        'yearweek':[],
+    }
+
+    # obtain weeks and status from the response object
+    weeks = {k:v for k,v in response['dimension']['time']['category']['index'].items() if 'W99' not in k and 'W53' not in k}
+    provisional = {int(k):v for k,v in response['status'].items() if int(k) in list(weeks.values())}
+
+    # adding year and week to df
+    df['yearweek'] = [x for x in weeks.keys()]
+
+    # convert to dataframe
+    df = pd.DataFrame(df)
+
+    # modifying provisional col values to include status
+    earliest_idx = list(provisional.keys())[0]
+
+    # obtain earliest provisional data point
+    earliest_date = df.loc[earliest_idx, 'yearweek']
+    return earliest_date
+
+# %% Basic boilerplate query dict
+
+# get last provisional date
+date = check_earliest_provisional()
+last_prov_date_death = date
+last_prov_date_pop = date[0:4]
+
+# constructing the query
+query = {
+    'dataset': 'demo_r_mwk2_05',  # Name of the dataset
+    'sinceTimePeriod': check_earliest_provisional(),  # Starting week of the study
+    'geo': ccaa_list,                  # CCAAs
+    'unit': 'NR'                  # Units (NR = number)
+}
 
 # %% GENERATE DEATH DF
 def generate_death_df(raw_data, date=False):
@@ -113,7 +164,7 @@ def generate_death_df(raw_data, date=False):
 
 # %% QUERY INE DATA TABLES
 
-def query_INE_pop(df_id='9681', start='20100101', end=''):
+def query_INE_pop(df_id='9681', start=f'{last_prov_date_pop}0101', end=''):
     print(f'Querying INE table id: {df_id}, starting at: {start[0:4]}-{start[4:6]}-{start[6:]}...\n')
     url = f'https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/{df_id}?date={start}:{end}'
     return json.loads(requests.get(url).text)
@@ -373,6 +424,50 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
     # Returning the resulting dataframe
     return df
 
+# %% FUNCTION TO PERFORM DATASET UPDATE (adds new entries, keeps old useful ones, updates provisional ones)
+def perform_update_datasets(curr_path, db_type, updated_dataset):
+    """
+    curr_path       : path where the current revision of the datasets is located
+    db_type         : metric to update, currently it must be either 'deaths' or 'pop'
+    updated_dataset : dataframe object as obtained from the generate_df functions, either a death or pop dataset 
+    """
+    # reading currently available data and replacing/appending only the new data
+    curr = pd.read_csv(curr_path)[['year','week','ccaa','sex','age',db_type]]
+
+    # create marker to uniquely identify entries
+    curr['mkr'] = curr['year'].astype(str) + curr['week'].astype(str) + curr['sex'] + curr['ccaa'] + curr['age']
+    updated_dataset['mkr'] = updated_dataset['year'].astype(str) + updated_dataset['week'].astype(str) + updated_dataset['sex'] + updated_dataset['ccaa'] + updated_dataset['age']
+
+    # values to add correspond to those whose markers are not present in the current version
+    to_add = updated_dataset[~updated_dataset['mkr'].isin(curr['mkr'])]
+
+    # we only keep those that we'll update
+    updated_dataset = updated_dataset[updated_dataset['mkr'].isin(curr['mkr'])]
+
+    # values to keep correspond to those which have been acquired previously and are no longer provisional
+    to_keep = curr[~curr['mkr'].isin(updated_dataset['mkr'].unique())]
+
+    # values to update correspond to those which are still marked as provisional by eurostat
+    to_update = curr[curr['mkr'].isin(updated_dataset['mkr'].unique())].reset_index()
+
+    # we update the db_type metric (deaths, pop, etc) for the provisional values
+    to_update.loc[to_update['mkr'] == updated_dataset['mkr'],db_type] = updated_dataset.loc[to_update['mkr'] == updated_dataset['mkr'],db_type]
+
+    # we return the previous index of the dataset to concatenate easier
+    to_update.index = to_update['index']
+
+    # we drop the index column, as it already served its purpose
+    to_update = to_update.drop(['index'], axis=1)
+
+    # joining it all up together
+    df = pd.concat([to_keep, to_update, to_add])
+
+    # we drop the marker column, as it already served its purpose
+    df = df.drop(['mkr'], axis=1)
+
+    # returning updated df
+    return df.reset_index(drop=True)
+
 # %% QUERYING ALL DATASETS AND EXPORTING + DIAGNOSTIC MESSAGES
 # logging everything to text file
 print('\nSTEP 1 - Querying Eurostat...\n')
@@ -397,8 +492,10 @@ print('\n> STEP 2 - Creating death dataset...\n')
 with open('./logs/update_database.log', 'r+') as f:
     contents = f.read()
     f.write('\nSTEP 2 - Creating death dataset...\n')
-death = pd.concat(death_datasets)
+death = pd.concat(death_datasets).reset_index(drop=True)
 most_recent_week = max(death.loc[death['year'] == max(death['year']), 'week'])
+# perform database update
+death = perform_update_datasets(curr_path='../data/death.csv', db_type='deaths', updated_dataset=death)
 death.to_csv('../data/death.csv')
 
 # obtain pop dataset
@@ -409,6 +506,8 @@ with open('./logs/update_database.log', 'r+') as f:
     f.write('\nSTEP 3 - Creating pop dataset...\n')
 pop_raw = query_INE_pop()
 pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week)
+# perform database update
+pop = perform_update_datasets(curr_path='../data/pop.csv', db_type='pop', updated_dataset=pop)
 pop.to_csv('../data/pop.csv')
 
 # Finished process

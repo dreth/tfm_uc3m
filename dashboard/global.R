@@ -18,7 +18,7 @@ require(RColorBrewer)
 options(shiny.trace=FALSE)
 
 # Running last eurostat update check
-system('bash ./www/scripts/check_eurostat.sh', wait=FALSE)
+system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
 death_count <- 'FALSE'
@@ -314,7 +314,7 @@ gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp) {
 }
 
 # GENERATE MAP
-gen_chloropleth <- function(dataset, metric, provider="CartoDB.DarkMatterNoLabels", palette="RdBu") {
+gen_chloropleth <- function(dataset, metric, provider="CartoDB.DarkMatterNoLabels", palette="Reds") {
     # colours
     pal <- colorNumeric(palette=palette, domain = dataset$metric)
 
