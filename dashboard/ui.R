@@ -82,7 +82,7 @@ shinyUI(
         ),
 
         # Second tab content
-        tabItem(tabName = "maps"),
+        tabItem(tabName = "lifeExp"),
 
         # Third tab content
         tabItem(tabName = "maps",
@@ -120,16 +120,17 @@ shinyUI(
               ),
               actionButton("plotMapsButton",
                   label = h4(strong("Generate map"))
-              )
+              ),
+              hr(),
+              h4(strong("Data for selected parameters:")),
+              tableOutput("mapDataOutput"),
             ),
 
             mainPanel(
+              tags$head(tags$script(src = "dimension.js")),
               h4(strong("Resulting map:")),
               br(),
-              leafletOutput("mapsPlot"),
-              br(),
-              h4(strong("Data for selected parameters:")),
-              tableOutput("mapDataOutput")
+              uiOutput("leafletMapOutput")
             )
           )
         ),

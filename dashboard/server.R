@@ -185,6 +185,10 @@ shinyServer(
         output$mapDataOutput <- renderTable({
             genChloroplethTable()
         }, digits=10)
+        # map output
+        output$leafletMapOutput <- renderUI({
+            leafletOutput("mapsPlot", height=input$dimension[2])
+        })
         
         # PLOT OUTPUTS
         # Action button to generate mortality plots

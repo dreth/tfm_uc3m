@@ -2,10 +2,6 @@ html {
     font-family: ubuntu, sans-serif;
 }
 
-#mapsPlot {
-    height: 95vh;
-}
-
 #updateDatabaseButton {
     color: red;
 }
