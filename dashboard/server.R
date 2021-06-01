@@ -228,6 +228,10 @@ shinyServer(
 
         # Generate chloropleth map event
         genChloropleth <- eventReactive(input$plotMapsButton, {
+            shinyjs::show('mapsPlot')
+            shinyjs::show('mapDataOutput')
+            shinyjs::show('mapDataLabels1')
+            shinyjs::show('mapDataLabels2')
             df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 

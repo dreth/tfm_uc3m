@@ -326,7 +326,8 @@ gen_chloropleth <- function(dataset, metric, provider="CartoDB.DarkMatterNoLabel
     popup <- paste("<strong>CCAA:</strong>",CCAA_SHORT[dataset$ccaa],str_interp("<br><strong>${metric_name}:</strong>"),round(dataset$metric,5))
 
     # creating map
-    leaflet(data = dataset) %>%
+    leaflet(data = dataset,
+            options = leafletOptions(zoomControl = FALSE, dragging = FALSE)) %>%
         addProviderTiles(provider) %>%
         addPolygons(fillColor = ~pal(metric), 
                     fillOpacity = 1, 

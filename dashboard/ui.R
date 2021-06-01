@@ -17,13 +17,13 @@ shinyUI(
         menuItem("Database Tables", tabName = "databaseTable", icon = icon("hdd", lib="glyphicon")),
 
         # Fifth tab content
-        menuItem("Update Database", tabName = "updateDatabase", icon = icon("refresh", lib="glyphicon"))
+        menuItem("DB info and update", tabName = "updateDatabase", icon = icon("refresh", lib="glyphicon"))
       )
     ),
     dashboardBody(id='dashboardBody',
       tabItems(
         # First tab content
-        tabItem(tabName = "mortality",
+        tabItem(tabName = "mortality",         
           sidebarLayout(
             sidebarPanel(
               h4(strong('Mortality metrics')),
@@ -88,6 +88,7 @@ shinyUI(
         tabItem(tabName = "maps",
           sidebarLayout(
             sidebarPanel(
+              useShinyjs(),
               tags$head(includeCSS("./www/styles.css")),
               selectInput("plotMetricMaps",
                   label = h5(strong("Select metric to plot")),
@@ -121,14 +122,16 @@ shinyUI(
               actionButton("plotMapsButton",
                   label = h4(strong("Generate map"))
               ),
-              hr(),
-              h4(strong("Data for selected parameters:")),
-              tableOutput("mapDataOutput"),
+              hidden(
+                hr(id="mapDataLabels1"),
+                h4(id="mapDataLabels2", strong("Data for selected parameters:")),
+                tableOutput("mapDataOutput")
+              )
             ),
 
             mainPanel(
+              useShinyjs(),
               tags$head(tags$script(src = "dimension.js")),
-              h4(strong("Resulting map:")),
               br(),
               uiOutput("leafletMapOutput")
             )
@@ -190,11 +193,13 @@ shinyUI(
             tags$head(includeCSS("./www/styles.css")),
             useShinyjs(),
             wellPanel(
+              # GENERAL DB INFO
               h3(strong("Database information:")),
               hr(),
               h4(strong("Last DB update:")),
               verbatimTextOutput('lastUpdatedLog'),
               hr(),
+              # DEATHS DB
               h4(strong('Deaths DB (Eurostat):')),
               h5(strong("Latest Eurostat date available:")),
               verbatimTextOutput('lastEurostatWeek'),
@@ -205,13 +210,16 @@ shinyUI(
               h5(strong("Original DB ID from Eurostat:")),
               verbatimTextOutput('eurostatDBID'),
               hr(),
+              # POP DB
               h4(strong('Population DB (INE):')),
               h5(strong("Latest date available from INE population DB:")),
               verbatimTextOutput('lastINEWeek'),
               h5(strong("Original DB ID from INE:")),
               verbatimTextOutput('INEDBID'),
             ),
+            br(),
             wellPanel(
+              # UPDATE DB BUTTON
               actionButton("updateDatabaseButton",
                   label = h4(strong("Update Database"))
               ),
