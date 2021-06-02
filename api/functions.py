@@ -31,7 +31,7 @@ def query_eurostat(**kwargs):
             if type(value) == list:
                 field = ''.join([f'geo={x}&' for x in value])
             else:
-                field = f'geo={value}&'
+                field = f'geo={value}'
         elif param == 'age':
             field = f'age={value}'
         elif param == 'unit':
@@ -67,14 +67,16 @@ def check_eurostat_provisional(sex='T', age='Y80-84', ccaa='ES3', earliest=True,
     weeks = {k:date for date,k in response['dimension']['time']['category']['index'].items() if 'W99' not in date and 'W53' not in date}
     provisional = {int(k):tag for k,tag in response['status'].items() if int(k) in list(weeks.keys()) and tag == 'p'}
 
-    # modifying provisional col values to include status
+    # obtain earliest and latest date of interest and save corresponding one
+    index_of_interest = (list(provisional.keys())[0], list(provisional.keys())[-1])
     if earliest == True:
-        index_of_interest = list(provisional.keys())[0]
+        date_of_interest = weeks[index_of_interest[0]]
+    elif earliest == 'both':
+        date_of_interest = (weeks[index_of_interest[0]], weeks[index_of_interest[1]])
     else:
-        index_of_interest = list(provisional.keys())[-1]
+        date_of_interest = weeks[index_of_interest[1]]
 
-    # obtain earliest provisional data point
-    date_of_interest = weeks[index_of_interest]
+    # return earliest provisional data point
     return date_of_interest
 
 # %% GENERATE DEATH DF

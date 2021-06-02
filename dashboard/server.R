@@ -22,7 +22,9 @@ shinyServer(
                                 'bf'='Cumulative Improvement Factor',
                                 'dc'='Death count'
                                 )
-            plotTitle <- str_interp('${plotTitle} for CCAA(s): ${paste(selectedCCAAs,collapse=", ")}, and Age Groups: ${paste(selectedAgeGroups,collapse=", ")}')
+            titleCCAA <- paste(selectedCCAAs,collapse=", ")
+            titleAgeGroups <- paste(selectedAgeGroups,collapse=", ")
+            plotTitle <- str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}')
 
             # Condition in case of error
             if (suppressWarnings({df[1] == 'error'})) {
@@ -108,18 +110,19 @@ shinyServer(
         # Text output for 
         # log output from command in update database
         output$lastUpdatedLog <- renderText({
-            updateDBLogsLast()
+            suppressWarnings(updateDBLogsLast())
+            
         })
         # DEATH DB
         # Text output for
         # Indicator of provisional data
         output$provisionalDataIndicator <- renderText({
-            updateEurostatLogsEarliestProvisional()
+            suppressWarnings(updateEurostatLogsEarliestProvisional())
         })
         # Text output for
         # log output from last eurostat update script
         output$lastEurostatWeek <- renderText({
-            updateEurostatLogsLast()
+            suppressWarnings(updateEurostatLogsLast())
         })
         # Text output for
         # last repo week available, eurostat data (deaths)
@@ -137,7 +140,7 @@ shinyServer(
         # Text output for
         # log output from last INE update script
         output$lastINEWeek <- renderText({
-            updateINELogsLast()
+            suppressWarnings(updateINELogsLast())
         })
         # DB ID for INE population DB
         output$INEDBID <- renderText({

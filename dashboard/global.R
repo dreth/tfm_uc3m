@@ -92,12 +92,12 @@ CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
     # initialize number of deaths
     death_num <- 0
 
-    # assuming multiple years+weeks
+    # assuming multiple years
     # cumulative deaths
     numerator <- death %>% dplyr::filter(year %in% yr & week %in% 1:wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
 
-    if (length(wk) > 1 | length(yr) > 1) {
-        # multiple years+weeks
+    if (length(yr) > 1) {
+        # multiple years
         numerator <- aggregate(numerator$death, list(year = numerator$year), FUN=sum)
         death_num <- numerator$x
     } else {
@@ -109,8 +109,9 @@ CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
     # pop for week wk
     period_pop <- pop %>% dplyr::filter(year %in% yr & week == wk & sex == sexes & age %in% age_groups & ccaa %in% ccaas)
 
-    # assuming multiple years+weeks
-    if (length(wk) > 1 | length(yr) > 1) {
+    # assuming multiple years
+    if (length(yr) > 1) {
+        # multiple years
         period_pop <- aggregate(period_pop$pop, list(year = period_pop$year), FUN=sum)
         if (cmr_c==TRUE) {
             ratio <- tryCatch(mean(death_num / period_pop$x), warning=function(w) {return(c(mean(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1]),NA))})
@@ -118,7 +119,7 @@ CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
             ratio <- tryCatch(death_num / period_pop$x, warning=function(w) {return(c(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1],NA))})
         }
     } else {
-    # individual years+weeks
+        # individual years+weeks
         period_pop <- aggregate(period_pop$pop, list(year = period_pop$year, week = period_pop$week), FUN=sum)
         ratio <- death_num / sum(period_pop$x)
     }
@@ -135,9 +136,8 @@ CMR_C <- function(ccaas, age_groups, sexes, all=FALSE, sel_week=FALSE, yrs=2010:
         }
         return(all_weeks)
     } else {
-        med_cmr_wk <- mean(sapply(yrs, function(y) CMR(wk=sel_week, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
-        last_cmr_wk <- mean(sapply(yrs, function(y) CMR(wk=52, yr=y, ccaas=ccaas, age_groups=age_groups, sexes=sexes)))
-        print(c(med_cmr_wk, last_cmr_wk))
+        med_cmr_wk <- mean(CMR(wk=sel_week, yr=yrs, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+        last_cmr_wk <- mean(CMR(wk=52, yr=yrs, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
         return(c(med_cmr_wk, last_cmr_wk))
     }
 }
@@ -327,13 +327,18 @@ gen_chloropleth <- function(dataset, metric, provider="CartoDB.DarkMatterNoLabel
 
     # creating map
     leaflet(data = dataset,
-            options = leafletOptions(zoomControl = FALSE, dragging = FALSE)) %>%
+            options = leafletOptions(zoomControl = FALSE, dragging = FALSE, doubleClickZoom= FALSE)) %>%
         addProviderTiles(provider) %>%
         addPolygons(fillColor = ~pal(metric), 
                     fillOpacity = 1, 
                     color = "#000000", 
                     weight = 1,
-                    popup = popup)
+                    popup = popup) %>%
+        addLegend("topleft", 
+                  pal = pal, 
+                  values = ~metric,
+                  title = str_interp("${metric_name}"),
+                  opacity = 2)
 }
 
 # OTHER HELPER FUNCTIONS
@@ -342,6 +347,17 @@ paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
 
+# LIFE EXPECTANCY FUNCTION
+# MR <- function(wk, yr, ccaas, age_groups, sexes) {
+#     # assuming multiple years
+#     #  deaths
+#     numerator <- death %>% dplyr::filter(year %in% yr & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
 
 
-
+# }
+# testdeaths <- death %>% dplyr::filter(year %in% 2019:2020 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
+# testdeaths <- aggregate(testdeaths$death, list(week = testdeaths$week, year = testdeaths$year), FUN=sum)
+# total_deaths <- sum(testdeaths[(testdeaths$week %in% 2:52 & testdeaths$year == 2019) | (testdeaths$week %in% 1:2 & testdeaths$year == 2020),'x'])
+# testpop <- pop %>% dplyr::filter(year %in% 2020 & week %in% 2 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
+# total_pop <- sum(testpop$pop)
+# total_deaths/total_pop
