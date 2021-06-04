@@ -76,7 +76,7 @@ shinyUI(
 
             mainPanel(
               plotOutput("mortalityPlot"),
-              uiOutput('plotlyUIGenMortality'),
+              uiOutput('plotlyUIGenMortality')
             )
           )
         ),
@@ -97,7 +97,7 @@ shinyUI(
                   label = h5(strong("Plotting library")),
                   choices = PLOT_DEVICE_UI_SELECT,
                   selected = 'ggplot2'
-              ),
+                ),
               radioButtons("selectCCAALifeExpTotal",
                   label = h5(strong("Select CCAAs or Total")),
                   choices = CCAA_UI_SELECT,

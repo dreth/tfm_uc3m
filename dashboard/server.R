@@ -14,7 +14,6 @@ shinyServer(
             # plot title construction
             selectedCCAAs <- switch(input$selectCCAAMortalityTotal, all='All', select=CCAA_SHORT[input$selectCCAAMortality])
             selectedAgeGroups <- switch(input$selectAgeGroupsMortalityTotal, all='All', select=AGE_GROUP_RANGES[input$selectAgeMortality])
-            print(selectedCCAAs)
             plotTitle <- switch(type,
                                 'em'='Excess Mortality',
                                 'crmr'='Cumulative Relative Mortality Rate',
@@ -34,17 +33,29 @@ shinyServer(
             # Condition for when user uses ggplot as plot device
             } else if (device == 'ggplot2') {
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
-                plt <- ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
-                ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
+                if (as.numeric(substring(Sys.time(),0,4)) %in% fig_df$year) {
+                    plt <- ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
+                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
+                } else {
+                    plt <- ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
+                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15))
+                }
                 return(plt)
 
             # Condition for when the user uses plotly as plot device
             } else if (device == 'plotly') {
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
-                plt <- ggplotly(
-                    ggplot(data=fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
-                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
-                )
+                if (as.numeric(substring(Sys.time(),0,4)) %in% fig_df$year) {
+                    plt <- ggplotly(
+                        ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
+                        ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
+                    )
+                } else {
+                    plt <- ggplotly(
+                        ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
+                        ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10))
+                    )
+                }
                 return(plt)
             
             # Condition in case of an unexpected error
@@ -84,17 +95,25 @@ shinyServer(
             )
             # only taking life exp at birth
             lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == 'Y_LT5',]
+            print(wk)
+            print(yr)
+            print(ccaas)
+            print(sexes)
+            print(type)
+            print(week_range_plot)
+            print(yr_range_plot)
+            print(device_plot)
 
             # life expectancy plot
-            if (type == 'plot') {
-                lifeExpPlot <- plot_metric(
-                    df=data.frame(week=lifeExpDF$week, year=lifeExpDF$year, le=lifeExpDF$ex),
+            if (type == 'le') {
+                lePlot <- plot_metric(
+                    df=data.frame(week=lifeExpDF_AB$week, year=lifeExpDF_AB$year, le=lifeExpDF_AB$ex),
                     week_range=week_range_plot,
                     yr_range=yr_range_plot,
                     type=type,
                     device=device_plot
                 )
-                return(lifeExpPlot)
+                return(lePlot)
 
             # life table create and filter
             } else {
@@ -208,7 +227,7 @@ shinyServer(
 
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
-        output$plotlyUIGenLifeExp <- renderUI ({
+        output$plotlyUIGenLifeExp <- renderUI({
             plotly::plotlyOutput(outputId = "lifeExpPlotly",
                             # match width for a square plot
                             height = session$clientData$output_lifeExpPlotly_width)
@@ -328,8 +347,8 @@ shinyServer(
                                             height = function () {session$clientData$output_mortalityPlot_width}
                                         )
             } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
-                shinyjs::hide('mortalityPlot')
                 shinyjs::show('mortalityPlotly')
+                shinyjs::hide('mortalityPlot')
                 output$mortalityPlotly <- renderPlotly(
                                             {genMortPlot()},
                                         )
@@ -346,7 +365,7 @@ shinyServer(
                 ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
                 # age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
                 sexes=input$selectSexesLifeExp,
-                type=input$plotTypeLifeExp,
+                type=switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table'),
                 week_range_plot=weeks,
                 yr_range_plot=years,
                 device_plot=input$usePlotlyOrGgplotLifeExp
@@ -354,32 +373,44 @@ shinyServer(
         })
 
         # life expectancy plots
+        observeEvent(input$usePlotlyOrGgplotLifeExp, {
+            if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
+            shinyjs::hide('lifeExpPlotly')
+            shinyjs::hide('lifeTableTblOutput')
+            shinyjs::show('lifeExpPlot')
+            output$lifeExpPlot <- renderPlot(
+                                        {genLifeExpOutputs()},
+                                        # match width for a square plot
+                                        height = function () {session$clientData$output_lifeExpPlot_width}
+                                    )
+            } else {
+                shinyjs::hide('lifeTableTblOutput')
+                shinyjs::hide('lifeExpPlot')
+                shinyjs::show('lifeExpPlotly')
+                output$lifeExpPlotly <- renderPlotly(
+                                            {genLifeExpOutputs()},
+                                        )
+            }
+        })
+
+        # life exp plots or life table
         observeEvent(input$showLifeExpPlotOrLifeTable, {
             if (input$showLifeExpPlotOrLifeTable == 'plot') {
-                if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
-                shinyjs::hide('lifeExpPlotly')
+                shinyjs::show('usePlotlyOrGgplotLifeExp')
                 shinyjs::hide('lifeTableTblOutput')
-                shinyjs::show('lifeExpPlot')
-                output$lifeExpPlot <- renderPlot(
-                                            {genLifeExpOutputs()},
-                                            # match width for a square plot
-                                            height = function () {session$clientData$output_lifeExpPlot_width}
-                                        )
-                } else if (input$usePlotlyOrGgplotLifeExp == 'plotly') {
-                    shinyjs::hide('lifeTableTblOutput')
+                if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
+                    shinyjs::show('lifeExpPlot')
+                    shinyjs::hide('lifeExpPlotly')
+                } else {
                     shinyjs::hide('lifeExpPlot')
                     shinyjs::show('lifeExpPlotly')
-                    output$lifeExpPlotly <- renderPlotly(
-                                                {genLifeExpOutputs()},
-                                            )
                 }
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
                 shinyjs::hide('lifeExpPlot')
                 shinyjs::hide('lifeExpPlotly')
                 shinyjs::show('lifeTableTblOutput')
-
+                shinyjs::hide('usePlotlyOrGgplotLifeExp')
             }
-            
         })
 
         # Generate chloropleth map event

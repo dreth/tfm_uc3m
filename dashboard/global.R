@@ -20,7 +20,7 @@ require(RcppRoll)
 system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
 
 # TRACE 
-options(shiny.trace=FALSE)
+options(shiny.trace=TRUE)
 
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
@@ -366,6 +366,7 @@ MR <- function(wk, yr, ccaas, sexes) {
     # deaths rolling window of 1 year for year(s) yr and week wk
     numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week, age = numerator$age), FUN=sum)
     numerator$age <- factor(numerator$age, levels=AGE_GROUPS)
+    numerator$year <- factor(numerator$year)
     numerator <- numerator[order(numerator$year, numerator$age),]
     numerator$rolling_sum <- NA
     for (ag in AGE_GROUPS) {
@@ -378,6 +379,7 @@ MR <- function(wk, yr, ccaas, sexes) {
     denominator <- pop %>% dplyr::filter(year %in% yr & sex == sexes & ccaa %in% ccaas)
     denominator <- aggregate(denominator$pop, list(year = denominator$year, week = denominator$week, age = denominator$age), FUN=sum)
     denominator$age <- factor(denominator$age, levels=AGE_GROUPS)
+    denominator$year <- factor(denominator$year)
     denominator <- denominator[order(denominator$year, denominator$age),]
     denominator <- denominator %>% dplyr::filter(week %in% wk & year %in% yr)
 
@@ -410,13 +412,13 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
             lx <- c(initial_pop)
             ndx <- c(initial_pop*nqx[1])
             nLx <- c(ndx[1]/nmx[1])
-
+            
             for (i in 2:length(nqx)) {
                 ndx[i] <- lx[i-1]*nqx[i]
                 lx[i] <- lx[i-1] - ndx[i]
                 nLx[i] <- ndx[i]/nmx[i]
             }
-            
+
             # metrics constructed post-loop
             Tx <- rev(sapply(1:length(nLx), function(s) {sum(nLx[1:s])}))
             ex <- Tx/lx
