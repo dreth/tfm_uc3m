@@ -81,7 +81,7 @@ It is recommended to use the docker approach described above, nevertheless, if y
 To be able to use every feature in the app, a series of requirements must be met, all the R libraries used can be found in the first few lines of the *global.R* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/global.R). Which can be installed as follows:
 
 ```R
-install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes','pracma','dplyr','ggplot2','stringr','MASS','plotly'))
+install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes','pracma','dplyr','ggplot2','stringr','MASS','plotly','leaflet','rgdal','RColorBrewer','zoo','RcppRoll'))
 ```
 
 #### Python requirements

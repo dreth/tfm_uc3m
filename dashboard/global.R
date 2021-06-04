@@ -50,7 +50,7 @@ names(AGE_GROUP_RANGES) <- AGE_GROUPS
 # SEXES
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
-# OPTIONS TO PLOT
+# OPTIONS TO PLOT (MORTALITY)
 MORTALITY_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
 names(MORTALITY_PLOT_TYPE) <-switch(as.character(death_count), 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
 # reverse options for reference
@@ -65,6 +65,12 @@ names(CCAA_UI_SELECT) <- c('All CCAAs', 'Select CCAAs')
 # AGE GROUP UI SELECTOR
 AGE_GROUPS_UI_SELECT <- c('all', 'select')
 names(AGE_GROUPS_UI_SELECT) <- c('All Age groups', 'Select Age groups')
+# AGE GROUP UI SELECTOR (LIFE EXP)
+AGE_GROUPS_UI_SELECT_LE <- c('at_birth', 'select')
+names(AGE_GROUPS_UI_SELECT_LE) <- c('Life expectancy at birth', 'Select Age group')
+# SHOW PLOT OR LIFE TABLES (LIFE EXP)
+SHOW_PLOT_OR_LT <- c('plot','life_table')
+names(SHOW_PLOT_OR_LT) <- c('Life expectancy TS', 'Life table')
 # PLOTTING DEVICE TO USE
 PLOT_DEVICE_UI_SELECT <- c('ggplot2','plotly')
 names(PLOT_DEVICE_UI_SELECT) <- c('ggplot2', 'plotly')

@@ -82,7 +82,64 @@ shinyUI(
         ),
 
         # Second tab content
-        tabItem(tabName = "lifeExp"),
+        tabItem(tabName = "lifeExp"
+          sidebarLayout(
+            sidebarPanel(
+              h4(strong('Life expectancy')),
+              tags$head(includeCSS("./www/styles.css")),
+              tags$head(tags$script(src = "dimension.js")),
+              radioButtons("usePlotlyOrGgplotLifeExp",
+                  label = h5(strong("Plotting library")),
+                  choices = PLOT_DEVICE_UI_SELECT,
+                  selected = 'ggplot2'
+              ),
+              radioButtons("showLifeExpPlotOrLifeTable",
+                  label = h5(strong("Show plot or life table")),
+                  choices = SHOW_PLOT_OR_LT,
+                  selected = 'plot'
+              ),
+              radioButtons("selectCCAALifeExpTotal",
+                  label = h5(strong("Select CCAAs or Total")),
+                  choices = CCAA_UI_SELECT,
+                  selected = 'all'
+              ),
+              uiOutput("selectCCAALifeExpUIOutput"),
+              radioButtons("selectAgeGroupsLifeExpTotal",
+                  label = h5(strong("Plot life expectancy at birth or otherwise")),
+                  choices = AGE_GROUPS_UI_SELECT_LE,
+                  selected = 'at_birth'
+              ),
+              uiOutput("selectAgeGroupsLifeExpUIOutput"),
+              selectInput("selectSexesLifeExp",
+                  label = h5(strong("Select Sex/Total")),
+                  choices = SEXES,
+                  selected = 'T'
+              ),
+              sliderInput("weekSliderSelectorLifeExp",
+                  label = h5(strong("Select week range to plot")),
+                  min = 1,
+                  max = 52,
+                  value = c(1,52),
+                  step = 1
+              ),
+              sliderInput("yearSliderSelectorLifeExp",
+                  label = h5(strong("Select year range to plot")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = c(2015, max(YEAR)),
+                  step = 1
+              ),
+              actionButton("plotLifeExpButton",
+                  label = h4(strong("Generate plot"))
+              )
+            ),
+
+            mainPanel(
+              plotOutput("lifeExpPlot"),
+              uiOutput('plotlyUIGenLifeExp'),
+            )
+          )
+        ),
 
         # Third tab content
         tabItem(tabName = "maps",

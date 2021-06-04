@@ -10,7 +10,7 @@ shinyServer(
 
         # PLOTTING FUNCTIONS
         # mortality plots
-        plot_mortality <- function(df, week_range, yr_range, type='crmr', device='ggplot2') {
+        plot_metric <- function(df, week_range, yr_range, type='crmr', device='ggplot2') {
             # plot title construction
             selectedCCAAs <- switch(input$selectCCAAMortalityTotal, all='All', select=CCAA_SHORT[input$selectCCAAMortality])
             selectedAgeGroups <- switch(input$selectAgeGroupsMortalityTotal, all='All', select=AGE_GROUP_RANGES[input$selectAgeMortality])
@@ -20,11 +20,12 @@ shinyServer(
                                 'crmr'='Cumulative Relative Mortality Rate',
                                 'cmr'='Cumulative Mortality Rate',
                                 'bf'='Cumulative Improvement Factor',
-                                'dc'='Death count'
+                                'dc'='Death count',
+                                'le'='Life expectancy'
                                 )
             titleCCAA <- paste(selectedCCAAs,collapse=", ")
             titleAgeGroups <- paste(selectedAgeGroups,collapse=", ")
-            plotTitle <- str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}')
+            plotTitle <- ifelse(type=='le',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}')
 
             # Condition in case of error
             if (suppressWarnings({df[1] == 'error'})) {
@@ -62,7 +63,7 @@ shinyServer(
                 sexes=sexes,
                 type=type,
             )
-            mortPlot <- plot_mortality(
+            mortPlot <- plot_metric(
                 df=mortPlotdf,
                 week_range=week_range_plot,
                 yr_range=yr_range_plot,
@@ -104,6 +105,39 @@ shinyServer(
             plotly::plotlyOutput(outputId = "mortalityPlotly",
                             # match width for a square plot
                             height = session$clientData$output_mortalityPlotly_width)
+        })
+
+        # LIFE EXPECTANCY TAB
+        # Select total or selectize CCAA
+        output$selectCCAALifeExpUIOutput <- renderUI({
+            if (input$selectCCAALifeExpTotal == 'select') {
+                selectizeInput("selectCCAALifeExp",
+                  label = h5(strong("Select CCAAs")),
+                  choices = c("",CCAA),
+                  selected = NULL,
+                  options = list(maxItems = length(CCAA))
+                )
+            }
+        })
+
+        # Select total or selectize Age Groups
+        output$selectAgeGroupsLifeExpUIOutput <- renderUI({
+            if (input$selectAgeGroupsLifeExpTotal == 'select') {
+                selectInput("selectAgeLifeExp",
+                  label = h5(strong("Select Age group(s)")),
+                  choices = c("",AGE_GROUPS),
+                  selected = NULL,
+                  options = list(maxItems = length(AGE_GROUPS))
+                )
+            }
+        })
+
+        # plotly output
+        # rendering the plotly UI to pass on the height from the session object
+        output$plotlyUIGenLifeExp <- renderUI ({
+            plotly::plotlyOutput(outputId = "L=lifeExpPlotly",
+                            # match width for a square plot
+                            height = session$clientData$output_lifeExpPlotly_width)
         })
 
         # UPDATE DATABASE TAB
