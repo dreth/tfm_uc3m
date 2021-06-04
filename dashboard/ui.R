@@ -88,15 +88,15 @@ shinyUI(
               h4(strong('Life expectancy')),
               tags$head(includeCSS("./www/styles.css")),
               tags$head(tags$script(src = "dimension.js")),
-              radioButtons("usePlotlyOrGgplotLifeExp",
-                  label = h5(strong("Plotting library")),
-                  choices = PLOT_DEVICE_UI_SELECT,
-                  selected = 'ggplot2'
-              ),
               radioButtons("showLifeExpPlotOrLifeTable",
                   label = h5(strong("Show plot or life table")),
                   choices = SHOW_PLOT_OR_LT,
                   selected = 'plot'
+              ),
+              radioButtons("usePlotlyOrGgplotLifeExp",
+                  label = h5(strong("Plotting library")),
+                  choices = PLOT_DEVICE_UI_SELECT,
+                  selected = 'ggplot2'
               ),
               radioButtons("selectCCAALifeExpTotal",
                   label = h5(strong("Select CCAAs or Total")),
@@ -115,20 +115,8 @@ shinyUI(
                   choices = SEXES,
                   selected = 'T'
               ),
-              sliderInput("weekSliderSelectorLifeExp",
-                  label = h5(strong("Select week range to plot")),
-                  min = 1,
-                  max = 52,
-                  value = c(1,52),
-                  step = 1
-              ),
-              sliderInput("yearSliderSelectorLifeExp",
-                  label = h5(strong("Select year range to plot")),
-                  min = min(YEAR),
-                  max = max(YEAR),
-                  value = c(2015, max(YEAR)),
-                  step = 1
-              ),
+              uiOutput("weekSliderSelectorLifeExpUIOutput"),
+              uiOutput("yearSliderSelectorLifeExpUIOutput"),
               actionButton("plotLifeExpButton",
                   label = h4(strong("Generate plot"))
               )

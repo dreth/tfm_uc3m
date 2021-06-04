@@ -73,6 +73,33 @@ shinyServer(
             return(mortPlot)
         }
 
+        # Generate life expectancy df and plot
+        plot_lifeexp_or_lifetable <- function(wk, yr, ccaas, sexes, week_range_plot, yr_range_plot, device_plot, type) {
+            # generate DF
+            lifeExpDF <- LT(
+                wk=wk,
+                yr=yr,
+                ccaas=ccaas,
+                sexes=sexes
+            )
+
+            # life expectancy plot
+            if (type == 'plot') {
+                mortPlot <- plot_metric(
+                    df=lifeExpDF,
+                    week_range=week_range_plot,
+                    yr_range=yr_range_plot,
+                    type=type,
+                    device=device_plot
+                )
+                return(mortPlot)
+
+            # life table create and filter
+            } else {
+                return(lifeExpDF)
+            }
+        }
+
         # DYNAMIC UI CONTROLS
         # MORTALITY TAB
         # Select total or selectize CCAA
@@ -120,7 +147,7 @@ shinyServer(
             }
         })
 
-        # Select total or selectize Age Groups
+        # Select total or select Age Groups
         output$selectAgeGroupsLifeExpUIOutput <- renderUI({
             if (input$selectAgeGroupsLifeExpTotal == 'select') {
                 selectInput("selectAgeLifeExp",
@@ -132,10 +159,57 @@ shinyServer(
             }
         })
 
+        # week slider for life table
+        output$weekSliderSelectorLifeExpUIOutput <- renderUI({
+            # life expectancy plot
+            if (input$showLifeExpPlotOrLifeTable == 'plot') {
+                sliderInput("weekSliderSelectorLifeExp",
+                  label = h5(strong("Select week range to plot")),
+                  min = 1,
+                  max = 52,
+                  value = c(1,52),
+                  step = 1
+                )
+            # life table
+            } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
+                sliderInput("weekSliderSelectorLifeExp",
+                  label = h5(strong("Select week to compute")),
+                  min = 1,
+                  max = 52,
+                  value = 1,
+                  step = 1
+                )
+            }
+        })
+
+        # year slider for life table
+        output$yearSliderSelectorLifeExpUIOutput <- renderUI({
+            # life expectancy plot
+            if (input$showLifeExpPlotOrLifeTable == 'plot') {
+                sliderInput("yearSliderSelectorLifeExp",
+                  label = h5(strong("Select year range to plot")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = c(2015, max(YEAR)),
+                  step = 1
+                )
+            # life table
+            } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
+                sliderInput("yearSliderSelectorLifeExp",
+                  label = h5(strong("Select year to compute")),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = 2021,
+                  step = 1
+                )
+            }
+        })
+
+
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
         output$plotlyUIGenLifeExp <- renderUI ({
-            plotly::plotlyOutput(outputId = "L=lifeExpPlotly",
+            plotly::plotlyOutput(outputId = "lifeExpPlotly",
                             # match width for a square plot
                             height = session$clientData$output_lifeExpPlotly_width)
         })
@@ -243,7 +317,6 @@ shinyServer(
             )
         })
 
-
         # Mortality ratio plots
         observeEvent(input$usePlotlyOrGgplotMortality, {
             if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
@@ -261,6 +334,45 @@ shinyServer(
                                             {genMortPlot()},
                                         )
             }
+        })
+
+        # Action button to generate life expectancy plots or life table
+        genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
+            plot_lifeexp_or_lifetable(
+                wk=WEEK, 
+                yr=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 
+                ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
+                age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
+                sexes=input$selectSexesLifeExp,
+                type=input$plotTypeLifeExp,
+                week_range_plot=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2],
+                yr_range_plot=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2],
+                device_plot=input$usePlotlyOrGgplotLifeExp
+            )
+        })
+
+        # life expectancy plots
+        observeEvent(input$showLifeExpPlotOrLifeTable, {
+            if (input$showLifeExpPlotOrLifeTable == 'plot') {
+                if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
+                shinyjs::hide('lifeExpPlotly')
+                shinyjs::show('lifeExpPlot')
+                output$lifeExpPlot <- renderPlot(
+                                            {genLifeExpOutputs()},
+                                            # match width for a square plot
+                                            height = function () {session$clientData$output_lifeExpPlot_width}
+                                        )
+                } else if (input$usePlotlyOrGgplotLifeExp == 'plotly') {
+                    shinyjs::show('lifeExpPlotly')
+                    shinyjs::hide('lifeExpPlot')
+                    output$lifeExpPlotly <- renderPlotly(
+                                                {genLifeExpOutputs()},
+                                            )
+                }
+            } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
+                
+            }
+            
         })
 
         # Generate chloropleth map event
