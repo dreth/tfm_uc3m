@@ -28,6 +28,8 @@ RUN R -e "install.packages('MASS')"
 RUN R -e "install.packages('plotly')"
 RUN R -e "install.packages('leaflet')"
 RUN R -e "install.packages('rgdal')"
+RUN R -e "install.packages('zoo')"
+RUN R -e "install.packages('RcppRoll')"
 
 
 # select port

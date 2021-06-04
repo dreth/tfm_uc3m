@@ -13,15 +13,18 @@ require(plotly)
 require(leaflet)
 require(rgdal)
 require(RColorBrewer)
-
-# TRACE 
-options(shiny.trace=FALSE)
+require(zoo)
+require(RcppRoll)
 
 # Running last eurostat update check
 system('bash ./www/scripts/check_dbs.sh', wait=TRUE)
 
+# TRACE 
+options(shiny.trace=FALSE)
+
+
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
-death_count <- 'FALSE'
+death_count <- FALSE
 
 # DATASETS
 pop <- read.csv('../data/pop.csv')
@@ -48,8 +51,8 @@ names(AGE_GROUP_RANGES) <- AGE_GROUPS
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
 # OPTIONS TO PLOT
-MORTALITY_PLOT_TYPE <-switch(death_count, 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
-names(MORTALITY_PLOT_TYPE) <-switch(death_count, 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
+MORTALITY_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
+names(MORTALITY_PLOT_TYPE) <-switch(as.character(death_count), 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
 # reverse options for reference
 MORTALITY_PLOT_TYPE_R <- names(MORTALITY_PLOT_TYPE)
 names(MORTALITY_PLOT_TYPE_R) <- MORTALITY_PLOT_TYPE
@@ -347,17 +350,79 @@ paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
 
-# LIFE EXPECTANCY FUNCTION
-# MR <- function(wk, yr, ccaas, age_groups, sexes) {
-#     # assuming multiple years
-#     #  deaths
-#     numerator <- death %>% dplyr::filter(year %in% yr & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+# %% LIFE EXPECTANCY FUNCTIONS
+# CRUDE MORTALITY RATE FUNCTION (PROBABILITY OF DEATH)
+MR <- function(wk, yr, ccaas, age_groups, sexes) {
+    # assuming multiple years
+    # deaths
+    numerator <- death %>% dplyr::filter(year %in% (min(yr)-1):max(yr) & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+
+    # deaths rolling window of 1 year for year(s) yr and week wk
+    numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week, numerator$age), FUN=sum)
+    numerator <- numerator[order(numerator$year),]
+    numerator$rolling_sum <- lag(roll_sum(numerator$x, 52, fill=NA),26)
+    numerator <- numerator %>% dplyr::filter(week == wk & year %in% yr)
+    numerator <- numerator$rolling_sum
+
+    # Population at week wk
+    denominator <- pop %>% dplyr::filter(year %in% yr & sex == sexes & age %in% age_groups & ccaa %in% ccaas)
+    denominator <- aggregate(denominator$pop, list(year = denominator$year, week = denominator$week), FUN=sum)
+    denominator <- denominator %>% dplyr::filter(week == wk & year %in% yr)
+    denominator <- denominator$x
+
+    # resulting crude mortality rate
+    return(numerator/denominator)
+}
+
+# LIFE EXPECTANCY FUNCTION ITSELF
 
 
-# }
-# testdeaths <- death %>% dplyr::filter(year %in% 2019:2020 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
-# testdeaths <- aggregate(testdeaths$death, list(week = testdeaths$week, year = testdeaths$year), FUN=sum)
-# total_deaths <- sum(testdeaths[(testdeaths$week %in% 2:52 & testdeaths$year == 2019) | (testdeaths$week %in% 1:2 & testdeaths$year == 2020),'x'])
-# testpop <- pop %>% dplyr::filter(year %in% 2020 & week %in% 2 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
-# total_pop <- sum(testpop$pop)
-# total_deaths/total_pop
+MR(15,2018:2021,CCAA, AGE_GROUPS, 'T')
+
+# MEASURES AND RATIOS
+# Cumulative mortality rate
+CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
+    # initialize number of deaths
+    death_num <- 0
+
+    # assuming multiple years
+    # cumulative deaths
+    numerator <- death %>% dplyr::filter(year %in% yr & week %in% 1:wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+
+    if (length(yr) > 1) {
+        # multiple years
+        numerator <- aggregate(numerator$death, list(year = numerator$year), FUN=sum)
+        death_num <- numerator$x
+    } else {
+        # individual years+weeks
+        numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week), FUN=sum)
+        death_num <- sum(numerator$x)
+    }    
+    
+    # pop for week wk
+    period_pop <- pop %>% dplyr::filter(year %in% yr & week == wk & sex == sexes & age %in% age_groups & ccaa %in% ccaas)
+
+    # assuming multiple years
+    if (length(yr) > 1) {
+        # multiple years
+        period_pop <- aggregate(period_pop$pop, list(year = period_pop$year), FUN=sum)
+        if (cmr_c==TRUE) {
+            ratio <- tryCatch(mean(death_num / period_pop$x), warning=function(w) {return(c(mean(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1]),NA))})
+        } else {
+            ratio <- tryCatch(death_num / period_pop$x, warning=function(w) {return(c(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1],NA))})
+        }
+    } else {
+        # individual years+weeks
+        period_pop <- aggregate(period_pop$pop, list(year = period_pop$year, week = period_pop$week), FUN=sum)
+        ratio <- death_num / sum(period_pop$x)
+    }
+    
+    return(ratio)
+} 
+
+testdeaths <- death %>% dplyr::filter(year %in% 2019:2020 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
+testdeaths <- aggregate(testdeaths$death, list(week = testdeaths$week, year = testdeaths$year), FUN=sum)
+total_deaths <- sum(testdeaths[(testdeaths$week %in% 2:52 & testdeaths$year == 2019) | (testdeaths$week %in% 1:2 & testdeaths$year == 2020),'x'])
+testpop <- pop %>% dplyr::filter(year %in% 2020 & week %in% 2 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
+total_pop <- sum(testpop$pop)
+total_deaths/total_pop
