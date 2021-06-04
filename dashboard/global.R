@@ -407,13 +407,17 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
             # obtaining the death rates for year and week in loop
             nqx <- df[df$year == year & df$week == week,'nqx']
             nmx <- df[df$year == year & df$week == week,'nmx']
+            if (length(nqx) == 0) {
+                nqx <- rep(NA,length(AGE_GROUPS))
+                nmx <- rep(NA,length(AGE_GROUPS))
+            }
 
             # creating a vector for the different metrics
             lx <- c(initial_pop)
             ndx <- c(initial_pop*nqx[1])
             nLx <- c(ndx[1]/nmx[1])
             
-            for (i in 2:length(nqx)) {
+            for (i in 2:length(nqx)) {            
                 ndx[i] <- lx[i-1]*nqx[i]
                 lx[i] <- lx[i-1] - ndx[i]
                 nLx[i] <- ndx[i]/nmx[i]
