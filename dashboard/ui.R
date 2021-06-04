@@ -82,7 +82,7 @@ shinyUI(
         ),
 
         # Second tab content
-        tabItem(tabName = "lifeExp"
+        tabItem(tabName = "lifeExp",
           sidebarLayout(
             sidebarPanel(
               h4(strong('Life expectancy')),
@@ -125,6 +125,7 @@ shinyUI(
             mainPanel(
               plotOutput("lifeExpPlot"),
               uiOutput('plotlyUIGenLifeExp'),
+              uiOutput('lifeTableTblUIOutput')
             )
           )
         ),

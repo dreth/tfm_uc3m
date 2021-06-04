@@ -17,7 +17,7 @@ require(zoo)
 require(RcppRoll)
 
 # Running last eurostat update check
-system('bash ./www/scripts/check_dbs.sh', wait=TRUE)
+system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
 
 # TRACE 
 options(shiny.trace=FALSE)

@@ -2,7 +2,7 @@
 from functions import check_eurostat_provisional, check_INE_latest
 
 # %% RUN SCRIPT AND UPDATE LOG FILES
-print('\nCalculating database information prior to runtime...\n')
+print('\nCalculating database information...\n')
 
 # obtaining eurostat info
 eurostat_dates = check_eurostat_provisional(earliest='both')
@@ -21,4 +21,4 @@ with open('./logs/earliest_eurostat_provisional.log', 'w+') as f:
     f.write(f'Earliest provisional date from Eurostat DB: {earliest_date[0:4]}, week: {earliest_date[-2:]}')
 
 # done (:
-print('\nDone!\n')
+print('\nDatabase information obtained, Check DB info section for more information\n')

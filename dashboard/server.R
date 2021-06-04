@@ -3,10 +3,10 @@ shinyServer(
     function(input, output, session) {
         # REACTIVE VALUES
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
-        updateDBLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
-        updateEurostatLogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
-        updateEurostatLogsEarliestProvisional <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/earliest_eurostat_provisional.log', readFunc=readLines)
-        updateINELogsLast <- reactiveFileReader(intervalMillis=60000, session=session, filePath='../api/logs/last_ine_update.log', readFunc=readLines)
+        updateDBLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
+        updateEurostatLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
+        updateEurostatLogsEarliestProvisional <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/earliest_eurostat_provisional.log', readFunc=readLines)
+        updateINELogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_ine_update.log', readFunc=readLines)
 
         # PLOTTING FUNCTIONS
         # mortality plots
@@ -25,7 +25,7 @@ shinyServer(
                                 )
             titleCCAA <- paste(selectedCCAAs,collapse=", ")
             titleAgeGroups <- paste(selectedAgeGroups,collapse=", ")
-            plotTitle <- ifelse(type=='le',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}')
+            plotTitle <- ifelse(type=='le',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}'),str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}'))
 
             # Condition in case of error
             if (suppressWarnings({df[1] == 'error'})) {
@@ -153,8 +153,7 @@ shinyServer(
                 selectInput("selectAgeLifeExp",
                   label = h5(strong("Select Age group(s)")),
                   choices = c("",AGE_GROUPS),
-                  selected = NULL,
-                  options = list(maxItems = length(AGE_GROUPS))
+                  selected = NULL
                 )
             }
         })
@@ -328,8 +327,8 @@ shinyServer(
                                             height = function () {session$clientData$output_mortalityPlot_width}
                                         )
             } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
-                shinyjs::show('mortalityPlotly')
                 shinyjs::hide('mortalityPlot')
+                shinyjs::show('mortalityPlotly')
                 output$mortalityPlotly <- renderPlotly(
                                             {genMortPlot()},
                                         )
@@ -356,6 +355,7 @@ shinyServer(
             if (input$showLifeExpPlotOrLifeTable == 'plot') {
                 if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
                 shinyjs::hide('lifeExpPlotly')
+                shinyjs::hide('lifeTableTblOutput')
                 shinyjs::show('lifeExpPlot')
                 output$lifeExpPlot <- renderPlot(
                                             {genLifeExpOutputs()},
@@ -363,14 +363,18 @@ shinyServer(
                                             height = function () {session$clientData$output_lifeExpPlot_width}
                                         )
                 } else if (input$usePlotlyOrGgplotLifeExp == 'plotly') {
-                    shinyjs::show('lifeExpPlotly')
+                    shinyjs::hide('lifeTableTblOutput')
                     shinyjs::hide('lifeExpPlot')
+                    shinyjs::show('lifeExpPlotly')
                     output$lifeExpPlotly <- renderPlotly(
                                                 {genLifeExpOutputs()},
                                             )
                 }
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
-                
+                shinyjs::hide('lifeExpPlot')
+                shinyjs::hide('lifeExpPlotly')
+                shinyjs::show('lifeTableTblOutput')
+
             }
             
         })
