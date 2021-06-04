@@ -11,7 +11,7 @@ shinyUI(
         menuItem("Maps", tabName = "maps", icon = icon("map-marker", lib="glyphicon")),
 
         # Third tab content
-        menuItem("Life expectancy (soon)", tabName = "lifeExp", icon = icon("grain", lib="glyphicon")),
+        menuItem("Life expectancy", tabName = "lifeExp", icon = icon("grain", lib="glyphicon")),
 
         # Fourth tab content
         menuItem("Database Tables", tabName = "databaseTable", icon = icon("hdd", lib="glyphicon")),
