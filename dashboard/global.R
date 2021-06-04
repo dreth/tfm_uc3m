@@ -359,6 +359,7 @@ MR <- function(wk, yr, ccaas, sexes) {
 
     # deaths rolling window of 1 year for year(s) yr and week wk
     numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week, age = numerator$age), FUN=sum)
+    numerator$age <- factor(numerator$age, levels=AGE_GROUPS)
     numerator <- numerator[order(numerator$year, numerator$age),]
     numerator$rolling_sum <- NA
     for (ag in AGE_GROUPS) {
@@ -370,16 +371,57 @@ MR <- function(wk, yr, ccaas, sexes) {
     # Population at week wk
     denominator <- pop %>% dplyr::filter(year %in% yr & sex == sexes & ccaa %in% ccaas)
     denominator <- aggregate(denominator$pop, list(year = denominator$year, week = denominator$week, age = denominator$age), FUN=sum)
+    denominator$age <- factor(denominator$age, levels=AGE_GROUPS)
     denominator <- denominator[order(denominator$year, denominator$age),]
     denominator <- denominator %>% dplyr::filter(week %in% wk & year %in% yr)
 
     # mortality rate for life table
-    nqx = numerator/denominator$x
+    nmx <- numerator/denominator$x
+
+    # creating levels for age groups
+    df <- data.frame(year=denominator$year, week=denominator$week, age=denominator$age, nmx=nmx)
 
     # resulting crude mortality rate
-    return(data.frame(year=denominator$year, week=denominator$week, age=denominator$age, nqx=nqx))
+    return(df)
 }
 
 
-# LIFE EXPECTANCY FUNCTION
+# LIFE TABLE FUNCTION
+LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
+    # creating the life table template
+    df <- MR(wk=wk, yr=yr, ccaas=ccaas, sexes=sexes)
+    for (col in c("nqx","lx","ndx", "nLx", "Tx", "ex")) {df[,col] = rep(NA,length(df[,'week']))}
+    df$nqx <- 1 - exp(-age_interval_length * df$nmx)
 
+    # creating the lx col
+    for (year in yr) {
+        for (week in wk) {
+            # obtaining the death rates for year and week in loop
+            nqx <- df[df$year == year & df$week == week,'nqx']
+            nmx <- df[df$year == year & df$week == week,'nmx']
+
+            # creating a vector for the different metrics
+            lx <- c(initial_pop)
+            ndx <- c(initial_pop*nqx[1])
+            nLx <- c(ndx[1]/nmx[1])
+
+            for (i in 2:length(nqx)) {
+                ndx[i] <- lx[i-1]*nqx[i]
+                lx[i] <- lx[i-1] - ndx[i]
+                nLx[i] <- ndx[i]/nmx[i]
+            }
+            
+            # metrics constructed post-loop
+            Tx <- rev(sapply(1:length(nLx), function(s) {sum(nLx[1:s])}))
+            ex <- Tx/lx
+
+            # adding the columns to the df
+            df[df$year == year & df$week == week,'lx'] <- lx
+            df[df$year == year & df$week == week,'ndx'] <- ndx
+            df[df$year == year & df$week == week,'nLx'] <- nLx
+            df[df$year == year & df$week == week,'Tx'] <- Tx
+            df[df$year == year & df$week == week,'ex'] <- ex
+        }
+    }
+    return(df)
+}
