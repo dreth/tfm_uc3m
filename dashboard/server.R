@@ -1,14 +1,14 @@
 # SERVER
 shinyServer(
     function(input, output, session) {
-        # REACTIVE VALUES
+# REACTIVE VALUES --------------------------------------------------------------------------
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
         updateDBLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
         updateEurostatLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
         updateEurostatLogsEarliestProvisional <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/earliest_eurostat_provisional.log', readFunc=readLines)
         updateINELogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_ine_update.log', readFunc=readLines)
 
-        # PLOTTING FUNCTIONS
+# PLOTTING/TABLE FUNCTIONS --------------------------------------------------------------------------
         # mortality plots
         plot_metric <- function(df, week_range, yr_range, type='crmr', device='ggplot2') {
             # plot title construction
@@ -95,14 +95,6 @@ shinyServer(
             )
             # only taking life exp at birth
             lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == 'Y_LT5',]
-            print(wk)
-            print(yr)
-            print(ccaas)
-            print(sexes)
-            print(type)
-            print(week_range_plot)
-            print(yr_range_plot)
-            print(device_plot)
 
             # life expectancy plot
             if (type == 'le') {
@@ -121,8 +113,8 @@ shinyServer(
             }
         }
 
-        # DYNAMIC UI CONTROLS
-        # MORTALITY TAB
+# DYNAMIC UI CONTROLS
+# MORTALITY TAB -------------------------------------------------------------------------- 
         # Select total or selectize CCAA
         output$selectCCAAMortalityUIOutput <- renderUI({
             if (input$selectCCAAMortalityTotal == 'select') {
@@ -155,7 +147,42 @@ shinyServer(
                             height = session$clientData$output_mortalityPlotly_width)
         })
 
-        # LIFE EXPECTANCY TAB
+        # PLOT OUTPUTS
+        # Action button to generate mortality plots
+        genMortPlot <- eventReactive(input$plotMortalityButton, {
+            gen_df_and_plot_mortality(
+                wk=WEEK, 
+                yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
+                ccaas=switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
+                age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
+                sexes=input$selectSexesMortality,
+                type=input$plotTypeMortality,
+                week_range_plot=input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2],
+                yr_range_plot=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2],
+                device_plot=input$usePlotlyOrGgplotMortality
+            )
+        })
+
+        # Mortality ratio plots
+        observeEvent(input$usePlotlyOrGgplotMortality, {
+            if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
+                shinyjs::hide('mortalityPlotly')
+                shinyjs::show('mortalityPlot')
+                output$mortalityPlot <- renderPlot(
+                                            {genMortPlot()},
+                                            # match width for a square plot
+                                            height = function () {session$clientData$output_mortalityPlot_width}
+                                        )
+            } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
+                shinyjs::show('mortalityPlotly')
+                shinyjs::hide('mortalityPlot')
+                output$mortalityPlotly <- renderPlotly(
+                                            {genMortPlot()},
+                                        )
+            }
+        })
+
+#  LIFE EXPECTANCY TAB ----------------------------------------------------------------------------------
         # Select total or selectize CCAA
         output$selectCCAALifeExpUIOutput <- renderUI({
             if (input$selectCCAALifeExpTotal == 'select') {
@@ -225,6 +252,9 @@ shinyServer(
             }
         })
 
+        # Table output for life table
+        output$lifeTableUIOutput
+
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
         output$plotlyUIGenLifeExp <- renderUI({
@@ -233,7 +263,65 @@ shinyServer(
                             height = session$clientData$output_lifeExpPlotly_width)
         })
 
-        # UPDATE DATABASE TAB
+        # Action button to generate life expectancy plots or life table
+        genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
+            weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
+            years <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
+            plot_lifeexp_or_lifetable(
+                wk=weeks, 
+                yr=years, 
+                ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
+                # age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
+                sexes=input$selectSexesLifeExp,
+                type=switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table'),
+                week_range_plot=weeks,
+                yr_range_plot=years,
+                device_plot=input$usePlotlyOrGgplotLifeExp
+            )
+        })
+
+        # life expectancy plots
+        observeEvent(input$usePlotlyOrGgplotLifeExp, {
+            if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
+            shinyjs::hide('lifeExpPlotly')
+            shinyjs::hide('lifeTableOutput')
+            shinyjs::show('lifeExpPlot')
+            output$lifeExpPlot <- renderPlot(
+                                        {genLifeExpOutputs()},
+                                        # match width for a square plot
+                                        height = function () {session$clientData$output_lifeExpPlot_width}
+                                    )
+            } else {
+                shinyjs::hide('lifeTableOutput')
+                shinyjs::hide('lifeExpPlot')
+                shinyjs::show('lifeExpPlotly')
+                output$lifeExpPlotly <- renderPlotly(
+                                            {genLifeExpOutputs()},
+                                        )
+            }
+        })
+
+        # life exp plots or life table
+        observeEvent(input$showLifeExpPlotOrLifeTable, {
+            if (input$showLifeExpPlotOrLifeTable == 'plot') {
+                shinyjs::show('usePlotlyOrGgplotLifeExp')
+                shinyjs::hide('lifeTableOutput')
+                if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
+                    shinyjs::show('lifeExpPlot')
+                    shinyjs::hide('lifeExpPlotly')
+                } else {
+                    shinyjs::hide('lifeExpPlot')
+                    shinyjs::show('lifeExpPlotly')
+                }
+            } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
+                shinyjs::hide('lifeExpPlot')
+                shinyjs::hide('lifeExpPlotly')
+                shinyjs::show('lifeTableOutput')
+                shinyjs::hide('usePlotlyOrGgplotLifeExp')
+            }
+        })
+
+# UPDATE DATABASE TAB -------------------------------------------------------------------------------------
         # Text output for 
         # log output from command in update database
         output$lastUpdatedLog <- renderText({
@@ -273,9 +361,21 @@ shinyServer(
         output$INEDBID <- renderText({
             INEDBID
         })
+
+        # UPDATE DATABASE BUTTON
+        observeEvent(input$updateDatabaseButton, {
+            system('bash ./www/scripts/update_database_app.sh', wait=FALSE)
+            systime <- Sys.time()
+            updateActionButton(session=session, inputId='updateDatabaseButton', label="Update Database (Again)")
+        })
+
+        # log output from command in update database
+        output$consoleLogsUpdateDatabase <- renderUI({
+            HTML(updateDBLogs())
+        })
         
 
-        # DB TABLE TAB
+# DB TABLE TAB -------------------------------------------------------------------------------------
         # Select total or selectize CCAA
         output$selectCCAADBTableUIOutput <- renderUI({
             if (input$selectCCAADBTableTotal == 'select') {
@@ -299,7 +399,25 @@ shinyServer(
             }
         })
 
-        # MAPS TAB
+        # DATABASE TABLE DOWNLOADER
+        filtered_download_df <- reactive({filter_df_table(
+                                            db=DBs[[input$selectDBTable]],
+                                            wk=input$weekSliderSelectorDBTable[1]:input$weekSliderSelectorDBTable[2],
+                                            yr=input$yearSliderSelectorDBTable[1]:input$yearSliderSelectorDBTable[2],
+                                            ccaas=switch(input$selectCCAADBTableTotal, 'all'=CCAA, 'select'=input$selectCCAADBTable),
+                                            age_groups=switch(input$selectAgeGroupsDBTableTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeDBTable),
+                                            sexes=input$selectSexesDBTable
+                                        )})
+        output$downloadDBTable <- downloadHandler(
+            filename = function() {
+                str_interp('Filtered_data-${Sys.Date()}.csv')
+            },
+            content = function(file){
+                write.csv(filtered_download_df(),file)
+            }
+        )
+
+# MAPS TAB -------------------------------------------------------------------------------------
         # Dynamic age group control, for all age groups, or selected
         output$selectAgeGroupsMapsUIOutput <- renderUI({
             if (input$selectAgeGroupsMapsTotal == 'select') {
@@ -320,99 +438,6 @@ shinyServer(
             leafletOutput("mapsPlot", height=input$dimension[2])
         })
         
-        # PLOT OUTPUTS
-        # Action button to generate mortality plots
-        genMortPlot <- eventReactive(input$plotMortalityButton, {
-            gen_df_and_plot_mortality(
-                wk=WEEK, 
-                yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
-                ccaas=switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
-                age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
-                sexes=input$selectSexesMortality,
-                type=input$plotTypeMortality,
-                week_range_plot=input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2],
-                yr_range_plot=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2],
-                device_plot=input$usePlotlyOrGgplotMortality
-            )
-        })
-
-        # Mortality ratio plots
-        observeEvent(input$usePlotlyOrGgplotMortality, {
-            if (input$usePlotlyOrGgplotMortality == 'ggplot2') {
-                shinyjs::hide('mortalityPlotly')
-                shinyjs::show('mortalityPlot')
-                output$mortalityPlot <- renderPlot(
-                                            {genMortPlot()},
-                                            # match width for a square plot
-                                            height = function () {session$clientData$output_mortalityPlot_width}
-                                        )
-            } else if (input$usePlotlyOrGgplotMortality == 'plotly') {
-                shinyjs::show('mortalityPlotly')
-                shinyjs::hide('mortalityPlot')
-                output$mortalityPlotly <- renderPlotly(
-                                            {genMortPlot()},
-                                        )
-            }
-        })
-
-        # Action button to generate life expectancy plots or life table
-        genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
-            weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
-            years <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
-            plot_lifeexp_or_lifetable(
-                wk=weeks, 
-                yr=years, 
-                ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
-                # age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
-                sexes=input$selectSexesLifeExp,
-                type=switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table'),
-                week_range_plot=weeks,
-                yr_range_plot=years,
-                device_plot=input$usePlotlyOrGgplotLifeExp
-            )
-        })
-
-        # life expectancy plots
-        observeEvent(input$usePlotlyOrGgplotLifeExp, {
-            if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
-            shinyjs::hide('lifeExpPlotly')
-            shinyjs::hide('lifeTableTblOutput')
-            shinyjs::show('lifeExpPlot')
-            output$lifeExpPlot <- renderPlot(
-                                        {genLifeExpOutputs()},
-                                        # match width for a square plot
-                                        height = function () {session$clientData$output_lifeExpPlot_width}
-                                    )
-            } else {
-                shinyjs::hide('lifeTableTblOutput')
-                shinyjs::hide('lifeExpPlot')
-                shinyjs::show('lifeExpPlotly')
-                output$lifeExpPlotly <- renderPlotly(
-                                            {genLifeExpOutputs()},
-                                        )
-            }
-        })
-
-        # life exp plots or life table
-        observeEvent(input$showLifeExpPlotOrLifeTable, {
-            if (input$showLifeExpPlotOrLifeTable == 'plot') {
-                shinyjs::show('usePlotlyOrGgplotLifeExp')
-                shinyjs::hide('lifeTableTblOutput')
-                if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
-                    shinyjs::show('lifeExpPlot')
-                    shinyjs::hide('lifeExpPlotly')
-                } else {
-                    shinyjs::hide('lifeExpPlot')
-                    shinyjs::show('lifeExpPlotly')
-                }
-            } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
-                shinyjs::hide('lifeExpPlot')
-                shinyjs::hide('lifeExpPlotly')
-                shinyjs::show('lifeTableTblOutput')
-                shinyjs::hide('usePlotlyOrGgplotLifeExp')
-            }
-        })
-
         # Generate chloropleth map event
         genChloropleth <- eventReactive(input$plotMapsButton, {
             shinyjs::show('mapsPlot')
@@ -450,35 +475,6 @@ shinyServer(
         # output for map
         output$mapsPlot <- renderLeaflet({genChloropleth()})
        
-        # UPDATE DATABASE BUTTON
-        observeEvent(input$updateDatabaseButton, {
-            system('bash ./www/scripts/update_database_app.sh', wait=FALSE)
-            systime <- Sys.time()
-            updateActionButton(session=session, inputId='updateDatabaseButton', label="Update Database (Again)")
-        })
-
-        # log output from command in update database
-        output$consoleLogsUpdateDatabase <- renderUI({
-            HTML(updateDBLogs())
-        })
-
-        # DATABASE TABLE DOWNLOADER
-        filtered_download_df <- reactive({filter_df_table(
-                                            db=DBs[[input$selectDBTable]],
-                                            wk=input$weekSliderSelectorDBTable[1]:input$weekSliderSelectorDBTable[2],
-                                            yr=input$yearSliderSelectorDBTable[1]:input$yearSliderSelectorDBTable[2],
-                                            ccaas=switch(input$selectCCAADBTableTotal, 'all'=CCAA, 'select'=input$selectCCAADBTable),
-                                            age_groups=switch(input$selectAgeGroupsDBTableTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeDBTable),
-                                            sexes=input$selectSexesDBTable
-                                        )})
-        output$downloadDBTable <- downloadHandler(
-            filename = function() {
-                str_interp('Filtered_data-${Sys.Date()}.csv')
-            },
-            content = function(file){
-                write.csv(filtered_download_df(),file)
-            }
-        )
     } 
 )
 
