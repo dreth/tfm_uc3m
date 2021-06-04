@@ -74,7 +74,7 @@ shinyServer(
         }
 
         # Generate life expectancy df and plot
-        plot_lifeexp_or_lifetable <- function(wk, yr, ccaas, sexes, week_range_plot, yr_range_plot, device_plot, type) {
+        plot_lifeexp_or_lifetable <- function(wk, yr, ccaas, sexes, type, week_range_plot, yr_range_plot, device_plot) {
             # generate DF
             lifeExpDF <- LT(
                 wk=wk,
@@ -171,7 +171,7 @@ shinyServer(
                 )
             # life table
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
-                sliderInput("weekSliderSelectorLifeExp",
+                sliderInput("weekSliderSelectorLifeTable",
                   label = h5(strong("Select week to compute")),
                   min = 1,
                   max = 52,
@@ -194,7 +194,7 @@ shinyServer(
                 )
             # life table
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
-                sliderInput("yearSliderSelectorLifeExp",
+                sliderInput("yearSliderSelectorLifeTable",
                   label = h5(strong("Select year to compute")),
                   min = min(YEAR),
                   max = max(YEAR),
@@ -341,11 +341,11 @@ shinyServer(
                 wk=WEEK, 
                 yr=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 
                 ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
-                age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
+                # age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
                 sexes=input$selectSexesLifeExp,
                 type=input$plotTypeLifeExp,
-                week_range_plot=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2],
-                yr_range_plot=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2],
+                week_range_plot=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable),
+                yr_range_plot=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable),
                 device_plot=input$usePlotlyOrGgplotLifeExp
             )
         })
