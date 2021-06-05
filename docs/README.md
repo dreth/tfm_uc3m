@@ -2,4 +2,4 @@
 
 Documentation for the app.
 
-**Coming soon.**
+Coming soon.
