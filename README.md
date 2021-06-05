@@ -60,8 +60,8 @@ The data can also be updated, however, database updates performed within the app
 In case you prefer to build the container yourself, the repository contains a Dockerfile from which it can be built and run as follows:
 
 ```bash
-docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t tfm_app
-docker run -p 3838:3838/tcp tfm_app
+docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t dreth:tfm_uc3m
+docker run -p 3838:3838/tcp dreth:tfm_uc3m
 ```
 
 This approach will always guarantee you're pulling the latest version of the container, as I might take slightly longer to push changes to the container to docker hub unless they're significant. However, since the container always pulls the latest version of the app from github, any version of it will run the latest version of the app after pulled.
