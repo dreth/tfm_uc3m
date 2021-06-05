@@ -120,11 +120,7 @@ shinyServer(
                 sexes=sexes
             )
             # only taking life exp at birth
-            if (age_groups == 'all') {
-                lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == 'Y_LT5',]
-            } else {
-                lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == age_groups,]
-            }
+            lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == age_groups,]
             
 
             # life expectancy plot
@@ -140,7 +136,8 @@ shinyServer(
 
             # life table create and filter
             } else {
-                return(lifeExpDF)
+                tableDF <- lifeExpDF[lifeExpDF$week == wk & lifeExpDF$year == yr,]
+                return(tableDF)
             }
         }
 
@@ -299,7 +296,7 @@ shinyServer(
                 wk=weeks, 
                 yr=years, 
                 ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
-                age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
+                age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'at_birth'='Y_LT5', 'select'=input$selectAgeLifeExp),
                 sexes=input$selectSexesLifeExp,
                 type=switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table'),
                 week_range_plot=weeks,
