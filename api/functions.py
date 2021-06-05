@@ -460,7 +460,7 @@ def perform_update_datasets(curr_path, db_type, updated_dataset):
     to_add = updated_dataset[~updated_dataset['mkr'].isin(curr['mkr'])]
 
     # we only keep those that we'll update
-    updated_dataset = updated_dataset[updated_dataset['mkr'].isin(curr['mkr'])]
+    updated_dataset = updated_dataset[updated_dataset['mkr'].isin(curr['mkr'])].reset_index(drop=True)
 
     # values to keep correspond to those which have been acquired previously and are no longer provisional
     to_keep = curr[~curr['mkr'].isin(updated_dataset['mkr'].unique())]
@@ -485,3 +485,5 @@ def perform_update_datasets(curr_path, db_type, updated_dataset):
 
     # returning updated df
     return df.reset_index(drop=True)
+
+# %%
