@@ -13,15 +13,18 @@ require(plotly)
 require(leaflet)
 require(rgdal)
 require(RColorBrewer)
-
-# TRACE 
-options(shiny.trace=FALSE)
+require(zoo)
+require(RcppRoll)
 
 # Running last eurostat update check
-system('bash ./www/scripts/check_dbs.sh', wait=TRUE)
+system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
+
+# TRACE 
+options(shiny.trace=TRUE)
+
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
-death_count <- 'FALSE'
+death_count <- FALSE
 
 # DATASETS
 pop <- read.csv('../data/pop.csv')
@@ -47,9 +50,9 @@ names(AGE_GROUP_RANGES) <- AGE_GROUPS
 # SEXES
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
-# OPTIONS TO PLOT
-MORTALITY_PLOT_TYPE <-switch(death_count, 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
-names(MORTALITY_PLOT_TYPE) <-switch(death_count, 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
+# OPTIONS TO PLOT (MORTALITY)
+MORTALITY_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
+names(MORTALITY_PLOT_TYPE) <-switch(as.character(death_count), 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
 # reverse options for reference
 MORTALITY_PLOT_TYPE_R <- names(MORTALITY_PLOT_TYPE)
 names(MORTALITY_PLOT_TYPE_R) <- MORTALITY_PLOT_TYPE
@@ -62,6 +65,12 @@ names(CCAA_UI_SELECT) <- c('All CCAAs', 'Select CCAAs')
 # AGE GROUP UI SELECTOR
 AGE_GROUPS_UI_SELECT <- c('all', 'select')
 names(AGE_GROUPS_UI_SELECT) <- c('All Age groups', 'Select Age groups')
+# AGE GROUP UI SELECTOR (LIFE EXP)
+AGE_GROUPS_UI_SELECT_LE <- c('at_birth', 'select')
+names(AGE_GROUPS_UI_SELECT_LE) <- c('Life expectancy at birth', 'Select Age group')
+# SHOW PLOT OR LIFE TABLES (LIFE EXP)
+SHOW_PLOT_OR_LT <- c('plot','life_table')
+names(SHOW_PLOT_OR_LT) <- c('Life expectancy TS', 'Life table')
 # PLOTTING DEVICE TO USE
 PLOT_DEVICE_UI_SELECT <- c('ggplot2','plotly')
 names(PLOT_DEVICE_UI_SELECT) <- c('ggplot2', 'plotly')
@@ -347,17 +356,84 @@ paste_readLines <- function(text) {
     return(paste(readLines(text), collapse='<br/>'))
 }
 
-# LIFE EXPECTANCY FUNCTION
-# MR <- function(wk, yr, ccaas, age_groups, sexes) {
-#     # assuming multiple years
-#     #  deaths
-#     numerator <- death %>% dplyr::filter(year %in% yr & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+# %% LIFE EXPECTANCY FUNCTIONS
+# CRUDE MORTALITY RATE FUNCTION (PROBABILITY OF DEATH)
+MR <- function(wk, yr, ccaas, sexes) {
+    # assuming multiple years
+    # deaths
+    numerator <- death %>% dplyr::filter(year %in% (min(yr)-1):max(yr) & ccaa %in% ccaas & sex == sexes)
+
+    # deaths rolling window of 1 year for year(s) yr and week wk
+    numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week, age = numerator$age), FUN=sum)
+    numerator$age <- factor(numerator$age, levels=AGE_GROUPS)
+    numerator$year <- factor(numerator$year)
+    numerator <- numerator[order(numerator$year, numerator$age),]
+    numerator$rolling_sum <- NA
+    for (ag in AGE_GROUPS) {
+        numerator[numerator$age == ag,'rolling_sum'] = lag(roll_sum(numerator[numerator$age == ag,'x'], 52, fill=NA),26)
+    }
+    numerator <- numerator %>% dplyr::filter(week %in% wk & year %in% yr)
+    numerator <- numerator$rolling_sum
+
+    # Population at week wk
+    denominator <- pop %>% dplyr::filter(year %in% yr & sex == sexes & ccaa %in% ccaas)
+    denominator <- aggregate(denominator$pop, list(year = denominator$year, week = denominator$week, age = denominator$age), FUN=sum)
+    denominator$age <- factor(denominator$age, levels=AGE_GROUPS)
+    denominator$year <- factor(denominator$year)
+    denominator <- denominator[order(denominator$year, denominator$age),]
+    denominator <- denominator %>% dplyr::filter(week %in% wk & year %in% yr)
+
+    # mortality rate for life table
+    nmx <- numerator/denominator$x
+
+    # creating levels for age groups
+    df <- data.frame(year=denominator$year, week=denominator$week, age=denominator$age, nmx=nmx)
+
+    # resulting crude mortality rate
+    return(df)
+}
 
 
-# }
-# testdeaths <- death %>% dplyr::filter(year %in% 2019:2020 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
-# testdeaths <- aggregate(testdeaths$death, list(week = testdeaths$week, year = testdeaths$year), FUN=sum)
-# total_deaths <- sum(testdeaths[(testdeaths$week %in% 2:52 & testdeaths$year == 2019) | (testdeaths$week %in% 1:2 & testdeaths$year == 2020),'x'])
-# testpop <- pop %>% dplyr::filter(year %in% 2020 & week %in% 2 & ccaa %in% CCAA & age %in% AGE_GROUPS & sex %in% 'T')
-# total_pop <- sum(testpop$pop)
-# total_deaths/total_pop
+# LIFE TABLE FUNCTION
+LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
+    # creating the life table template
+    df <- MR(wk=wk, yr=yr, ccaas=ccaas, sexes=sexes)
+    for (col in c("nqx","lx","ndx", "nLx", "Tx", "ex")) {df[,col] = rep(NA,length(df[,'week']))}
+    df$nqx <- 1 - exp(-age_interval_length * df$nmx)
+
+    # creating the lx col
+    for (year in yr) {
+        for (week in wk) {
+            # obtaining the death rates for year and week in loop
+            nqx <- df[df$year == year & df$week == week,'nqx']
+            nmx <- df[df$year == year & df$week == week,'nmx']
+            if (length(nqx) == 0) {
+                nqx <- rep(NA,length(AGE_GROUPS))
+                nmx <- rep(NA,length(AGE_GROUPS))
+            }
+
+            # creating a vector for the different metrics
+            lx <- c(initial_pop)
+            ndx <- c(initial_pop*nqx[1])
+            nLx <- c(ndx[1]/nmx[1])
+            
+            for (i in 2:length(nqx)) {            
+                ndx[i] <- lx[i-1]*nqx[i]
+                lx[i] <- lx[i-1] - ndx[i]
+                nLx[i] <- ndx[i]/nmx[i]
+            }
+
+            # metrics constructed post-loop
+            Tx <- rev(sapply(1:length(nLx), function(s) {sum(nLx[1:s])}))
+            ex <- Tx/lx
+
+            # adding the columns to the df
+            df[df$year == year & df$week == week,'lx'] <- lx
+            df[df$year == year & df$week == week,'ndx'] <- ndx
+            df[df$year == year & df$week == week,'nLx'] <- nLx
+            df[df$year == year & df$week == week,'Tx'] <- Tx
+            df[df$year == year & df$week == week,'ex'] <- ex
+        }
+    }
+    return(df)
+}

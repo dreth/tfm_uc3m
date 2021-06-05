@@ -60,8 +60,8 @@ The data can also be updated, however, database updates performed within the app
 In case you prefer to build the container yourself, the repository contains a Dockerfile from which it can be built and run as follows:
 
 ```bash
-docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t tfm_app
-docker run -p 3838:3838/tcp tfm_app
+docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t dreth:tfm_uc3m
+docker run -p 3838:3838/tcp dreth:tfm_uc3m
 ```
 
 This approach will always guarantee you're pulling the latest version of the container, as I might take slightly longer to push changes to the container to docker hub unless they're significant. However, since the container always pulls the latest version of the app from github, any version of it will run the latest version of the app after pulled.
@@ -81,7 +81,7 @@ It is recommended to use the docker approach described above, nevertheless, if y
 To be able to use every feature in the app, a series of requirements must be met, all the R libraries used can be found in the first few lines of the *global.R* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/global.R). Which can be installed as follows:
 
 ```R
-install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes','pracma','dplyr','ggplot2','stringr','MASS','plotly'))
+install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes','pracma','dplyr','ggplot2','stringr','MASS','plotly','leaflet','rgdal','RColorBrewer','zoo','RcppRoll'))
 ```
 
 #### Python requirements

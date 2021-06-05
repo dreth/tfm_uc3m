@@ -43,7 +43,7 @@ with open('./logs/update_database.log', 'r+') as f:
     contents = f.read()
     f.write('\nSTEP 2 - Creating death dataset...\n')
 death = pd.concat(death_datasets).reset_index(drop=True)
-most_recent_week = latest_prov_date_death[-2:]
+most_recent_week = int(latest_prov_date_death[-2:])
 # perform database update
 death = perform_update_datasets(curr_path='../data/death.csv', db_type='deaths', updated_dataset=death)
 death.to_csv('../data/death.csv')

@@ -12,8 +12,9 @@ ccaa_list = ['ES11', 'ES12', 'ES13', 'ES21', 'ES22', 'ES23', 'ES24', 'ES3', 'ES4
              'ES42', 'ES43', 'ES51', 'ES52', 'ES53', 'ES61', 'ES62', 'ES63', 'ES64', 'ES7']
 
 # Age groups
-age_groups = ['Y10-14', 'Y15-19', 'Y20-24', 'Y25-29', 'Y30-34', 'Y35-39', 'Y40-44', 'Y45-49', 'Y5-9',
-              'Y50-54', 'Y55-59', 'Y60-64', 'Y65-69', 'Y70-74', 'Y75-79', 'Y80-84', 'Y85-89', 'Y_GE90', 'Y_LT5']
+age_groups = ['Y_LT5', 'Y5-9', 'Y10-14', 'Y15-19', 'Y20-24', 'Y25-29', 'Y30-34', 'Y35-39', 
+              'Y40-44', 'Y45-49','Y50-54', 'Y55-59', 'Y60-64', 'Y65-69', 'Y70-74', 'Y75-79', 
+              'Y80-84', 'Y85-89', 'Y_GE90']
 
 # Sexes
 sexes = ['M','F','T']
@@ -189,7 +190,8 @@ def check_INE_latest(df_id='9681', lookback=2):
 def generate_pop_df(raw_data, most_recent_week, date=False):
     """
     raw_data         : json object obtained from the query_INE_pop function
-    most_recent_week : 
+    most_recent_week : most recent week obtainable from INE's dataset
+    date             : whether to keep or remove date (YYYY-MM-DD) in the dataset
     """
     # column fields
     df = {
@@ -459,7 +461,7 @@ def perform_update_datasets(curr_path, db_type, updated_dataset):
     to_add = updated_dataset[~updated_dataset['mkr'].isin(curr['mkr'])]
 
     # we only keep those that we'll update
-    updated_dataset = updated_dataset[updated_dataset['mkr'].isin(curr['mkr'])]
+    updated_dataset = updated_dataset[updated_dataset['mkr'].isin(curr['mkr'])].reset_index(drop=True)
 
     # values to keep correspond to those which have been acquired previously and are no longer provisional
     to_keep = curr[~curr['mkr'].isin(updated_dataset['mkr'].unique())]
@@ -484,3 +486,5 @@ def perform_update_datasets(curr_path, db_type, updated_dataset):
 
     # returning updated df
     return df.reset_index(drop=True)
+
+# %%
