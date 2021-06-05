@@ -71,4 +71,3 @@ with open('./logs/update_history.log', 'r+') as f:
     contents = f.read()
     f.seek(0)
     f.write(f'> Database updated at: {dt.datetime.now().isoformat(" ")}\n')
-# %%

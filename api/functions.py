@@ -190,7 +190,8 @@ def check_INE_latest(df_id='9681', lookback=2):
 def generate_pop_df(raw_data, most_recent_week, date=False):
     """
     raw_data         : json object obtained from the query_INE_pop function
-    most_recent_week : 
+    most_recent_week : most recent week obtainable from INE's dataset
+    date             : whether to keep or remove date (YYYY-MM-DD) in the dataset
     """
     # column fields
     df = {
