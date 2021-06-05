@@ -12,19 +12,33 @@ shinyServer(
         # mortality plots
         plot_metric <- function(df, week_range, yr_range, type='crmr', device='ggplot2') {
             # plot title construction
-            selectedCCAAs <- switch(input$selectCCAAMortalityTotal, all='All', select=CCAA_SHORT[input$selectCCAAMortality])
-            selectedAgeGroups <- switch(input$selectAgeGroupsMortalityTotal, all='All', select=AGE_GROUP_RANGES[input$selectAgeMortality])
+            # plot name by metric
             plotTitle <- switch(type,
                                 'em'='Excess Mortality',
                                 'crmr'='Cumulative Relative Mortality Rate',
                                 'cmr'='Cumulative Mortality Rate',
                                 'bf'='Cumulative Improvement Factor',
                                 'dc'='Death count',
-                                'le'='Life expectancy'
+                                'le'=ifelse(input$selectAgeGroupsLifeExpTotal=='at_birth', 'Life expectancy at birth', 'Life expectancy')
                                 )
-            titleCCAA <- paste(selectedCCAAs,collapse=", ")
-            titleAgeGroups <- ifelse(type=='le', AGE_GROUP_RANGES[input$selectAgeLifeExp], paste(selectedAgeGroups,collapse=", "))
-            plotTitle <- ifelse(type=='le',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Group: ${titleAgeGroups}'),str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}'))
+
+            # title elements conditions
+            # Life expectancy
+            if (type == 'le') {
+                selectedCCAAs <- switch(input$selectCCAALifeExpTotal,'all'='All','select'=CCAA_SHORT[input$selectCCAALifeExp])
+                selectedAgeGroups <- ifelse(input$selectAgeGroupsLifeExpTotal=='at_birth', '', AGE_GROUP_RANGES[input$selectAgeLifeExp])
+                titleCCAA <- paste(selectedCCAAs,collapse=", ")
+                titleAgeGroups <- ifelse(input$selectAgeGroupsLifeExpTotal=='at_birth','',str_interp(", and Age Group: ${selectedAgeGroups}"))
+            # Mortality metrics
+            } else {
+                selectedCCAAs <- switch(input$selectCCAAMortalityTotal, 'all'='All', 'select'=CCAA_SHORT[input$selectCCAAMortality])
+                selectedAgeGroups <- switch(input$selectAgeGroupsMortalityTotal, 'all'='All', 'select'=AGE_GROUP_RANGES[input$selectAgeMortality])
+                titleCCAA <- paste(selectedCCAAs,collapse=", ")
+                titleAgeGroups <- str_interp(", and Age Groups: ${paste(selectedAgeGroups,collapse=', ')}")
+            }   
+
+            # final plot title construction
+            plotTitle <- str_interp('${plotTitle} for CCAA(s): ${titleCCAA}${titleAgeGroups}')
 
             # Condition in case of error
             if (suppressWarnings({df[1] == 'error'})) {
@@ -136,7 +150,7 @@ shinyServer(
 
             # life table create and filter
             } else {
-                tableDF <- lifeExpDF[lifeExpDF$week == wk & lifeExpDF$year == yr,]
+                tableDF <- lifeExpDF[lifeExpDF$week == wk & lifeExpDF$year == yr,!]
                 return(tableDF)
             }
         }
