@@ -23,8 +23,8 @@ shinyServer(
                                 'le'='Life expectancy'
                                 )
             titleCCAA <- paste(selectedCCAAs,collapse=", ")
-            titleAgeGroups <- paste(selectedAgeGroups,collapse=", ")
-            plotTitle <- ifelse(type=='le',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}'),str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}'))
+            titleAgeGroups <- ifelse(type=='le', AGE_GROUP_RANGES[input$selectAgeLifeExp], paste(selectedAgeGroups,collapse=", "))
+            plotTitle <- ifelse(type=='le',str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Group: ${titleAgeGroups}'),str_interp('${plotTitle} for CCAA(s): ${titleCCAA}, and Age Groups: ${titleAgeGroups}'))
 
             # Condition in case of error
             if (suppressWarnings({df[1] == 'error'})) {
@@ -32,30 +32,56 @@ shinyServer(
 
             # Condition for when user uses ggplot as plot device
             } else if (device == 'ggplot2') {
+
+                # filtering df
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
+
+                # if selection includes current year
                 if (as.numeric(substring(Sys.time(),0,4)) %in% fig_df$year) {
-                    plt <- ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
-                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
+                    plt <- ggplot(data = fig_df, aes_string(x='week', y=type)) + 
+                           geom_line(aes(color=year)) +
+                           ggtitle(plotTitle) + 
+                           labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + 
+                           geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
+
+                # if selection does not include current year
                 } else {
                     plt <- ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
-                    ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15))
+                           ggtitle(plotTitle) + 
+                           labs(title = str_wrap(plotTitle, input$dimension[1]/15))
                 }
+                
+                # returning the plot object
                 return(plt)
 
             # Condition for when the user uses plotly as plot device
             } else if (device == 'plotly') {
+
+                # filtering df
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
+
+                # if selection includes current year
                 if (as.numeric(substring(Sys.time(),0,4)) %in% fig_df$year) {
                     plt <- ggplotly(
-                        ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
-                        ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10)) + geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
+                        ggplot(data = fig_df, aes_string(x='week', y=type)) + 
+                        geom_line(aes(color=year)) +
+                        ggtitle(plotTitle) + 
+                        labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + 
+                        theme(plot.title = element_text(size=10)) + 
+                        geom_line(data = filter(fig_df, year == str_interp("${substring(Sys.time(),0,4)}")), size = 1.5,  aes(color=year))
                     )
+
+                # if selection does not include current year
                 } else {
                     plt <- ggplotly(
-                        ggplot(data = fig_df, aes_string(x='week', y=type)) + geom_line(aes(color=year)) +
-                        ggtitle(plotTitle) + labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10))
+                        ggplot(data = fig_df, aes_string(x='week', y=type)) + 
+                        geom_line(aes(color=year)) +
+                        ggtitle(plotTitle) + 
+                        labs(title = str_wrap(plotTitle, input$dimension[1]/15)) + theme(plot.title = element_text(size=10))
                     )
                 }
+
+                # returning the plot object
                 return(plt)
             
             # Condition in case of an unexpected error
@@ -85,7 +111,7 @@ shinyServer(
         }
 
         # Generate life expectancy df and plot
-        plot_lifeexp_or_lifetable <- function(wk, yr, ccaas, sexes, type, week_range_plot, yr_range_plot, device_plot) {
+        plot_lifeexp_or_lifetable <- function(wk, yr, ccaas, age_groups, sexes, type,week_range_plot, yr_range_plot, device_plot) {
             # generate DF
             lifeExpDF <- LT(
                 wk=wk,
@@ -94,7 +120,12 @@ shinyServer(
                 sexes=sexes
             )
             # only taking life exp at birth
-            lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == 'Y_LT5',]
+            if (age_groups == 'all') {
+                lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == 'Y_LT5',]
+            } else {
+                lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == age_groups,]
+            }
+            
 
             # life expectancy plot
             if (type == 'le') {
@@ -252,9 +283,6 @@ shinyServer(
             }
         })
 
-        # Table output for life table
-        output$lifeTableUIOutput
-
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
         output$plotlyUIGenLifeExp <- renderUI({
@@ -271,13 +299,18 @@ shinyServer(
                 wk=weeks, 
                 yr=years, 
                 ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
-                # age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
+                age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeLifeExp),
                 sexes=input$selectSexesLifeExp,
                 type=switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table'),
                 week_range_plot=weeks,
                 yr_range_plot=years,
                 device_plot=input$usePlotlyOrGgplotLifeExp
             )
+        })
+
+        # table output for life table
+        output$lifeTableOutput <- renderTable({
+            genLifeExpOutputs()
         })
 
         # life expectancy plots

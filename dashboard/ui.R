@@ -125,7 +125,9 @@ shinyUI(
             mainPanel(
               plotOutput("lifeExpPlot"),
               uiOutput('plotlyUIGenLifeExp'),
-              uiOutput('lifeTableUIOutput')
+              hidden(
+                tableOutput('lifeTableOutput')
+              )
             )
           )
         ),
