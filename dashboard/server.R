@@ -150,7 +150,7 @@ shinyServer(
 
             # life table create and filter
             } else {
-                tableDF <- lifeExpDF[lifeExpDF$week == wk & lifeExpDF$year == yr,!]
+                tableDF <- lifeExpDF[lifeExpDF$week == wk & lifeExpDF$year == yr,]
                 return(tableDF)
             }
         }
