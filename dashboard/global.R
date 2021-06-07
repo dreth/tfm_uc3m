@@ -20,7 +20,7 @@ require(RcppRoll)
 system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
 
 # TRACE 
-options(shiny.trace=TRUE)
+options(shiny.trace=FALSE)
 
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
