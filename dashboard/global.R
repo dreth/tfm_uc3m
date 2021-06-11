@@ -22,7 +22,6 @@ system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
 # TRACE 
 options(shiny.trace=FALSE)
 
-
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
 death_count <- FALSE
 
@@ -424,7 +423,7 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
             }
 
             # metrics constructed post-loop
-            Tx <- rev(sapply(1:length(nLx), function(s) {sum(nLx[1:s])}))
+            Tx <- sapply(1:length(nLx), function(s) {sum(nLx[s:length(nLx)])})
             ex <- Tx/lx
 
             # adding the columns to the df
