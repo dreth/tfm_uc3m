@@ -10,8 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     libudunits2-dev \
     libgdal-dev \
-    git \
-    wget
+    git
 
 # installing python libraries
 RUN pip3 install pandas
@@ -33,11 +32,9 @@ RUN R -e "install.packages('rgdal')"
 RUN R -e "install.packages('zoo')"
 RUN R -e "install.packages('RcppRoll')"
 
-# select port 
+
+# select port
 EXPOSE 3838/tcp
 
-# add initialization shell script 
-RUN wget "https://raw.githubusercontent.com/dreth/tfm_uc3m/main/docker/start.sh"
-
 # running app from repo
-CMD bash start.sh
+CMD ["R", "-e", "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard', host = '0.0.0.0', port = 3838, launch.browser=FALSE)"]
