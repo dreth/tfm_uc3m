@@ -37,7 +37,6 @@ RUN R -e "install.packages('RcppRoll')"
 EXPOSE 3838/tcp
 
 # add initialization shell script 
-RUN ls
 RUN wget "https://raw.githubusercontent.com/dreth/tfm_uc3m/main/docker/start.sh"
 
 # running app from repo
