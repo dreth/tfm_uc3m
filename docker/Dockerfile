@@ -33,11 +33,11 @@ RUN R -e "install.packages('rgdal')"
 RUN R -e "install.packages('zoo')"
 RUN R -e "install.packages('RcppRoll')"
 
-# select port
+# select port 
 EXPOSE 3838/tcp
 
 # add initialization shell script 
 RUN wget "https://raw.githubusercontent.com/dreth/tfm_uc3m/main/docker/start.sh"
 
 # running app from repo
-CMD sh start.sh
+CMD bash start.sh
