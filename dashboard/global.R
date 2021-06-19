@@ -26,8 +26,8 @@ options(shiny.trace=FALSE)
 death_count <- FALSE
 
 # DATASETS
-pop <- read.csv('../data/pop.csv')
-death <- read.csv('../data/death.csv')
+pop <- read.csv('../tfm_uc3m_data/pop.csv')
+death <- read.csv('../tfm_uc3m_data/death.csv')
 # Removing X-column imported from read.csv
 pop <- pop[,2:length(pop)]
 death <- death[,2:length(death)]

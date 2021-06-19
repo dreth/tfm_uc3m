@@ -16,7 +16,7 @@ fi
 python3 query.py
 python3 dbs_check.py
 echo 'commit database up to' $date
-git commit -m "Update database ${date}" '../data/*'
 git commit -m "Update logs ${date}" '../api/logs/*'
+git commit -m "Update database ${date}" '../tfm_uc3m_data'
 git push
 

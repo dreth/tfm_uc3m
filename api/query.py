@@ -45,8 +45,8 @@ with open('./logs/update_database.log', 'r+') as f:
 death = pd.concat(death_datasets).reset_index(drop=True)
 most_recent_week = int(latest_prov_date_death[-2:])
 # perform database update
-death = perform_update_datasets(curr_path='../data/death.csv', db_type='deaths', updated_dataset=death)
-death.to_csv('../data/death.csv')
+death = perform_update_datasets(curr_path='../tfm_uc3m_data/death.csv', db_type='deaths', updated_dataset=death)
+death.to_csv('../tfm_uc3m_data/death.csv')
 
 # obtain pop dataset
 print('> STEP 3 - Creating pop dataset...\n')
@@ -57,8 +57,8 @@ with open('./logs/update_database.log', 'r+') as f:
 pop_raw = query_INE_pop(start=f'{earliest_prov_date_pop}0101')
 pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week)
 # perform database update
-pop = perform_update_datasets(curr_path='../data/pop.csv', db_type='pop', updated_dataset=pop)
-pop.to_csv('../data/pop.csv')
+pop = perform_update_datasets(curr_path='../tfm_uc3m_data/pop.csv', db_type='pop', updated_dataset=pop)
+pop.to_csv('../tfm_uc3m_data/pop.csv')
 
 # Finished process
 print('\nDone!\n')
