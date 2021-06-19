@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 cd /home
 git clone https://github.com/dreth/tfm_uc3m.git
 cd ./tfm_uc3m
