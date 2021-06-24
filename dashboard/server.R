@@ -2,8 +2,8 @@
 shinyServer(
     function(input, output, session) {
 # REACTIVE VALUES --------------------------------------------------------------------------
-        updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../api/logs/update_database.log', readFunc=paste_readLines)
-        updateDBLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/update_history.log', readFunc=readLines)
+        updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../data/logs/update_database.log', readFunc=paste_readLines)
+        updateDBLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../data/logs/update_history.log', readFunc=readLines)
         updateEurostatLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
         updateEurostatLogsEarliestProvisional <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/earliest_eurostat_provisional.log', readFunc=readLines)
         updateINELogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_ine_update.log', readFunc=readLines)
