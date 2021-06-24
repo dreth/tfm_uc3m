@@ -16,5 +16,4 @@ fi
 cd '../api'
 python3 './query.py'
 python3 './dbs_check.py'
-cd '/tfm_uc3m'
 git subtree push --prefix data https://"$GITHUB_USER":"$GITHUB_TOKEN"@github.com/dreth/tfm_uc3m_data.git main
