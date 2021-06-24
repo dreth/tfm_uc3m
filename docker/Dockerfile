@@ -37,4 +37,5 @@ RUN R -e "install.packages('RcppRoll')"
 EXPOSE 3838/tcp
 
 # running app from repo
-CMD ["R", "-e", "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard', host = '0.0.0.0', port = 3838, launch.browser=FALSE)"]
+# CMD ["R", "-e", "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard', host = '0.0.0.0', port = 3838, launch.browser=FALSE)"]
+CMD ["/bin/bash"]
