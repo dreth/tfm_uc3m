@@ -46,7 +46,7 @@ You can download docker [here](https://www.docker.com/products/docker-desktop) i
 Given docker is installed, the app can be launched by running the following lines of code. This will pull the container from Docker hub and run the application:
 
 ```bash
-docker run -p 3838:3838/tcp dreth/tfm_uc3m:latest
+docker run -it -p 3838:3838/tcp dreth/tfm_uc3m:latest
 ```
 
 Then navigate to [**http://0.0.0.0:3838/**](http://0.0.0.0:3838/) on your web browser.
@@ -61,7 +61,7 @@ In case you prefer to build the container yourself, the repository contains a Do
 
 ```bash
 docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t dreth:tfm_uc3m
-docker run -p 3838:3838/tcp dreth:tfm_uc3m
+docker run -it -p 3838:3838/tcp dreth:tfm_uc3m
 ```
 
 This approach will always guarantee you're pulling the latest version of the container, as I might take slightly longer to push changes to the container to docker hub unless they're significant. However, since the container always pulls the latest version of the app from github, any version of it will run the latest version of the app after pulled.
