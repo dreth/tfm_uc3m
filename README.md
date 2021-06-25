@@ -119,3 +119,27 @@ If on a shell console, you can also run the app as follows if the R binary is on
 ```Shell
 R -e "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard')"
 ```
+
+## Closing the application
+
+#### What should always work
+
+In order to close the application, if ran through a console using either the docker CLI approach or directly through an R interactive console, you can always kill the application using *Ctrl+C*.
+
+#### Docker
+
+Using *Ctrl+C* should always work and has always worked in my testing, however, when running the docker container, if the container's execution is not halted by using *Ctrl+C* you can do the following to kill the container:
+
+```Shell
+docker ps
+```
+
+Check the container ID, copy it either using *Ctrl+Shift+C* or right clicking the console's text and copying directly using the context menu, and running the following command:
+
+```Shell
+docker kill <Container ID>
+```
+
+And replacing ```<Container ID>``` with the copied container ID from running ```docker ps```.
+
+If the container ID and tag do not show up when running ```docker ps```, the container's execution was successfully halted.
