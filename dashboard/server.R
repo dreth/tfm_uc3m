@@ -2,6 +2,7 @@
 shinyServer(
     function(input, output, session) {
 # REACTIVE VALUES --------------------------------------------------------------------------
+        # Reactive file readers for log files
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../data/logs/update_database.log', readFunc=paste_readLines)
         updateDBLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../data/logs/update_history.log', readFunc=readLines)
         updateEurostatLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
@@ -157,6 +158,7 @@ shinyServer(
 
 # DYNAMIC UI CONTROLS
 # MORTALITY TAB -------------------------------------------------------------------------- 
+        # UI OUTPUTS
         # Select total or selectize CCAA
         output$selectCCAAMortalityUIOutput <- renderUI({
             if (input$selectCCAAMortalityTotal == 'select') {
@@ -183,10 +185,45 @@ shinyServer(
 
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
-        output$plotlyUIGenMortality <- renderUI ({
+        output$plotlyUIGenMortality <- renderUI({
             plotly::plotlyOutput(outputId = "mortalityPlotly",
                             # match width for a square plot
                             height = session$clientData$output_mortalityPlotly_width)
+        })
+
+        # output for image download dimension (image)
+        # manual  or custom
+        observeEvent(input$plotDownloadSizeSelectorMortality, {
+            if (input$plotDownloadSizeSelectorMortality == 'predefined') {
+                output$plotDownloadSizeControlsMortalityUIOutput <- renderUI({
+                    selectInput("selectDimensionsMortalityDownload",
+                        label = h5(strong("Select dimension for download")),
+                        choices = DOWNLOAD_SIZE_PREDEF,
+                        selected = 800
+                    )
+                })
+                shinyjs::hide('heightMortalityDownload')
+            } else if (input$plotDownloadSizeSelectorMortality == 'custom') {
+                output$plotDownloadSizeControlsMortalityUIOutput <- renderUI({
+                    numericInput("widthMortalityDownload",
+                        label=h5(strong("width of the resulting image")),
+                        value=500,
+                        min=1,
+                        max=10000,
+                        step=1
+                    )
+                })
+                output$plotDownloadSizeControlsMortalityUIOutputNS2 <- renderUI({
+                    numericInput("heightMortalityDownload",
+                        label=h5(strong("height of the resulting image")),
+                        value=500,
+                        min=1,
+                        max=10000,
+                        step=1
+                    )
+                })
+                shinyjs::show('heightMortalityDownload')
+            }
         })
 
         # PLOT OUTPUTS
@@ -224,7 +261,32 @@ shinyServer(
             }
         })
 
+        # PLOT DOWNLOAD BUTTON
+        output$downloadPlotMortality <- downloadHandler(
+            filename = str_interp("${input$plotTypeMortality}.png"),
+            content = function(file) {
+                ggsave(
+                    file,
+                    width=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=input$selectDimensionsMortalityDownload, 'custom'=input$widthMortalityDownload),
+                    height=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=input$selectDimensionsMortalityDownload, 'custom'=input$heightMortalityDownload),
+                    plot=gen_df_and_plot_mortality(
+                            wk=WEEK, 
+                            yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
+                            ccaas=switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
+                            age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
+                            sexes=input$selectSexesMortality,
+                            type=input$plotTypeMortality,
+                            week_range_plot=input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2],
+                            yr_range_plot=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2],
+                            device_plot='ggplot2'
+                        ),
+                    device=input$plotDownloadFormatMortality
+                )
+            }
+        )
+
 #  LIFE EXPECTANCY TAB ----------------------------------------------------------------------------------
+        # UI OUTPUTS
         # Select total or selectize CCAA
         output$selectCCAALifeExpUIOutput <- renderUI({
             if (input$selectCCAALifeExpTotal == 'select') {
@@ -302,6 +364,7 @@ shinyServer(
                             height = session$clientData$output_lifeExpPlotly_width)
         })
 
+        # PLOT/TABLE OUTPUTS
         # Action button to generate life expectancy plots or life table
         genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
             weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
@@ -366,6 +429,7 @@ shinyServer(
         })
 
 # UPDATE DATABASE TAB -------------------------------------------------------------------------------------
+        # UI OUTPUTS
         # Text output for 
         # log output from command in update database
         output$lastUpdatedLog <- renderText({
@@ -420,6 +484,7 @@ shinyServer(
         
 
 # DB TABLE TAB -------------------------------------------------------------------------------------
+        # UI OUTPUTS
         # Select total or selectize CCAA
         output$selectCCAADBTableUIOutput <- renderUI({
             if (input$selectCCAADBTableTotal == 'select') {
@@ -462,6 +527,7 @@ shinyServer(
         )
 
 # MAPS TAB -------------------------------------------------------------------------------------
+        # UI OUTPUTS
         # Dynamic age group control, for all age groups, or selected
         output$selectAgeGroupsMapsUIOutput <- renderUI({
             if (input$selectAgeGroupsMapsTotal == 'select') {
@@ -473,15 +539,18 @@ shinyServer(
                 )
             }
         })
-        # Map data table output
-        output$mapDataOutput <- renderTable({
-            genChloroplethTable()
-        }, digits=10)
+        
         # map output
         output$leafletMapOutput <- renderUI({
             leafletOutput("mapsPlot", height=input$dimension[2])
         })
-        
+
+        # PLOT/TABLE OUTPUTS
+        # Map data table output
+        output$mapDataOutput <- renderTable({
+            genChloroplethTable()
+        }, digits=10)
+
         # Generate chloropleth map event
         genChloropleth <- eventReactive(input$plotMapsButton, {
             shinyjs::show('mapsPlot')

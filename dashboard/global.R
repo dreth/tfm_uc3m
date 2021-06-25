@@ -20,7 +20,7 @@ require(RcppRoll)
 system('bash ./www/scripts/check_dbs.sh', wait=FALSE)
 
 # TRACE 
-options(shiny.trace=FALSE)
+options(shiny.trace=TRUE)
 
 # DIAGNOSTIC FEATURES ENABLE/DISABLE
 death_count <- FALSE
@@ -76,6 +76,14 @@ names(PLOT_DEVICE_UI_SELECT) <- c('ggplot2', 'plotly')
 # DATABASE TABLES
 DATABASE_TABLES <- c('death','pop')
 names(DATABASE_TABLES) <- c('Deaths table', 'Population table')
+# PLOT DOWNLOAD SIZE SELECTOR
+DOWNLOAD_SIZE_TOGGLE <- c('predefined','custom')
+names(DOWNLOAD_SIZE_TOGGLE) <- c('Predefined','Custom')
+# PLOT DOWNLOAD SIZE PREDEFINED SELECTOR
+DOWNLOAD_SIZE_PREDEF <- c(200,500,800,1200,2000)
+names(DOWNLOAD_SIZE_PREDEF) <- c('200x200','500x500','800x800','1200x1200','2000x2000')
+# PLOT DOWNLOAD IMAGE FORMATS
+DOWNLOAD_IMAGE_FORMAT <- c('png','jpeg','svg','tiff','pdf','tex','bmp','eps')
 
 # DATABASE VECTOR
 # contains databases indexed by string
