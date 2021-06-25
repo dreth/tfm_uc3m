@@ -35,10 +35,6 @@ You can find the base image source in the following [repository folder](https://
 
 ## Running the application
 
-
-- **Building the container from the repo's Dockerfile**: All features except pushing data to the [data repo](https://github.com/dreth/tfm_uc3m_data)
-- **Running directly from R**: All features except pushing data to the [data repo](https://github.com/dreth/tfm_uc3m_data)
-
 ### Docker
 
 I have created a docker container for the application, this way we avoid any requirements needing to be installed in your OS. This is the recommended approach to run it.
