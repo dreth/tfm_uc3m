@@ -35,6 +35,10 @@ You can find the base image source in the following [repository folder](https://
 
 ## Running the application
 
+
+- **Building the container from the repo's Dockerfile**: All features except pushing data to the [data repo](https://github.com/dreth/tfm_uc3m_data)
+- **Running directly from R**: All features except pushing data to the [data repo](https://github.com/dreth/tfm_uc3m_data)
+
 ### Docker
 
 I have created a docker container for the application, this way we avoid any requirements needing to be installed in your OS. This is the recommended approach to run it.
@@ -42,6 +46,8 @@ I have created a docker container for the application, this way we avoid any req
 You can download docker [here](https://www.docker.com/products/docker-desktop) if you don't have it installed yet, it is the only requirement to run the application.
 
 #### Docker hub
+
+**All features** are available when using this method.
 
 Given docker is installed, the app can be launched by running the following lines of code. This will pull the container from Docker hub and run the application:
 
@@ -57,6 +63,8 @@ The data can also be updated, however, database updates performed within the app
 
 #### Building
 
+**All features except pushing data to the [data repo](https://github.com/dreth/tfm_uc3m_data)** are available using this method.
+
 In case you prefer to build the container yourself, the repository contains a Dockerfile from which it can be built and run as follows:
 
 ```bash
@@ -64,17 +72,17 @@ docker build https://github.com/dreth/tfm_uc3m.git#main:docker -t dreth/tfm_uc3m
 docker run -it -p 3838:3838/tcp dreth/tfm_uc3m
 ```
 
-This approach will always guarantee you're pulling the latest version of the container, as I might take slightly longer to push changes to the container to docker hub unless they're significant. However, since the container always pulls the latest version of the app from github, any version of it will run the latest version of the app after pulled.
-
-That said, changes to the container won't happen very often.
-
-You might require administrative privileges to build docker containers. If on sh/zsh/bash, you can use ```sudo```.
+This always ensures you're using the latest version of the container, however, this approach will not allow you to push database changes to the [data folder's repository](https://github.com/dreth/tfm_uc3m_data), unlike using the container uploaded to docker hub, although you will still be able to update the data locally if you desire to do so.
 
 ---
 
 ### Running directly on R
 
-It is recommended to use the docker approach described above, nevertheless, if you want to do so otherwise, it is possible to run the full-featured application as follows:
+**All features except pushing data to the [data repo](https://github.com/dreth/tfm_uc3m_data)** are available using this method, although there are significantly more requirements to use it.
+
+If on windows, you will not be able to update the database locally either unless you manually clone the repo and run the [query.py](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py) python script.
+
+It is recommended to pull the docker hub container as described above, nevertheless, if you still want to do so through directly through R, it is possible to run the application as described below.
 
 #### R requirements
 
@@ -86,20 +94,32 @@ install.packages(c('shiny','shinydashboard','shinyjs','tidyverse','shinythemes',
 
 #### Python requirements
 
-Also, in order to be able to update the database, Python 3.8 must be installed along with the following libraries:
+Also, in order to be able to update the database, Python 3.8 must be installed along with several libraries which you can install as follows through *pip*:
 
 ```Python
 pip3 install requests json numpy pandas datetime copy
 ```
 
-As shown in the *functions.py* file, located [here](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py).
+If you have the anaconda distribution installed as your python interpreter, most if not all of these requirements are installed out of the box, otherwise you can install them through *conda* as follows:
+
+```Python
+conda install requests json numpy pandas datetime copy
+```
 
 #### Bash scripts
 
-Your system should also be able to run *bash* scripts, therefore it is recommended that you use a *linux* or *macOS* system.
+Your system should also be able to run shell scripts, therefore it is recommended that you use a *linux* or *macOS* system or the *WSL* on *Windows*.
 
-Once such requirements have been met, the app can be ran as follows:
+#### Launch the app directly on R
+
+Once such requirements have been met, the app can be ran through an R interactive console as follows:
 
 ```R
 runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard')
+```
+
+If on a shell console, you can also run the app as follows if the R binary is on your PATH:
+
+```Shell
+R -e "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard')"
 ```
