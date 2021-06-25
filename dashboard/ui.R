@@ -71,6 +71,9 @@ shinyUI(
               ),
               actionButton("plotMortalityButton",
                   label = h4(strong("Generate plot"))
+              ),
+              downloadButton("downloadPlotMortality",
+                  label=h4(strong("Download plot"))
               )
             ),
 
@@ -119,7 +122,8 @@ shinyUI(
               uiOutput("yearSliderSelectorLifeExpUIOutput"),
               actionButton("plotLifeExpButton",
                   label = h4(strong("Generate plot"))
-              )
+              ),
+              uiOutput("downloadPlotOrTableUIOutput")
             ),
 
             mainPanel(
