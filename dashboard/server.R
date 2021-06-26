@@ -206,7 +206,7 @@ shinyServer(
             } else if (input$plotDownloadSizeSelectorMortality == 'custom') {
                 output$plotDownloadSizeControlsMortalityUIOutput <- renderUI({
                     numericInput("widthMortalityDownload",
-                        label=h5(strong("width of the resulting image")),
+                        label=h5(strong("Width of the resulting image")),
                         value=500,
                         min=1,
                         max=10000,
@@ -215,7 +215,7 @@ shinyServer(
                 })
                 output$plotDownloadSizeControlsMortalityUIOutputNS2 <- renderUI({
                     numericInput("heightMortalityDownload",
-                        label=h5(strong("height of the resulting image")),
+                        label=h5(strong("Height of the resulting image")),
                         value=500,
                         min=1,
                         max=10000,
@@ -263,12 +263,12 @@ shinyServer(
 
         # PLOT DOWNLOAD BUTTON
         output$downloadPlotMortality <- downloadHandler(
-            filename = str_interp("${input$plotTypeMortality}.png"),
+            filename = str_interp("${input$plotTypeMortality}.${input$plotDownloadFormatMortality}"),
             content = function(file) {
                 ggsave(
                     file,
-                    width=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=input$selectDimensionsMortalityDownload, 'custom'=input$widthMortalityDownload),
-                    height=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=input$selectDimensionsMortalityDownload, 'custom'=input$heightMortalityDownload),
+                    width=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=as.numeric(input$selectDimensionsMortalityDownload)*0.01333333, 'custom'=input$widthMortalityDownload*0.01333333),
+                    height=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=as.numeric(input$selectDimensionsMortalityDownload)*0.01333333, 'custom'=input$heightMortalityDownload*0.01333333),
                     plot=gen_df_and_plot_mortality(
                             wk=WEEK, 
                             yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
