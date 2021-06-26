@@ -156,6 +156,21 @@ shinyServer(
             }
         }
 
+        # function to plot life table/plot for download handler, avoids repetition
+        plot_LELT_download <- function() {
+            plot_lifeexp_or_lifetable(
+                wk=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable), 
+                yr=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable), 
+                ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
+                age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'at_birth'='Y_LT5', 'select'=input$selectAgeLifeExp),
+                sexes=input$selectSexesLifeExp,
+                type=switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table'),
+                week_range_plot=weeks,
+                yr_range_plot=years,
+                device_plot='ggplot2'
+            )
+        }
+
 # DYNAMIC UI CONTROLS
 # MORTALITY TAB -------------------------------------------------------------------------- 
         # UI OUTPUTS
@@ -364,6 +379,8 @@ shinyServer(
                             height = session$clientData$output_lifeExpPlotly_width)
         })
 
+
+
         # PLOT/TABLE OUTPUTS
         # Action button to generate life expectancy plots or life table
         genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
@@ -411,8 +428,37 @@ shinyServer(
         # life exp plots or life table
         observeEvent(input$showLifeExpPlotOrLifeTable, {
             if (input$showLifeExpPlotOrLifeTable == 'plot') {
+                # download button for plot
+                output$downloadPlotOrTableUIOutput <- renderUI({
+                    downloadButton("downloadPlotLifeExp",
+                        label=h4(strong("Download plot"))
+                    )
+                })
+
+                # download format selector
+                output$lifeExpPlotDownloadFormatUIOutput <- renderUI({
+                    selectInput("plotDownloadFormatLifeExp",
+                        label = h5(strong("Select image format")),
+                        choices = DOWNLOAD_IMAGE_FORMAT,
+                        selected = 'png'
+                    )
+                })
+
+                # menu header, for plot
+                output$lifeExpOrTableHeaderUIOutput <- renderUI({h4(strong('Plot parameters'))})
+                output$  lifeExpOrTableDownloadHeaderUIOutput <- renderUI({h4(strong('Image download options'))})
+
+                # showing plot/table outputs
                 shinyjs::show('usePlotlyOrGgplotLifeExp')
                 shinyjs::hide('lifeTableOutput')
+
+                # showing plot download controls
+                shinyjs::show('lifeExpPlotDownloadFormatUIOutput')
+                shinyjs::show('plotDownloadSizeSelectorLifeExp')
+                shinyjs::show('plotDownloadSizeControlsLifeExpUIOutput')
+                shinyjs::show('plotDownloadSizeControlsLifeExpUIOutputNS2')
+
+                # showing or hiding plot types depending on selection
                 if (input$usePlotlyOrGgplotLifeExp == 'ggplot2') {
                     shinyjs::show('lifeExpPlot')
                     shinyjs::hide('lifeExpPlotly')
@@ -420,13 +466,95 @@ shinyServer(
                     shinyjs::hide('lifeExpPlot')
                     shinyjs::show('lifeExpPlotly')
                 }
+
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
+                # download button for table
+                output$downloadPlotOrTableUIOutput <- renderUI({
+                    downloadButton("downloadTableLifeExp",
+                        label=h4(strong("Download table"))
+                    )
+                })
+
+                # menu header, for table 
+                output$lifeExpOrTableHeaderUIOutput <- renderUI({h4(strong('Table parameters'))})
+                output$  lifeExpOrTableDownloadHeaderUIOutput <- renderUI({h4(strong('Table download options'))})
+
+                # hiding plot settings/outputs and showing table output
                 shinyjs::hide('lifeExpPlot')
                 shinyjs::hide('lifeExpPlotly')
                 shinyjs::show('lifeTableOutput')
                 shinyjs::hide('usePlotlyOrGgplotLifeExp')
+
+                # hiding download controls for plot
+                shinyjs::hide('lifeExpPlotDownloadFormatUIOutput')
+                shinyjs::hide('plotDownloadSizeControlsLifeExpUIOutput')
+                shinyjs::hide('plotDownloadSizeControlsLifeExpUIOutputNS2')
+                shinyjs::hide('plotDownloadSizeSelectorLifeExp')
             }
         })
+
+        # toggle between predefined and custom size
+        observeEvent(input$plotDownloadSizeSelectorLifeExp, {
+            if (input$plotDownloadSizeSelectorLifeExp == 'predefined') {
+                output$plotDownloadSizeControlsLifeExpUIOutput <- renderUI({
+                    selectInput("selectDimensionsLifeExpDownload",
+                        label = h5(strong("Select dimension for download")),
+                        choices = DOWNLOAD_SIZE_PREDEF,
+                        selected = 800
+                    )
+                })
+                shinyjs::hide('heightLifeExpDownload')
+            } else if (input$plotDownloadSizeSelectorLifeExp == 'custom') {
+                output$plotDownloadSizeControlsLifeExpUIOutput <- renderUI({
+                    numericInput("widthLifeExpDownload",
+                        label=h5(strong("Width of the resulting image")),
+                        value=500,
+                        min=1,
+                        max=10000,
+                        step=1
+                    )
+                })
+                output$plotDownloadSizeControlsLifeExpUIOutputNS2 <- renderUI({
+                    numericInput("heightLifeExpDownload",
+                        label=h5(strong("Height of the resulting image")),
+                        value=500,
+                        min=1,
+                        max=10000,
+                        step=1
+                    )
+                })
+                shinyjs::show('heightLifeExpDownload')
+            }
+        })
+
+        # DOWNLOAD BUTTONS
+        # download plot
+        output$downloadPlotLifeExp <- downloadHandler(
+            filename = str_interp("LifeExpectancy.${input$plotDownloadFormatLifeExp}"),
+            content = function(file) {
+                ggsave(
+                    file,
+                    width=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$widthLifeExpDownload*0.01333333),
+                    height=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$heightLifeExpDownload*0.01333333),
+                    plot=plot_LELT_download(),
+                    device=input$plotDownloadFormatMortality
+                )
+            }
+        )
+
+        # download table
+        output$downloadPlotLifeExp <- downloadHandler(
+            filename = str_interp("LifeExpectancy.${input$plotDownloadFormatLifeExp}"),
+            content = function(file) {
+                ggsave(
+                    file,
+                    width=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$widthLifeExpDownload*0.01333333),
+                    height=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$heightLifeExpDownload*0.01333333),
+                    plot=plot_LELT_download(),
+                    device=input$plotDownloadFormatMortality
+                )
+            }
+        )
 
 # UPDATE DATABASE TAB -------------------------------------------------------------------------------------
         # UI OUTPUTS
