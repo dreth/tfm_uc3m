@@ -32,8 +32,12 @@ RUN R -e "install.packages('rgdal')"
 RUN R -e "install.packages('zoo')"
 RUN R -e "install.packages('RcppRoll')"
 
+# cloning the project repos
+RUN git clone https://github.com/dreth/tfm_uc3m.git
+RUN git clone https://github.com/dreth/tfm_uc3m_data.git
+
 # select port
 EXPOSE 3838/tcp
 
 # running app from repo
-CMD git clone https://github.com/dreth/tfm_uc3m.git && cd ./tfm_uc3m/dashboard && R -e "shiny::runApp(port = 3838, host = '0.0.0.0', launch.browser=FALSE)"
+CMD cd ./tfm_uc3m && git pull && cd ../tfm_uc3m_data && git pull && cp -r ./* ../tfm_uc3m/data && cd ../tfm_uc3m/dashboard && R -e "shiny::runApp(port = 3838, host = '0.0.0.0', launch.browser=FALSE)"
