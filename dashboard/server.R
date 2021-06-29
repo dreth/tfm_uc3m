@@ -157,10 +157,12 @@ shinyServer(
         }
 
         # function to plot life table/plot for download handler, avoids repetition
-        plot_LELT_download <- function() {
+        LELT_download <- function() {
+            weeks=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
+            years=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
             plot_lifeexp_or_lifetable(
-                wk=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable), 
-                yr=switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable), 
+                wk=weeks, 
+                yr=years, 
                 ccaas=switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp),
                 age_groups=switch(input$selectAgeGroupsLifeExpTotal, 'at_birth'='Y_LT5', 'select'=input$selectAgeLifeExp),
                 sexes=input$selectSexesLifeExp,
@@ -278,7 +280,7 @@ shinyServer(
 
         # PLOT DOWNLOAD BUTTON
         output$downloadPlotMortality <- downloadHandler(
-            filename = str_interp("${input$plotTypeMortality}.${input$plotDownloadFormatMortality}"),
+            filename = str_interp("${input$plotTypeMortality}"),
             content = function(file) {
                 ggsave(
                     file,
@@ -450,6 +452,7 @@ shinyServer(
 
                 # showing plot/table outputs
                 shinyjs::show('usePlotlyOrGgplotLifeExp')
+                shinyjs::show('selectAgeGroupsLifeExpTotal')
                 shinyjs::hide('lifeTableOutput')
 
                 # showing plot download controls
@@ -484,6 +487,7 @@ shinyServer(
                 shinyjs::hide('lifeExpPlotly')
                 shinyjs::show('lifeTableOutput')
                 shinyjs::hide('usePlotlyOrGgplotLifeExp')
+                shinyjs::hide('selectAgeGroupsLifeExpTotal')
 
                 # hiding download controls for plot
                 shinyjs::hide('lifeExpPlotDownloadFormatUIOutput')
@@ -530,29 +534,23 @@ shinyServer(
         # DOWNLOAD BUTTONS
         # download plot
         output$downloadPlotLifeExp <- downloadHandler(
-            filename = str_interp("LifeExpectancy.${input$plotDownloadFormatLifeExp}"),
+            filename = str_interp("LifeExpectancy"),
             content = function(file) {
                 ggsave(
                     file,
                     width=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$widthLifeExpDownload*0.01333333),
                     height=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$heightLifeExpDownload*0.01333333),
-                    plot=plot_LELT_download(),
-                    device=input$plotDownloadFormatMortality
+                    plot=LELT_download(),
+                    device=input$plotDownloadFormatLifeExp
                 )
             }
         )
 
         # download table
-        output$downloadPlotLifeExp <- downloadHandler(
-            filename = str_interp("LifeExpectancy.${input$plotDownloadFormatLifeExp}"),
+        output$downloadTableLifeExp <- downloadHandler(
+            filename = str_interp("LifeTable-wk${input$weekSliderSelectorLifeTable}-${input$yearSliderSelectorLifeTable}.csv"),
             content = function(file) {
-                ggsave(
-                    file,
-                    width=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$widthLifeExpDownload*0.01333333),
-                    height=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$heightLifeExpDownload*0.01333333),
-                    plot=plot_LELT_download(),
-                    device=input$plotDownloadFormatMortality
-                )
+                 write.csv(LELT_download(),file)
             }
         )
 

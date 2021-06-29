@@ -9,3 +9,7 @@ html {
 td {
     width: 100%;
 }
+
+hr {
+    border-top: 1px solid rgb(83,83,83);
+}

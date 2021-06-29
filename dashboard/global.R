@@ -83,7 +83,7 @@ names(DOWNLOAD_SIZE_TOGGLE) <- c('Predefined','Custom')
 DOWNLOAD_SIZE_PREDEF <- c(200,500,800,1200,2000)
 names(DOWNLOAD_SIZE_PREDEF) <- c('200x200','500x500','800x800','1200x1200','2000x2000')
 # PLOT DOWNLOAD IMAGE FORMATS
-DOWNLOAD_IMAGE_FORMAT <- c('png','jpeg','svg','tiff','pdf','tex','bmp','eps')
+DOWNLOAD_IMAGE_FORMAT <- c('png','jpeg','tiff','pdf','tex','bmp','eps')
 
 # DATABASE VECTOR
 # contains databases indexed by string

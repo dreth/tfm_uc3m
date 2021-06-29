@@ -26,10 +26,10 @@ shinyUI(
         tabItem(tabName = 'mortality',     
           sidebarLayout(
             sidebarPanel(
-              h4(strong('Mortality metrics')),
-              h5(strong('Plot controls')),
               tags$head(includeCSS('./www/styles.css')),
               tags$head(tags$script(src = 'dimension.js')),
+              h4(strong('Mortality metrics')),
+              h5(strong('Plot controls')),
               selectInput('plotTypeMortality',
                 label = h5(strong('Select content to plot')),
                 choices = MORTALITY_PLOT_TYPE
@@ -104,10 +104,10 @@ shinyUI(
         tabItem(tabName = 'lifeExp',
           sidebarLayout(
             sidebarPanel(
-              h4(strong('Life expectancy')),
-              uiOutput('lifeExpOrTableHeaderUIOutput'),
               tags$head(includeCSS('./www/styles.css')),
               tags$head(tags$script(src = 'dimension.js')),
+              h4(strong('Life expectancy')),
+              uiOutput('lifeExpOrTableHeaderUIOutput'),
               radioButtons('showLifeExpPlotOrLifeTable',
                 label = h5(strong('Show plot or life table')),
                 choices = SHOW_PLOT_OR_LT,
