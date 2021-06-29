@@ -14,8 +14,12 @@ else
 fi
 
 cd '../api'
-# python3 './query.py'
-# python3 './dbs_check.py'
-cd '/tfm_uc3m'
-git subtree push --prefix data https://"$GITHUB_USER":"$GITHUB_TOKEN"@github.com/dreth/tfm_uc3m_data.git main
+python3 './query.py'
+python3 './dbs_check.py'
+cp -r /tfm_uc3m/data/logs /tfm_uc3m_data/logs
+cp -r /tfm_uc3m/data/death.csv /tfm_uc3m_data/death.csv
+cp -r /tfm_uc3m/data/pop.csv /tfm_uc3m_data/pop.csv
+cd /tfm_uc3m_data
+git commit -m "updated database at: $date"
+git push https://"$GITHUB_USER":"$GITHUB_TOKEN"@github.com/dreth/tfm_uc3m_data.git
 echo "Repo update pushed to GitHub"
