@@ -98,6 +98,11 @@ years_pop <- unique(pop$year)
 esp <- readOGR(dsn = './www/maps/map_shapefiles', encoding='UTF-8')
 # creating index for CCAAs
 esp@data$ccaa <- c("ES7","ES61","ES24","ES12","ES53","ES13","ES41","ES42","ES51","ES52","ES43","ES11","ES3","ES62","ES22","ES21","ES23","ES63","ES64")
+# CCAAs codes' order as they show in the shapefile
+esp@data$id <- c(18, 14, 6, 1, 13, 2, 8, 9, 11, 12, 10, 0, 7, 15, 4, 3, 5, 16, 17)
+
+# FORTIFIED MAP
+esp_df <- fortify(esp)
 
 # SIGNIFICANT FIGURES FOR EACH METRIC
 SIG_FIGURES <- function(m) {switch(m, "em"=2, "cmr"=3, "crmr"=10, "bf"=10, "dc"=2)}
@@ -356,6 +361,50 @@ gen_chloropleth <- function(dataset, metric, provider="CartoDB.DarkMatterNoLabel
                   title = str_interp("${metric_name}"),
                   opacity = 2)
 }
+
+# theme_map <- function(...) {  
+#   theme_minimal() +
+#     theme(
+#       text = element_text(family = "Ubuntu Regular", color = "#22211d"),
+#       axis.line = element_blank(),
+#       axis.text.x = element_blank(),
+#       axis.text.y = element_blank(),
+#       axis.ticks = element_blank(),
+#       axis.title.x = element_blank(),
+#       axis.title.y = element_blank(),
+#       # panel.grid.minor = element_line(color = "#ebebe5", size = 0.2),
+#       panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
+#       panel.grid.minor = element_blank(),
+#       plot.background = element_rect(fill = "#f5f5f2", color = NA), 
+#       panel.background = element_rect(fill = "#f5f5f2", color = NA), 
+#       legend.background = element_rect(fill = "#f5f5f2", color = NA),
+#       panel.border = element_blank()
+#     )
+# }
+
+# df <- gen_map_data(1,2020,AGE_GROUPS, 'T', 'em', shape_data=esp)
+# esp_df <- fortify(df) %>% mutate(id=as.numeric(id))
+# esp_df <- esp_df %>% left_join(df@data, by = 'id') %>% fill(metric)
+# ggplot() + geom_polygon(data=esp_df, aes(fill=metric, x=long, y=lat, group=group)) + geom_path(data=esp_df, aes(x=long, y=lat, group=group), color='white', size=0.1) + coord_equal() + theme_map() +
+#   theme(
+#     legend.position = c(0.7, 0.03),
+#     legend.text.align = 0,
+#     legend.background = element_rect(fill = alpha('white', 0.0)),
+#     legend.text = element_text(size = 14, hjust = 0, color = "#4e4d47"),
+#     legend.title = element_text(size = 20),
+#     plot.title = element_text(size = 28, hjust = 0.8, color = "#4e4d47"),
+#     plot.subtitle = element_text(size = 20, hjust = 0.8, face = "italic", color = "#4e4d47"),
+#     plot.caption = element_text(size = 14, hjust = 0.95, color = "#4e4d47"),
+#     plot.margin = unit(c(.5,.5,.2,.5), "cm"),
+#     panel.border = element_blank()
+#   )+
+#   labs(x = NULL, 
+#        y = NULL, 
+#        title = "Spain's regional demographics", 
+#        subtitle = "Average age in Spanish municipalities, 2011", 
+#        caption = "Author: Manuel Garrido (@manugarri) Original Idea: Timo Grossenbacher (@grssnbchr), Geometries: ArcGis Data: INE, 2011;") 
+
+
 
 # OTHER HELPER FUNCTIONS
 # Function to read lines and return a paste separated by an html line break
