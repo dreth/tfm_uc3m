@@ -94,15 +94,21 @@ DBs <- list(death=death, pop=pop)
 years_pop <- unique(pop$year)
 
 # MAPS CCAA INDEX
+# MAP FOR LEAFLET
 # reading map shapefile
-esp <- readOGR(dsn = './www/maps/map_shapefiles', encoding='UTF-8')
+esp_leaflet <- readOGR(dsn = './www/maps/map_shapefiles', encoding='UTF-8')
 # creating index for CCAAs
-esp@data$ccaa <- c("ES7","ES61","ES24","ES12","ES53","ES13","ES41","ES42","ES51","ES52","ES43","ES11","ES3","ES62","ES22","ES21","ES23","ES63","ES64")
+esp_leaflet@data$ccaa <- c("ES7","ES61","ES24","ES12","ES53","ES13","ES41","ES42","ES51","ES52","ES43","ES11","ES3","ES62","ES22","ES21","ES23","ES63","ES64")
 # CCAAs codes' order as they show in the shapefile
-esp@data$id <- c(18, 14, 6, 1, 13, 2, 8, 9, 11, 12, 10, 0, 7, 15, 4, 3, 5, 16, 17)
+esp_leaflet@data$id <- c(18, 14, 6, 1, 13, 2, 8, 9, 11, 12, 10, 0, 7, 15, 4, 3, 5, 16, 17)
 
-# FORTIFIED MAP
-esp_df <- fortify(esp)
+# MAP FOR GGPLOT
+# reading map shapefile
+esp_ggplot <- readOGR(dsn = './www/maps/map_shapefiles_ggplot', encoding='UTF-8')
+# creating index for CCAAs
+esp_ggplot@data$ccaa <- c("ES7","ES61","ES24","ES12","ES53","ES13","ES41","ES42","ES51","ES52","ES43","ES11","ES3","ES62","ES22","ES21","ES23","ES63","ES64",NA)
+# CCAAs codes' order as they show in the shapefile
+esp_ggplot@data$id <- c(18, 14, 6, 1, 13, 2, 8, 9, 11, 12, 10, 0, 7, 15, 4, 3, 5, 16, 17, NA)
 
 # SIGNIFICANT FIGURES FOR EACH METRIC
 SIG_FIGURES <- function(m) {switch(m, "em"=2, "cmr"=3, "crmr"=10, "bf"=10, "dc"=2)}
@@ -248,8 +254,6 @@ DC <- function(wk, yr, ccaas, age_groups, sexes) {
     }
 }
 
-# EM(1, 2017:2019, CCAA, AGE_GROUPS, 'T')
-
 # DATAFRAME GENERATING FUNCTIONS
 # historical cmr, crmr and bf
 factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:max(YEAR)-1) {
@@ -322,89 +326,6 @@ filter_df_table <- function(db, wk, yr, ccaas, age_groups, sexes) {
     filtered_df <- db %>% dplyr::filter(year %in% yr & week %in% wk & ccaa %in% ccaas & age %in% age_groups & sex %in% sexes)
     return(filtered_df)
 }
-
-# GENERATE MAP DATA
-gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp) {
-    # iterating over ccaas to calculate indexes for selected data
-    shape_data@data$metric <- switch(metric, 
-    'crmr'=sapply(shape_data@data$ccaa, function(ccaa) {CRMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'cmr'=sapply(shape_data@data$ccaa, function(ccaa) {CMR(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'bf'=sapply(shape_data@data$ccaa, function(ccaa) {BF(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'em'=sapply(shape_data@data$ccaa, function(ccaa) {EM(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}),
-    'dc'=sapply(shape_data@data$ccaa, function(ccaa) {DC(wk=wk, yr=yr, ccaas=ccaa, age_groups=age_groups, sexes=sexes)}))
-
-    # returning the data
-    return(shape_data)
-}
-
-# GENERATE MAP
-gen_chloropleth <- function(dataset, metric, provider="CartoDB.DarkMatterNoLabels", palette="Reds") {
-    # colours
-    pal <- colorNumeric(palette=palette, domain = dataset$metric)
-
-    # pop up with data
-    metric_name <- MORTALITY_PLOT_TYPE_R[metric]
-    popup <- paste("<strong>CCAA:</strong>",CCAA_SHORT[dataset$ccaa],str_interp("<br><strong>${metric_name}:</strong>"),round(dataset$metric,5))
-
-    # creating map
-    leaflet(data = dataset,
-            options = leafletOptions(zoomControl = FALSE, dragging = FALSE, doubleClickZoom= FALSE)) %>%
-        addProviderTiles(provider) %>%
-        addPolygons(fillColor = ~pal(metric), 
-                    fillOpacity = 1, 
-                    color = "#000000", 
-                    weight = 1,
-                    popup = popup) %>%
-        addLegend("topleft", 
-                  pal = pal, 
-                  values = ~metric,
-                  title = str_interp("${metric_name}"),
-                  opacity = 2)
-}
-
-# theme_map <- function(...) {  
-#   theme_minimal() +
-#     theme(
-#       text = element_text(family = "Ubuntu Regular", color = "#22211d"),
-#       axis.line = element_blank(),
-#       axis.text.x = element_blank(),
-#       axis.text.y = element_blank(),
-#       axis.ticks = element_blank(),
-#       axis.title.x = element_blank(),
-#       axis.title.y = element_blank(),
-#       # panel.grid.minor = element_line(color = "#ebebe5", size = 0.2),
-#       panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
-#       panel.grid.minor = element_blank(),
-#       plot.background = element_rect(fill = "#f5f5f2", color = NA), 
-#       panel.background = element_rect(fill = "#f5f5f2", color = NA), 
-#       legend.background = element_rect(fill = "#f5f5f2", color = NA),
-#       panel.border = element_blank()
-#     )
-# }
-
-# df <- gen_map_data(1,2020,AGE_GROUPS, 'T', 'em', shape_data=esp)
-# esp_df <- fortify(df) %>% mutate(id=as.numeric(id))
-# esp_df <- esp_df %>% left_join(df@data, by = 'id') %>% fill(metric)
-# ggplot() + geom_polygon(data=esp_df, aes(fill=metric, x=long, y=lat, group=group)) + geom_path(data=esp_df, aes(x=long, y=lat, group=group), color='white', size=0.1) + coord_equal() + theme_map() +
-#   theme(
-#     legend.position = c(0.7, 0.03),
-#     legend.text.align = 0,
-#     legend.background = element_rect(fill = alpha('white', 0.0)),
-#     legend.text = element_text(size = 14, hjust = 0, color = "#4e4d47"),
-#     legend.title = element_text(size = 20),
-#     plot.title = element_text(size = 28, hjust = 0.8, color = "#4e4d47"),
-#     plot.subtitle = element_text(size = 20, hjust = 0.8, face = "italic", color = "#4e4d47"),
-#     plot.caption = element_text(size = 14, hjust = 0.95, color = "#4e4d47"),
-#     plot.margin = unit(c(.5,.5,.2,.5), "cm"),
-#     panel.border = element_blank()
-#   )+
-#   labs(x = NULL, 
-#        y = NULL, 
-#        title = "Spain's regional demographics", 
-#        subtitle = "Average age in Spanish municipalities, 2011", 
-#        caption = "Author: Manuel Garrido (@manugarri) Original Idea: Timo Grossenbacher (@grssnbchr), Geometries: ArcGis Data: INE, 2011;") 
-
-
 
 # OTHER HELPER FUNCTIONS
 # Function to read lines and return a paste separated by an html line break
@@ -492,4 +413,80 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
         }
     }
     return(df)
+}
+
+
+# GENERATE MAP DATA
+gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp) {
+    # functions vector with name
+    fns <- c(CMR, CRMR, BF, EM, DC, LT)
+    names(fns) <- c('cmr','crmr','bf','em','dc','le')
+    
+    # iterating over ccaas to calculate indexes for selected data
+    shape_data@data$metric <- NA
+    for (i in 1:length(shape_data@data$ccaa)) {
+        shape_data@data[i,'metric'] = tryCatch({
+            fns[[metric]](wk=wk, yr=yr, ccaas=shape_data@data$ccaa[i], age_groups=age_groups, sexes=sexes)
+            },
+            error=function(e) {NA}
+        )
+    }
+
+    # returning the data
+    return(shape_data)
+}
+
+# GENERATE MAP
+gen_chloropleth <- function(dataset, metric, library='leaflet', leaflet_provider="CartoDB.DarkMatterNoLabels", palette="Reds") {
+    # USING LEAFLET
+    if (library == 'leaflet') {
+        # colours
+        pal <- colorNumeric(palette=palette, domain = dataset$metric)
+
+        # pop up with data
+        metric_name <- MORTALITY_PLOT_TYPE_R[metric]
+        popup <- paste("<strong>CCAA:</strong>",CCAA_SHORT[dataset$ccaa],str_interp("<br><strong>${metric_name}:</strong>"),round(dataset$metric,5))
+
+        # creating map
+        leaflet(data = dataset,
+                options = leafletOptions(zoomControl = FALSE, dragging = FALSE, doubleClickZoom= FALSE)) %>%
+            addProviderTiles(leaflet_provider) %>%
+            addPolygons(fillColor = ~pal(metric), 
+                        fillOpacity = 1, 
+                        color = "#000000", 
+                        weight = 1,
+                        popup = popup) %>%
+            addLegend("topleft", 
+                    pal = pal, 
+                    values = ~metric,
+                    title = str_interp("${metric_name}"),
+                    opacity = 2)
+    } else {
+        # fortify dataset and convert id to numeric
+        esp_df <- fortify(dataset) %>% mutate(id=as.numeric(id))
+
+        # joining by id and filling using the metric data
+        esp_df <- esp_df %>% left_join(dataset@data, by = 'id') %>% fill(metric)
+
+        # plot title
+
+        # legend title
+
+        # plotting the map
+        ggplot() + 
+            geom_polygon(data=esp_df, aes(fill=metric, x=long, y=lat, group=group)) + 
+            geom_path(data=esp_df, aes(x=long, y=lat, group=group), color='white', size=0.1) + 
+            coord_equal() +
+            theme_void() + 
+            scale_x_continuous(expand=c(0,0.2)) + 
+            scale_y_continuous(expand=c(0,0)) + 
+            theme(
+                legend.position = c(0.7, 0.03),
+                legend.text.align = 0,
+                legend.text = element_text(size = 14, hjust = 0),
+                legend.title = element_text(size = 20),
+                plot.title = element_text(size = 28, hjust = 0.8),
+                panel.border = element_blank()
+            ) 
+    }
 }
