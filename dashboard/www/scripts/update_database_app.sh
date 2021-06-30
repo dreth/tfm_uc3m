@@ -4,7 +4,7 @@ date=''
 
 # Record the date
 if [ $system == 'Darwin' ] then date=$(date -v-1d +%Y-%m-%d %T)  # MacOS
-elif [ $system == 'Linux' ] then date=$(date +%Y-%m-%d %T)  # Linux
+elif [ $system == 'Linux' ] then date=$(date +%Y-%m-%d)  # Linux
 else echo "OS not recognized" fi
 
 # Browse to API folder to run python scripts
