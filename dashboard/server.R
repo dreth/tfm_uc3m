@@ -668,7 +668,7 @@ shinyServer(
         
         # map output
         output$leafletMapOutput <- renderUI({
-            leafletOutput("mapsPlot", height=input$dimension[2])
+            leafletOutput("leafletMapsPlot", height=input$dimension[2])
         })
 
         # PLOT/TABLE OUTPUTS
@@ -679,7 +679,7 @@ shinyServer(
 
         # Generate chloropleth map event
         genChloropleth <- eventReactive(input$plotMapsButton, {
-            shinyjs::show('mapsPlot')
+            shinyjs::show('leafletMapsPlot')
             shinyjs::show('mapDataOutput')
             shinyjs::show('mapDataLabels1')
             shinyjs::show('mapDataLabels2')
@@ -688,10 +688,12 @@ shinyServer(
                 yr=input$yearSliderSelectorMaps, 
                 age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
                 sexes=input$selectSexesMaps,
-                metric=input$plotMetricMaps
+                metric=input$plotMetricMaps,
+                shape_data=switch(input$plotLibraryMaps, 'leaflet'=esp_leaflet, 'ggplot2'=esp_ggplot)
             )
             gen_chloropleth(
                 dataset=df,
+                library=input$plotLibraryMaps,
                 metric=input$plotMetricMaps
             )
         })
@@ -703,7 +705,8 @@ shinyServer(
                 yr=input$yearSliderSelectorMaps, 
                 age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
                 sexes=input$selectSexesMaps,
-                metric=input$plotMetricMaps
+                metric=input$plotMetricMaps,
+                shape_data=esp_leaflet
             )@data
             metric <- df$metric
             df <- data.frame(CCAA=CCAA_SHORT[df$ccaa])
@@ -711,9 +714,22 @@ shinyServer(
             df
         })
 
-        # output for map
-        output$mapsPlot <- renderLeaflet({genChloropleth()})
-       
+        # outputting the map upon switching the plotting library
+        observeEvent(input$plotLibraryMaps, {
+            click('plotMapsButton')
+            if (input$plotLibraryMaps == 'leaflet') {
+                output$leafletMapsPlot <- renderLeaflet({genChloropleth()})
+                shinyjs::show('leafletMapsPlot')
+                shinyjs::show('leafletMapOutput')
+                shinyjs::hide('ggplo2MapPlot')
+            } else if (input$plotLibraryMaps == 'ggplot2') {
+                output$ggplot2MapPlot <- renderPlot({genChloropleth()}, 
+                                                    height = function () {session$clientData$output_ggplot2MapPlot_width})
+                shinyjs::show('ggplot2MapPlot')
+                shinyjs::hide('leafletMapsPlot')
+                shinyjs::hide('leafletMapOutput')
+            }
+        })
     } 
 )
 

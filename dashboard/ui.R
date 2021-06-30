@@ -173,6 +173,11 @@ shinyUI(
                 label = h5(strong('Select metric to plot')),
                 choices = MORTALITY_PLOT_TYPE
               ),
+              radioButtons('plotLibraryMaps',
+                label = h5(strong('Select the type of plot to show')),
+                choices = PLOT_LIBRARY_MAPS,
+                selected = 'ggplot2'
+              ),
               radioButtons('selectAgeGroupsMapsTotal',
                 label = h5(strong('Select Age group or Total')),
                 choices = AGE_GROUPS_UI_SELECT,
@@ -212,7 +217,8 @@ shinyUI(
               useShinyjs(),
               tags$head(tags$script(src = 'dimension.js')),
               br(),
-              uiOutput('leafletMapOutput')
+              uiOutput('leafletMapOutput'),
+              plotOutput('ggplot2MapPlot')
             )
           )
         ),
