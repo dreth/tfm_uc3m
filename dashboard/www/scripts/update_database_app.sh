@@ -25,6 +25,6 @@ git add ./death.csv
 git add ./pop.csv
 git add ./logs/update_database.log
 git add ./logs/update_history.log
-git commit -m "updated database at: $date"
+git commit -m "updated database at: ${date}"
 git push https://"$GITHUB_USER":"$GITHUB_TOKEN"@github.com/dreth/tfm_uc3m_data.git
 echo "Repo update pushed to GitHub"
