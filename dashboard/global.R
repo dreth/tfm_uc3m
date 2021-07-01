@@ -55,6 +55,12 @@ names(MORTALITY_PLOT_TYPE) <-switch(as.character(death_count), 'TRUE'=c('Excess 
 # reverse options for reference
 MORTALITY_PLOT_TYPE_R <- names(MORTALITY_PLOT_TYPE)
 names(MORTALITY_PLOT_TYPE_R) <- MORTALITY_PLOT_TYPE
+# OPTIONS TO PLOT (MAPS)
+MAPS_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "bf", "le", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf", "le"))
+names(MAPS_PLOT_TYPE) <-switch(as.character(death_count), 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Life expectancy', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Life expectancy'))
+# reverse options for reference
+MAPS_PLOT_TYPE_R <- names(MAPS_PLOT_TYPE)
+names(MAPS_PLOT_TYPE_R) <- MAPS_PLOT_TYPE
 # DATE
 YEAR <- unique(pop$year)
 WEEK <- unique(death$week)
