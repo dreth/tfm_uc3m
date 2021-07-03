@@ -4,6 +4,7 @@ shinyServer(
 # INITIALIZATION PLOTS --------------------------------------------------------------------------
         click('plotMortalityButton')
         click('plotMapsButton')
+        click('plotLifeExpButton')
 
 # REACTIVE VALUES --------------------------------------------------------------------------
         # Reactive file readers for log files

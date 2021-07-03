@@ -389,7 +389,6 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_lengths=5) {
         if (df$age[i] == 'Y_GE90') {
             df$nqx[i] <- 1
         } else {
-            print(age_interval_lengths[i])
             df$nqx[i] <- 1 - exp(-age_interval_lengths * df$nmx[i])
         }
     }
