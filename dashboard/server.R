@@ -1,6 +1,10 @@
 # SERVER
 shinyServer(
     function(input, output, session) {
+# INITIALIZATION PLOTS --------------------------------------------------------------------------
+        click('plotMortalityButton')
+        click('plotMapsButton')
+
 # REACTIVE VALUES --------------------------------------------------------------------------
         # Reactive file readers for log files
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../data/logs/update_database.log', readFunc=paste_readLines)
@@ -50,6 +54,7 @@ shinyServer(
 
                 # filtering df
                 fig_df <- df %>% dplyr::filter(year %in% yr_range & week %in% week_range)
+                
 
                 # if selection includes current year
                 if (as.numeric(substring(Sys.time(),0,4)) %in% fig_df$year) {
@@ -137,7 +142,6 @@ shinyServer(
             # only taking life exp at birth
             lifeExpDF_AB <- lifeExpDF[lifeExpDF$age == age_groups,]
             
-
             # life expectancy plot
             if (type == 'le') {
                 lePlot <- plot_metric(
@@ -663,12 +667,39 @@ shinyServer(
                   selected = NULL,
                   options = list(maxItems = length(AGE_GROUPS))
                 )
+            } else if (input$selectAgeGroupsLifeExpTotalMaps == 'select') {
+                selectInput("selectAgeMaps",
+                  label = h5(strong("Select Age group")),
+                  choices = c("",AGE_GROUPS),
+                  selected = 'Y_LT5',
+                  options = AGE_GROUPS
+                )
             }
         })
         
         # map output
         output$leafletMapOutput <- renderUI({
             leafletOutput("leafletMapsPlot", height=input$dimension[2])
+        })
+
+        # life expectancy at birth or select age group option
+        observeEvent(input$plotMetricMaps, {
+            if (input$plotMetricMaps != 'le') {
+                shinyjs::show('selectAgeGroupsMapsTotal')
+                shinyjs::hide('selectAgeGroupsLifeExpTotalMaps')
+            } else {
+                shinyjs::hide('selectAgeGroupsMapsTotal')
+                shinyjs::show('selectAgeGroupsLifeExpTotalMaps')
+            }
+        })
+
+        # showing or hiding life exp age group selection based on at birth or not
+        observeEvent(input$selectAgeGroupsLifeExpTotalMaps, {
+            if (input$selectAgeGroupsLifeExpTotalMaps == 'at_birth') {
+                shinyjs::hide('selectAgeMaps')
+            } else {
+                shinyjs::show('selectAgeMaps')
+            }
         })
 
         # PLOT/TABLE OUTPUTS
@@ -686,7 +717,7 @@ shinyServer(
             df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 
-                age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
+                age_groups=ifelse(input$plotMetricMaps != 'le', switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps), switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps)),
                 sexes=input$selectSexesMaps,
                 metric=input$plotMetricMaps,
                 shape_data=switch(input$plotLibraryMaps, 'leaflet'=esp_leaflet, 'ggplot2'=esp_ggplot)
@@ -716,7 +747,6 @@ shinyServer(
 
         # outputting the map upon switching the plotting library
         observeEvent(input$plotLibraryMaps, {
-            click('plotMapsButton')
             if (input$plotLibraryMaps == 'leaflet') {
                 output$leafletMapsPlot <- renderLeaflet({genChloropleth()})
                 shinyjs::show('leafletMapsPlot')

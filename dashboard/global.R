@@ -75,7 +75,7 @@ AGE_GROUPS_UI_SELECT_LE <- c('at_birth', 'select')
 names(AGE_GROUPS_UI_SELECT_LE) <- c('Life expectancy at birth', 'Select Age group')
 # SHOW PLOT OR LIFE TABLES (LIFE EXP)
 SHOW_PLOT_OR_LT <- c('plot','life_table')
-names(SHOW_PLOT_OR_LT) <- c('Life expectancy TS', 'Life table')
+names(SHOW_PLOT_OR_LT) <- c('Life expectancy time series', 'Life table')
 # PLOTTING DEVICE TO USE
 PLOT_DEVICE_UI_SELECT <- c('ggplot2','plotly')
 names(PLOT_DEVICE_UI_SELECT) <- c('ggplot2', 'plotly')
@@ -371,7 +371,7 @@ MR <- function(wk, yr, ccaas, sexes) {
 
     # mortality rate for life table
     nmx <- numerator/denominator$x
-
+    
     # creating levels for age groups
     df <- data.frame(year=denominator$year, week=denominator$week, age=denominator$age, nmx=nmx)
 
@@ -379,13 +379,20 @@ MR <- function(wk, yr, ccaas, sexes) {
     return(df)
 }
 
-
 # LIFE TABLE FUNCTION
-LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
+LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_lengths=5) {
     # creating the life table template
     df <- MR(wk=wk, yr=yr, ccaas=ccaas, sexes=sexes)
     for (col in c("nqx","lx","ndx", "nLx", "Tx", "ex")) {df[,col] = rep(NA,length(df[,'week']))}
-    df$nqx <- 1 - exp(-age_interval_length * df$nmx)
+    df$nqx <- NA
+    for (i in 1:length(df$nmx)) {
+        if (df$age[i] == 'Y_GE90') {
+            df$nqx[i] <- 1
+        } else {
+            print(age_interval_lengths[i])
+            df$nqx[i] <- 1 - exp(-age_interval_lengths * df$nmx[i])
+        }
+    }
 
     # creating the lx col
     for (year in yr) {
@@ -398,18 +405,11 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
                 nmx <- rep(NA,length(AGE_GROUPS))
             }
 
-            # creating a vector for the different metrics
+            # creating all metrics
             lx <- c(initial_pop)
-            ndx <- c(initial_pop*nqx[1])
-            nLx <- c(ndx[1]/nmx[1])
-            
-            for (i in 2:length(nqx)) {            
-                ndx[i] <- lx[i-1]*nqx[i]
-                lx[i] <- lx[i-1] - ndx[i]
-                nLx[i] <- ndx[i]/nmx[i]
-            }
-
-            # metrics constructed post-loop
+            for (i in 2:length(nqx)) { lx[i] <- lx[i-1]*(1-nqx[i-1]) }
+            ndx <- lx*nqx
+            nLx <- ndx/nmx
             Tx <- sapply(1:length(nLx), function(s) {sum(nLx[s:length(nLx)])})
             ex <- Tx/lx
 
@@ -423,10 +423,9 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_length=5) {
     }
     return(df)
 }
-
-
+ 
 # GENERATE MAP DATA
-gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp) {
+gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp_leaflet) {
     # functions vector with name
     fns <- c(CMR, CRMR, BF, EM, DC, LT)
     names(fns) <- c('cmr','crmr','bf','em','dc','le')
@@ -434,8 +433,14 @@ gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp) {
     # iterating over ccaas to calculate indexes for selected data
     shape_data@data$metric <- NA
     for (i in 1:length(shape_data@data$ccaa)) {
-        shape_data@data[i,'metric'] = tryCatch({
-            fns[[metric]](wk=wk, yr=yr, ccaas=shape_data@data$ccaa[i], age_groups=age_groups, sexes=sexes)
+        shape_data@data[i,'metric'] = tryCatch(
+            {
+                if (metric != 'le') {
+                    fns[[metric]](wk=wk, yr=yr, ccaas=shape_data@data$ccaa[i], age_groups=age_groups, sexes=sexes)
+                } else {
+                    lt <- LT(wk=wk, yr=yr, ccaas=shape_data@data$ccaa[i], sexes=sexes)
+                }
+                
             },
             error=function(e) {NA}
         )

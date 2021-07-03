@@ -171,12 +171,17 @@ shinyUI(
               tags$head(includeCSS('./www/styles.css')),
               selectInput('plotMetricMaps',
                 label = h5(strong('Select metric to plot')),
-                choices = MORTALITY_PLOT_TYPE
+                choices = MAPS_PLOT_TYPE
               ),
               radioButtons('plotLibraryMaps',
                 label = h5(strong('Select the type of plot to show')),
                 choices = PLOT_LIBRARY_MAPS,
-                selected = 'ggplot2'
+                selected = 'leaflet'
+              ),
+              radioButtons('selectAgeGroupsLifeExpTotalMaps',
+                label = h5(strong('Plot life expectancy at birth or otherwise')),
+                choices = AGE_GROUPS_UI_SELECT_LE,
+                selected = 'at_birth'
               ),
               radioButtons('selectAgeGroupsMapsTotal',
                 label = h5(strong('Select Age group or Total')),
@@ -319,5 +324,3 @@ shinyUI(
     )
   )
 )
-
-
