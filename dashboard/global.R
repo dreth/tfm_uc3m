@@ -457,7 +457,7 @@ gen_chloropleth <- function(dataset, metric, library='leaflet', leaflet_provider
         pal <- colorNumeric(palette=palette, domain = dataset$metric)
 
         # pop up with data
-        metric_name <- MORTALITY_PLOT_TYPE_R[metric]
+        metric_name <- MAPS_PLOT_TYPE_R[metric]
         popup <- paste("<strong>CCAA:</strong>",CCAA_SHORT[dataset$ccaa],str_interp("<br><strong>${metric_name}:</strong>"),round(dataset$metric,5))
 
         # creating map

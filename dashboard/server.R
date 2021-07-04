@@ -4,7 +4,6 @@ shinyServer(
 # INITIALIZATION PLOTS --------------------------------------------------------------------------
         click('plotMortalityButton')
         click('plotMapsButton')
-        click('plotLifeExpButton')
 
 # REACTIVE VALUES --------------------------------------------------------------------------
         # Reactive file readers for log files
@@ -761,6 +760,9 @@ shinyServer(
                 shinyjs::hide('leafletMapOutput')
             }
         })
+
+
+        click('plotLifeExpButton')
     } 
 )
 
