@@ -392,6 +392,8 @@ shinyServer(
         genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
             weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
             years <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
+            print(weeks)
+            print(years)
             plot_lifeexp_or_lifetable(
                 wk=weeks, 
                 yr=years, 
@@ -451,8 +453,8 @@ shinyServer(
                 })
 
                 # menu header, for plot
-                output$lifeExpOrTableHeaderUIOutput <- renderUI({h4(strong('Plot parameters'))})
-                output$  lifeExpOrTableDownloadHeaderUIOutput <- renderUI({h4(strong('Image download options'))})
+                output$lifeExpOrTableHeaderUIOutput <- renderUI({h5(strong('Plot parameters'))})
+                output$lifeExpOrTableDownloadHeaderUIOutput <- renderUI({h4(strong('Image download options'))})
 
                 # showing plot/table outputs
                 shinyjs::show('usePlotlyOrGgplotLifeExp')
@@ -483,8 +485,8 @@ shinyServer(
                 })
 
                 # menu header, for table 
-                output$lifeExpOrTableHeaderUIOutput <- renderUI({h4(strong('Table parameters'))})
-                output$  lifeExpOrTableDownloadHeaderUIOutput <- renderUI({h4(strong('Table download options'))})
+                output$lifeExpOrTableHeaderUIOutput <- renderUI({h5(strong('Table parameters'))})
+                output$lifeExpOrTableDownloadHeaderUIOutput <- renderUI({h4(strong('Table download options'))})
 
                 # hiding plot settings/outputs and showing table output
                 shinyjs::hide('lifeExpPlot')

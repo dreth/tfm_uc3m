@@ -29,7 +29,7 @@ shinyUI(
               tags$head(includeCSS('./www/styles.css')),
               tags$head(tags$script(src = 'dimension.js')),
               h4(strong('Mortality metrics')),
-              h5(strong('Plot controls')),
+              h5(strong('Plot parameters')),
               selectInput('plotTypeMortality',
                 label = h5(strong('Select content to plot')),
                 choices = MORTALITY_PLOT_TYPE
