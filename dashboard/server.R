@@ -392,8 +392,6 @@ shinyServer(
         genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
             weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
             years <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
-            print(weeks)
-            print(years)
             plot_lifeexp_or_lifetable(
                 wk=weeks, 
                 yr=years, 
@@ -405,11 +403,6 @@ shinyServer(
                 yr_range_plot=years,
                 device_plot=input$usePlotlyOrGgplotLifeExp
             )
-        })
-
-        # table output for life table
-        output$lifeTableOutput <- renderTable({
-            genLifeExpOutputs()
         })
 
         # life expectancy plots
@@ -475,13 +468,17 @@ shinyServer(
                     shinyjs::hide('lifeExpPlot')
                     shinyjs::show('lifeExpPlotly')
                 }
-
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
                 # download button for table
                 output$downloadPlotOrTableUIOutput <- renderUI({
                     downloadButton("downloadTableLifeExp",
                         label=h4(strong("Download table"))
                     )
+                })
+
+                # table output for life table
+                output$lifeTableOutput <- renderTable({
+                    genLifeExpOutputs()
                 })
 
                 # menu header, for table 
@@ -559,6 +556,7 @@ shinyServer(
                  write.csv(LELT_download(),file)
             }
         )
+
 
 # UPDATE DATABASE TAB -------------------------------------------------------------------------------------
         # UI OUTPUTS
@@ -762,9 +760,6 @@ shinyServer(
                 shinyjs::hide('leafletMapOutput')
             }
         })
-
-
-        click('plotLifeExpButton')
     } 
 )
 

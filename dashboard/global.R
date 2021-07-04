@@ -78,7 +78,7 @@ SHOW_PLOT_OR_LT <- c('plot','life_table')
 names(SHOW_PLOT_OR_LT) <- c('Life expectancy time series', 'Life table')
 # PLOTTING DEVICE TO USE
 PLOT_DEVICE_UI_SELECT <- c('ggplot2','plotly')
-names(PLOT_DEVICE_UI_SELECT) <- c('ggplot2', 'plotly')
+names(PLOT_DEVICE_UI_SELECT) <- c('Static (ggplot2)', 'Interactive (plotly)')
 # DATABASE TABLES
 DATABASE_TABLES <- c('death','pop')
 names(DATABASE_TABLES) <- c('Deaths table', 'Population table')
@@ -92,7 +92,7 @@ names(DOWNLOAD_SIZE_PREDEF) <- c('200x200','500x500','800x800','1200x1200','2000
 DOWNLOAD_IMAGE_FORMAT <- c('png','jpeg','tiff','pdf','tex','bmp','eps')
 # MAP PLOT LIBRARY SELECTOR
 PLOT_LIBRARY_MAPS <- c('ggplot2','leaflet')
-names(PLOT_LIBRARY_MAPS) <- c('Fixed (ggplot2)', 'Interactive (leaflet)')
+names(PLOT_LIBRARY_MAPS) <- c('Static (ggplot2)', 'Interactive (leaflet)')
 
 # DATABASE VECTOR
 # contains databases indexed by string
