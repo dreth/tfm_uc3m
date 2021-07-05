@@ -1,8 +1,10 @@
 ---
 title: 'Development of an automatic tool for periodic surveillance of actuarial and demographic indicators'
-author: 'Daniel Alonso'
-date: 'June 23rd, 2021'
+author: 'Daniel Alonso, María Luz Durbán Reguera, Bernardo D'Auria'
+date: 'July-August 2021'
 output: 'pdf_document'
+documentclass: article
+classoption: a4paper
 ---
 
 ```{r setup, include=FALSE}
@@ -11,6 +13,5 @@ collapse = TRUE,
 comment = '#>',
 fig.path = './figures/'
 )
-knitr::knit_engines$set(julia = JuliaCall::eng_juliacall)
-options(JULIA_HOME = '/home/dreth/julia/bin')
 ```
+
