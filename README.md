@@ -45,7 +45,7 @@ You can download docker [here](https://www.docker.com/products/docker-desktop) i
 
 **All features** are available when using this method.
 
-Given docker is installed, the app can be launched by running the following lines of code. This will pull the container from Docker hub and run the application:
+Given docker is installed, the app can be launched by running the following command. This will pull the container from Docker hub and run the application:
 
 ```bash
 docker run -it -p 3838:3838/tcp dreth/tfm_uc3m:latest
