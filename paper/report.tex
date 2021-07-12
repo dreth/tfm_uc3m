@@ -1,0 +1,167 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Development of an automatic tool for periodic surveillance of actuarial and demographic indicators},
+            pdfauthor={Daniel Alonso, María Luz Durbán Reguera, Bernardo D'Auria},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{setspace}\doublespacing
+
+\title{Development of an automatic tool for periodic surveillance of actuarial
+and demographic indicators}
+\author{Daniel Alonso, María Luz Durbán Reguera, Bernardo D'Auria}
+\date{July-August 2021}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\newpage
+
+\hypertarget{abstract}{%
+\section{Abstract}\label{abstract}}
+
+As a result of the COVID-19 pandemic and its large impact across Spain,
+the monitoring of demographic measures as a direct result of deaths
+related to such pandemic and future similarly deadly events has become
+increasingly important. It is intended with this project to develop a
+tool in order to easily monitor a selection of demographic measures
+relating to collective deaths of individuals as a result of relevant
+worldwide events like the one mentioned previously. The tool consists of
+a shiny dashboard (developed in R) where such measures are displayed in
+different visualizations across time.
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+The COVID-19 pandemic has led to a widespread and noticeable temporary
+increase in mortality and reduction in life expectancy throughout Spain.
+This arises a need to monitor these demographic measures more closely
+and in real time.
+
+This project consists of a shiny dashboard with several features:
+
+\begin{itemize}
+\item
+  Visualizing several mortality metrics:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Excess mortality
+  \item
+    Cumulative mortality rate
+  \item
+    Cumulative relative mortality rate
+  \item
+    Mortality improvement factor
+  \end{itemize}
+\item
+  Visualizing life expectancy and constructing life tables
+\item
+  Visualizing a map of Spain with the previous metrics per autonomous
+  community (CCAA)
+\end{itemize}
+
+All metrics are calculated weekly with data stretching back as far back
+as 2010.
+
+\hypertarget{objectives}{%
+\section{Objectives}\label{objectives}}
+
+\begin{itemize}
+\item
+  Provide a simple-to-use, web-based, OS-agnostic tool to compute and
+  visualize common mortality and life expectancy metrics in time series
+  plots/maps
+\item
+  Provide the user the ability to customize the plot parameters
+  significantly
+\item
+  Provide the user the ability to download the plots and the data (with
+  or without filtering)
+\item
+  Allow the user to update and push the data to the corresponding github
+  repository hosting the data from within the application
+\item
+  Have data updated in real-time from the official Spanish sources and
+  Eurostat (also provided by INE)
+\end{itemize}
+
+\hypertarget{project-repository-tree-structure}{%
+\section{Project repository tree
+structure}\label{project-repository-tree-structure}}
+
+First of all, the project consists of two repositories:
+
+\begin{itemize}
+\item
+  🗄️ \href{https://github.com/dreth/tfm_uc3m}{The main project
+  repository (\emph{tfm\_uc3m})}
+\item
+  🗄️ \href{https://github.com/dreth/tfm_c3m_data}{The data repository
+  (\emph{tfm\_uc3m\_data})}
+\end{itemize}
+
+\end{document}

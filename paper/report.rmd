@@ -6,6 +6,7 @@ header-includes:
     - \usepackage{setspace}\doublespacing
 output: 
     pdf_document:
+        latex_engine: xelatex
         toc: true
 ---
 
@@ -15,8 +16,6 @@ collapse = TRUE,
 comment = "#>",
 fig.path = "./figures/"
 )
-knitr::knit_engines$set(julia = JuliaCall::eng_juliacall)
-options(JULIA_HOME = "/home/dreth/julia/bin")
 ```
 
 \newpage
@@ -56,4 +55,10 @@ All metrics are calculated weekly with data stretching back as far back as 2010.
 - Have data updated in real-time from the official Spanish sources and Eurostat (also provided by INE)
 
 # Project repository tree structure
+
+First of all, the project consists of two repositories:
+
+- 🗄️ [The main project repository (*tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
+
+- 🗄️ [The data repository (*tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
 
