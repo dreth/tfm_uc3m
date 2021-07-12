@@ -43,4 +43,17 @@ This project consists of a shiny dashboard with several features:
 
 All metrics are calculated weekly with data stretching back as far back as 2010.
 
-The idea is to provide a 
+# Objectives
+
+- Provide a simple-to-use, web-based, OS-agnostic tool to compute and visualize common mortality and life expectancy metrics in time series plots/maps
+
+- Provide the user the ability to customize the plot parameters significantly
+
+- Provide the user the ability to download the plots and the data (with or without filtering)
+
+- Allow the user to update and push the data to the corresponding github repository hosting the data from within the application
+
+- Have data updated in real-time from the official Spanish sources and Eurostat (also provided by INE)
+
+# Project repository tree structure
+
