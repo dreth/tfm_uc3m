@@ -54,11 +54,34 @@ All metrics are calculated weekly with data stretching back as far back as 2010.
 
 - Have data updated in real-time from the official Spanish sources and Eurostat (also provided by INE)
 
+# What problem does the application solve?
+
+As we saw during the COVID-19 pandemic, the most widely publicized measures shown to the public in order to explain the status of the pandemic and the country as a whole were always related to incidence of the virus and death counts/recovery counts.
+
 # Project repository tree structure
 
-First of all, the project consists of two repositories:
+First of all, the project consists of two repositories and their respectives **subfolders**/*files*:
 
-- 🗄️ [The main project repository (*tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
+- [**The main project repository** (*tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
+    - **api**
+        - **logs**
+            - *earliest_eurostat_provisional.log*
+            - *last_eurostat_update.log*
+            - *last_ine_update.log*
+        - *dbs_check.py*
+        - *function.py*
+        - *query.py*
+        - *update_database.sh*
+    - **dashboard**
+    - **data**
+    - **docker**
+    - **docs**
+    - **paper**
+    - *README.md*
 
-- 🗄️ [The data repository (*tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
+- [**The data repository** (*tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
+    - **ccaa_guide**
+        - *guide_ccaa.json*
+        - *guide_ccaa.txt*
+        - *guide_ccaa_python_dict.p*
 

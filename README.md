@@ -120,7 +120,7 @@ If on a shell console, you can also run the app as follows if the R binary is on
 R -e "shiny::runGitHub(repo='tfm_uc3m', username='dreth', ref='main', subdir='dashboard')"
 ```
 
-## Closing the application
+## ❎ Closing the application
 
 ### What should always work
 
