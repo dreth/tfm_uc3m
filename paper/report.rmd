@@ -63,21 +63,24 @@ As we saw during the COVID-19 pandemic, the most widely publicized measures show
 First of all, the project consists of two repositories and their respectives **subfolders**/*files*:
 
 - [**The main project repository** (*tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
-    - **api**
+    - **api**: Contains all files related to the querying, acquisition, manipulation of new data from the two aggregated data sources (INE and Eurostat), along with various log files used to keep track of some metadata from the data sources (last updated data and provisional data). 
         - **logs**
-            - *earliest_eurostat_provisional.log*
-            - *last_eurostat_update.log*
-            - *last_ine_update.log*
-        - *dbs_check.py*
-        - *function.py*
-        - *query.py*
-        - *update_database.sh*
-    - **dashboard**
+            - *earliest_eurostat_provisional.log*: Eurostat marks data as provisional when it can still be updated, as new deaths might occur. This file logs the earliest data entry marked as provisional.
+            - *last_eurostat_update.log*: This file logs the last week for which there is available and updated data from Eurostat for Spain within the database *demo_r_mwk2_05*.  
+            - *last_ine_update.log*: This file logs the last week for which there is available and updated data from INE for table No. *9681*.
+        - *dbs_check.py*: This script obtains a small sample of data from Eurostat and Ine and checks when the earliest provisional data point is, what is the latest obtainable week of data from both Eurostat and INE and writes it in the log files contained within **logs**.
+        - *functions.py*: This script contains all the functions used for fetching, manipulating and outputting the data obtained from the aggregated data sources' respective APIs (Eurostat and INE).
+        - *query.py*: This script will run a pre-constructed pipeline where the data is systematically queried per age group, manipulated and where new entries are added to the *.csv* files contained within the **data** folder.
+    
+    
+    - **dashboard**: Contains all files that allow the shiny app itself to run along with 
         - **www**
             - **maps**
-            - **map_shapefiles**
-            - **map_shapefiles_ggplot**
-            - *update
+                - **map_shapefiles**
+                - **map_shapefiles_ggplot**
+            - **scripts**
+                - *check_dbs.sh*
+                - *check_dbs.sh*
     - **data**
     - **docker**
     - **docs**

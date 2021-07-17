@@ -602,7 +602,7 @@ shinyServer(
 
         # UPDATE DATABASE BUTTON
         observeEvent(input$updateDatabaseButton, {
-            system('bash ./www/scripts/update_database_app.sh', wait=FALSE)
+            system('bash ./www/scripts/update_database.sh', wait=FALSE)
             systime <- Sys.time()
             updateActionButton(session=session, inputId='updateDatabaseButton', label="Update Database (Again)")
         })
