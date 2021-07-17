@@ -73,6 +73,11 @@ First of all, the project consists of two repositories and their respectives **s
         - *query.py*
         - *update_database.sh*
     - **dashboard**
+        - **www**
+            - **maps**
+            - **map_shapefiles**
+            - **map_shapefiles_ggplot**
+            - *update
     - **data**
     - **docker**
     - **docs**
