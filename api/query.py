@@ -72,5 +72,5 @@ with open('../data/logs/update_database.log', 'w+') as f:
 # adding update information to the update history log
 with open('../data/logs/update_history.log', 'r+') as f:
     contents = f.read()
-    f.seek(0)
-    f.write(f'> Database updated at: {dt.datetime.now().isoformat(" ")}\n')
+    f.seek(0,0)
+    f.write(f'> Database updated at: {dt.datetime.now().isoformat(" ")}\n' + contents)
