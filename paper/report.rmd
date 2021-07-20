@@ -110,7 +110,7 @@ The application computes the following 5 different metrics:
 
 ## Excess mortality {#EM}
 
-The term *excess mortality* refers to a measurement which corresponds to the difference between the average deaths which have ocurred during the $n$ years prior to the current $t$ time. Typically, the window of years to compute the average deaths is often $n = 5$. For the application, a window of $n = 5$ years is used to compute the measurement.
+The term *excess mortality* ($EM$) refers to a measurement which corresponds to the difference between the average deaths which have ocurred during the $n$ years prior to the current $t$ time. Typically, the window of years to compute the average deaths is often $n = 5$. For the application, a window of $n = 5$ years is used to compute the measurement.
 
 If excess mortality is very high and above zero, then there have been more deaths than the previous $n$ year average, if the number is smaller than zero, then there have been less deaths than the previous $n$ year average.
 
@@ -129,9 +129,9 @@ For the years between 2021 and 2027 inclusive, the application uses the same 5-y
 
 ### Computation
 
-It is computed as follows:
+The EM for week $w$ of year $y$ is computed as follows:
 
-$$EM = \frac{D_{w, y}}{\overline{D_{w, y-5, y}}}$$
+$$EM_{w, y} = \frac{D_{w, y}}{\overline{D_{w, y-5, y}}}$$
 
 Where:
 
@@ -141,7 +141,7 @@ Where:
 
 Exact definition:
 
-$$EM = \frac{D_{w, y}}{\frac{1}{n} \sum^{n}_{k=1} D_{w, y-k}}$$
+$$EM_{w, y} = \frac{D_{w, y}}{\frac{1}{n} \sum^{n}_{k=1} D_{w, y-k}}$$
 
 Where:
 
@@ -151,9 +151,11 @@ Where:
 
 - $D_{w, y-k}$: death count for week $w$ of year $y-k$, where $k$ starts at $k=1$ and ends at $n$ with $k \in \mathbb{N}$.
 
+\newpage
+
 ## Cumulative mortality rate {#CMR}
 
-The *cumulative mortality rate* represents the ratio between the sum of all deaths between the first week of a year or years up to a user-defined week, where weeks must be $1 \leq w \leq 52$.
+The *cumulative mortality rate* ($CMR$) represents the ratio between the sum of all deaths between the first week of a year or years up to a user-defined week, where weeks must be $1 \leq w \leq 52$.
 
 ### Purpose
 
@@ -165,22 +167,54 @@ The ratio is computed, depending on user selection, for years stretching as far 
 
 ### Computation
 
-The ratio is computed for a single year $y$ and up to week $s$ as follows:
+The CMR for year $y$ and up to week $s$ is computed as follows:
 
-$$CMR = \frac{\sum^{s}_{w=1} D_{w, y}}{P_{w, y}}$$
+$$CMR_{w, y} = \frac{\sum^{s}_{w=1} D_{w, y}}{P_{w, y}}$$
 
 Where:
 
-- $D_{w, y}$: death count for week $w$ of year $y$
+- $D_{w, y}$: death count for week $w$ of year $y$.
 
-- $s$: upper bound of week for which the death count is computed, with $1 \leq s \leq 52$ and $s \in \mathbb{N}$
+- $P_{w, y}$: population at week $w$ of year $y$
 
+- $s$: upper bound of week for which the death count is computed, with $1 \leq s \leq 52$ and $s \in \mathbb{N}$.
+
+\newpage
 
 ## Cumulative relative mortality rate {#CRMR}
 
+The *cumulative relative mortality rate* ($CRMR$) corresponds to the ratio of the difference between the cumulative mortality rate (CMR) at a specified week and the average CMR between the years 2010 and 2019 inclusive, and the average CMR between the years 2010 and 2019 for the last week of those years (the 52nd week).
+
+### Purpose
+
+The $CRMR$ allows us to show the medium to long-term effect of catastrophic or mortality-rising events on the population based on the $CMR$. 
+
+The effect of long-lasting events like the COVID-19 pandemic clearly show how mortality can part away from the mean significantly and how the cumulative effect of such mortality can rise to unprecedented levels for relatively long periods of time.
+
+This particular metric can be affected significantly by events which we might perceive as not-so-dramatic when they occur (perhaps like a severe heat wave), but it lets us historically see how much worse or better (in terms of mortality) a given time period can be.
+
+### Specification
+
+The metric is computed using the average CMR for years between 2010 and 2019. 2020 is explicitly excluded, as the effect of the COVID-19 pandemic would skew our perspective on 2021 mortality and further years. 
+
+The CMR for the last week of those years is averaged as it includes the entire year, given that the CMR is computed for a range of weeks starting at week 1 and ending at week $s$, for this metric we compute the denominator for week $s=52$ and the numerator for a specified week range.
+
+### Computation
+
+The CRMR for week $w$ of year $y$ is computed as follows:
+
+$$CRMR_{w, y} = \frac{CMR_{w, y} - \frac{1}{10} \sum^{2019}_{y=2010} CMR_{w, y}}{\frac{1}{10} \sum^{2019}_{y=2010} CMR_{w=52, y}}$$
+
+Where:
+
+- $CMR_{w, y}$ is the *cumulative mortality rate* at week $w$ of year $y$
+
 ## Mortality improvement factor {#MIF}
 
+
+
 ## Life expectancy {#LE}
+
 
 
 # Appendix
