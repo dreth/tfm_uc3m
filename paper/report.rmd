@@ -98,7 +98,17 @@ As it is with any demographic measure, knowing general metrics about population 
 
 The application computes the following 5 different metrics:
 
-## Excess mortality
+- [[Excess mortality]{color="black"}](#EM)
+
+- [[Cumulative mortality rate]{color="black"}](#CMR)
+
+- [[Cumulative relative mortality rate]{color="black"}](#CRMR)
+
+- [[Mortality improvement factor]{color="black"}](#MIF)
+
+- [[Life expectancy]{color="black"}](#LE)
+
+## Excess mortality {#EM}
 
 The term *excess mortality* refers to a measurement which corresponds to the difference between the average deaths which have ocurred during the $n$ years prior to the current $t$ time. Typically, the window of years to compute the average deaths is often $n = 5$. For the application, a window of $n = 5$ years is used to compute the measurement.
 
@@ -113,36 +123,64 @@ During the COVID-19 pandemic the measurement was particularly useful as mortalit
 
 ### Specification
 
-As a result of the COVID-19 pandemic, future measures calculated after 2020 
+As a result of the COVID-19 pandemic, future measures calculated after 2020 must exclude 2020 and 2021 from the calculation as the death counts are anomalous compared to previous and subsequent years prior the COVID-19 pandemic.
+
+For the years between 2021 and 2027 inclusive, the application uses the same 5-year moving average used for 2020, meaning the average deaths corresponding to week $w$ for $2015 \leq y \leq 2019$. After 2027 or prior to 2021 the average death counts used are computed from the 5 year window prior to the year(s) selected. For example, the average deaths for $w = 1$, 2019 will correspond to the average deaths during $w = 1$ for the years $2014 \leq y \leq 2018$, and the average deaths for $w = 1$, 2022 will correspond to the same average deaths observed on $w = 1$ for the years $2015 \leq y \leq 2019$.
 
 ### Computation
 
-It is computed for week $w$ as follows:
+It is computed as follows:
 
-$$EM = \frac{D_{w, y}}{\bar{D_{w, y-5, y}}}$$
+$$EM = \frac{D_{w, y}}{\overline{D_{w, y-5, y}}}$$
 
 Where:
 
-$D_{w, y}$: death count for week $w$ in year $y$
-$\bar{D}_{w, y-5, y-1}$: average death count for week $w$ of years $y-5$, $y-4$, $\dots$, $y-1$.
+- $D_{w, y}$: death count for week $w$ of year $y$
+
+- $\overline{D_{w, y-5, y-1}}$: average death count for week $w$ of years $y-5$, $y-4$, $\dots$, $y-1$.
 
 Exact definition:
 
-$$EM = \frac{D_{w, y}}{\sum^{n}_{k=1} D_{w, y-k}}$$
+$$EM = \frac{D_{w, y}}{\frac{1}{n} \sum^{n}_{k=1} D_{w, y-k}}$$
 
 Where:
 
-$D_{w, y}$: death count for week $w$ in year $y$
-$n$: years to look back to, default is $n = 5$
-$D_{w, y-k}$: death count for week $w$ in year $y-k$, where $k$ starts at $k=1$ and ends at $n$
+- $D_{w, y}$: death count for week $w$ of year $y$
 
-## Cumulative mortality rate
+- $n$: years to look back to, default is $n = 5$
 
-## Cumulative relative mortality rate
+- $D_{w, y-k}$: death count for week $w$ of year $y-k$, where $k$ starts at $k=1$ and ends at $n$ with $k \in \mathbb{N}$.
 
-## Mortality improvement factor
+## Cumulative mortality rate {#CMR}
 
-## Life expectancy
+The *cumulative mortality rate* represents the ratio between the sum of all deaths between the first week of a year or years up to a user-defined week, where weeks must be $1 \leq w \leq 52$.
+
+### Purpose
+
+This ratio can be used standalone to gauge the amount of deaths in a time period divided by the population alive at that time period, but, it is most commonly used in this project as a component of the more informational *[[cumulative relative mortality rate]{color="black"}](#CRMR)* or *[[mortality improvement factor]{color="black"}](#MIF)*. 
+
+### Specification
+
+The ratio is computed, depending on user selection, for years stretching as far back as 2010 and as updated as the current year. It can only be computed for any specified range between 1 and week $w$. 
+
+### Computation
+
+The ratio is computed for a single year $y$ and up to week $s$ as follows:
+
+$$CMR = \frac{\sum^{s}_{w=1} D_{w, y}}{P_{w, y}}$$
+
+Where:
+
+- $D_{w, y}$: death count for week $w$ of year $y$
+
+- $s$: upper bound of week for which the death count is computed, with $1 \leq s \leq 52$ and $s \in \mathbb{N}$
+
+
+## Cumulative relative mortality rate {#CRMR}
+
+## Mortality improvement factor {#MIF}
+
+## Life expectancy {#LE}
 
 
 # Appendix
