@@ -80,7 +80,7 @@ There are several advantages an application could potentially have over static, 
 
 - The user can choose what measures of those available to show.
 
-- As the application is [fully open source](https://github.com/tfm_uc3m), developers wanting to expand the application and add extra features and contribute directly to the project's development.
+- As the application is [fully open source](https://github.com/dreth/tfm_uc3m), developers wanting to expand the application and add extra features and contribute directly to the project's development.
 
 - The measures will be as up-to-date as the data source is. As these reports take time to construct and analyze, they will take longer to be released, so the user can simply open the application and update the database whenever they desire to do so.
 
