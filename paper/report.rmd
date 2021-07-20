@@ -94,6 +94,57 @@ As it is with any demographic measure, knowing general metrics about population 
 
 - Ordinary people. Perhaps mere curiosity or desire to be informed, being able to know in a timely manner whether the population is at risk or healthy helps people make choices regarding how to take care of themselves or how to take care of their loved ones.
 
+# Metrics computed by the application
+
+The application computes the following 5 different metrics:
+
+## Excess mortality
+
+The term *excess mortality* refers to a measurement which corresponds to the difference between the average deaths which have ocurred during the $n$ years prior to the current $t$ time. Typically, the window of years to compute the average deaths is often $n = 5$. For the application, a window of $n = 5$ years is used to compute the measurement.
+
+If excess mortality is very high and above zero, then there have been more deaths than the previous $n$ year average, if the number is smaller than zero, then there have been less deaths than the previous $n$ year average.
+
+### Purpose
+
+Excess mortality is used to assess how many more or less deaths than the previous years' average have ocurred. This way it's possible to determine if there is an increase in deaths that exceed what has been considered "normal". 
+
+During the COVID-19 pandemic the measurement was particularly useful as mortality spiked beyond the expectations of pretty much any country where the pandemic became widespread. Spain is no exception, and during the time where the deaths were at their peak, the excess mortality of that period of time was a highly publicized measure to illustrate how many deaths above what usually occurs happened.
+
+
+### Specification
+
+As a result of the COVID-19 pandemic, future measures calculated after 2020 
+
+### Computation
+
+It is computed for week $w$ as follows:
+
+$$EM = \frac{D_{w, y}}{\bar{D_{w, y-5, y}}}$$
+
+Where:
+
+$D_{w, y}$: death count for week $w$ in year $y$
+$\bar{D}_{w, y-5, y-1}$: average death count for week $w$ of years $y-5$, $y-4$, $\dots$, $y-1$.
+
+Exact definition:
+
+$$EM = \frac{D_{w, y}}{\sum^{n}_{k=1} D_{w, y-k}}$$
+
+Where:
+
+$D_{w, y}$: death count for week $w$ in year $y$
+$n$: years to look back to, default is $n = 5$
+$D_{w, y-k}$: death count for week $w$ in year $y-k$, where $k$ starts at $k=1$ and ends at $n$
+
+## Cumulative mortality rate
+
+## Cumulative relative mortality rate
+
+## Mortality improvement factor
+
+## Life expectancy
+
+
 # Appendix
 
 ## Appendix A: Python

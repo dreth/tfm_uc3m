@@ -210,7 +210,7 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
         # and lag it to fit it to the dataframe (as the current year can't be part of the average)
         agg$ma <- lag(movavg(agg$x, ma, type='s'))
         # isolating 2021, as it is still within the COVID-19 pandemic period
-        agg[agg$year == 2021,'ma'] <-  agg[agg$year == 2020,'ma']
+        agg[agg$year >= 2021 | agg$year <= 2027,'ma'] <- agg[agg$year == 2020,'ma']
         # appending results to df
         result_df <- agg[agg$year %in% yr,]
         return(result_df$x - result_df$ma)
