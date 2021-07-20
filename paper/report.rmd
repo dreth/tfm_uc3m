@@ -227,7 +227,7 @@ Where:
 
 The project consists of two repositories and their respectives **subfolders**/*files*:
 
-### [**The main project repository** (*tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
+### [**The main project repository** (*dreth/tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
 
 - **api**: Contains all files related to the querying, acquisition, manipulation of new data from the two aggregated data sources (INE and Eurostat), along with various log files used to keep track of some metadata from the data sources (last updated data and provisional data). 
     - **logs**
@@ -246,10 +246,10 @@ The project consists of two repositories and their respectives **subfolders**/*f
             - **map_shapefiles_ggplot**: Contains the shapefiles used to display the map using the ggplot2 library.
         - **scripts**
             - *check_dbs.sh*: This script is ran every time the app is launched. This shell script runs *dbs_check.py* from the **api** folder.
-            - *update_database.sh*: This is the update database script, basically checks the date, runs the *query.py* and *dbs_check.py* script from the **api** folder, appending new data (if available) to the data currently in the cloned repository tree. Then it copies the new files into the [**tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, then it commits and pushes the files to that repository.
+            - *update_database.sh*: This is the update database script, basically checks the date, runs the *query.py* and *dbs_check.py* script from the **api** folder, appending new data (if available) to the data currently in the cloned repository tree. Then it copies the new files into the [**dreth/tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, then it commits and pushes the files to that repository.
 
 
-- **data**: This folder is a subtree of the [**tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, therefore, it contains all the data used in the application along with logs showing diagnostic and historical information about database updates.
+- **data**: This folder is a subtree of the [**dreth/tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, therefore, it contains all the data used in the application along with logs showing diagnostic and historical information about database updates.
     - **logs**
         - *update_database.log*: This log file contains the date the database was last updated, it is written to every time the database is updated.
         - *update_history.log*: This log file contains the dates in which the database has been updated (historically) 
@@ -258,7 +258,7 @@ The project consists of two repositories and their respectives **subfolders**/*f
 - **paper**
 - *README.md*
 
-### [**The data repository** (*tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
+### [**The data repository** (*dreth/tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
 
 - **ccaa_guide**
     - *guide_ccaa.json*
