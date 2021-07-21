@@ -22,7 +22,7 @@ shinyServer(
                                 'em'='Excess Mortality',
                                 'crmr'='Cumulative Relative Mortality Rate',
                                 'cmr'='Cumulative Mortality Rate',
-                                'bf'='Cumulative Improvement Factor',
+                                'mif'='Cumulative Improvement Factor',
                                 'dc'='Death count',
                                 'le'=ifelse(input$selectAgeGroupsLifeExpTotal=='at_birth', 'Life expectancy at birth', 'Life expectancy')
                                 )

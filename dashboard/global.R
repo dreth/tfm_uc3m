@@ -50,13 +50,13 @@ names(AGE_GROUP_RANGES) <- AGE_GROUPS
 SEXES <- c("F","M","T")
 names(SEXES) <- c("Females","Males","Total")
 # OPTIONS TO PLOT (MORTALITY)
-MORTALITY_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "bf", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf"))
+MORTALITY_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "mif", "dc"), 'FALSE'=c("em", "cmr", "crmr", "mif"))
 names(MORTALITY_PLOT_TYPE) <-switch(as.character(death_count), 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor'))
 # reverse options for reference
 MORTALITY_PLOT_TYPE_R <- names(MORTALITY_PLOT_TYPE)
 names(MORTALITY_PLOT_TYPE_R) <- MORTALITY_PLOT_TYPE
 # OPTIONS TO PLOT (MAPS)
-MAPS_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "bf", "le", "dc"), 'FALSE'=c("em", "cmr", "crmr", "bf", "le"))
+MAPS_PLOT_TYPE <-switch(as.character(death_count), 'TRUE'=c("em", "cmr", "crmr", "mif", "le", "dc"), 'FALSE'=c("em", "cmr", "crmr", "mif", "le"))
 names(MAPS_PLOT_TYPE) <-switch(as.character(death_count), 'TRUE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Life expectancy', 'Death count'), 'FALSE'=c('Excess Mortality','Cumulative mortality rate', 'Cumulative relative mortality rate', 'Cumulative improvement factor', 'Life expectancy'))
 # reverse options for reference
 MAPS_PLOT_TYPE_R <- names(MAPS_PLOT_TYPE)
@@ -120,7 +120,7 @@ esp_ggplot@data$ccaa <- c("ES7","ES61","ES24","ES12","ES53","ES13","ES41","ES42"
 esp_ggplot@data$id <- c(18, 14, 6, 1, 13, 2, 8, 9, 11, 12, 10, 0, 7, 15, 4, 3, 5, 16, 17, NA)
 
 # SIGNIFICANT FIGURES FOR EACH METRIC
-SIG_FIGURES <- function(m) {switch(m, "em"=2, "cmr"=3, "crmr"=10, "bf"=10, "dc"=2)}
+SIG_FIGURES <- function(m) {switch(m, "em"=2, "cmr"=3, "crmr"=10, "mif"=10, "dc"=2)}
 
 # MEASURES AND RATIOS
 # Cumulative mortality rate
@@ -186,7 +186,7 @@ CRMR <- function(wk, yr, ccaas, age_groups, sexes, all=FALSE, cmr_c_yrs=2010:201
 }
 
 # Improvement factor (cumulative)
-BF <- function(wk, yr, ccaas, age_groups, sexes) {
+MIF <- function(wk, yr, ccaas, age_groups, sexes) {
     cmr_1 <- CMR(wk=wk, yr=yr-1, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
     cmr <- CMR(wk=wk, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
     end_cmr <- CMR(wk=52, yr=yr-1, ccaas=ccaas, age_groups=age_groups, sexes=sexes)
@@ -267,7 +267,7 @@ DC <- function(wk, yr, ccaas, age_groups, sexes) {
 }
 
 # DATAFRAME GENERATING FUNCTIONS
-# historical cmr, crmr and bf
+# historical cmr, crmr, mif, em and le
 factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=2010:max(YEAR)-1) {
     # Initializing vectors for the df
     wks <- c()
@@ -285,13 +285,13 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
         result <- data.frame(week=wks, year=yrs, crmr=metric)
     
     # Improvement factor
-    } else if (type == 'bf') {
+    } else if (type == 'mif') {
         for (j in wk) {
             yrs <- c(yrs, yr)
             wks <- c(wks, rep(j,length(yr)))
-            metric <- c(metric, BF(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+            metric <- c(metric, MIF(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
         }
-        result <- data.frame(week=wks, year=yrs, bf=metric)
+        result <- data.frame(week=wks, year=yrs, mif=metric)
     
     # Cumulative mortality rate
     } else if (type == 'cmr') {
@@ -429,8 +429,8 @@ LT <- function(wk, yr, ccaas, sexes, initial_pop=1e5, age_interval_lengths=5) {
 # GENERATE MAP DATA
 gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp_leaflet) {
     # functions vector with name
-    fns <- c(CMR, CRMR, BF, EM, DC, LT)
-    names(fns) <- c('cmr','crmr','bf','em','dc','le')
+    fns <- c(CMR, CRMR, MIF, EM, DC, LT)
+    names(fns) <- c('cmr','crmr','mif','em','dc','le')
     
     # iterating over ccaas to calculate indexes for selected data
     shape_data@data$metric <- NA
