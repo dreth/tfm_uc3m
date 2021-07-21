@@ -655,6 +655,18 @@ shinyServer(
             }
         )
 
+        # DB table download preview
+        output$tableDownloadPreviewDBTable <- renderDataTable({
+            filter_df_table(
+                db=DBs[[input$selectDBTable]],
+                wk=input$weekSliderSelectorDBTable[1]:input$weekSliderSelectorDBTable[2],
+                yr=input$yearSliderSelectorDBTable[1]:input$yearSliderSelectorDBTable[2],
+                ccaas=switch(input$selectCCAADBTableTotal, 'all'=CCAA, 'select'=input$selectCCAADBTable),
+                age_groups=switch(input$selectAgeGroupsDBTableTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeDBTable),
+                sexes=input$selectSexesDBTable
+            )
+        })
+
 # MAPS TAB -------------------------------------------------------------------------------------
         # UI OUTPUTS
         # Dynamic age group control, for all age groups, or selected

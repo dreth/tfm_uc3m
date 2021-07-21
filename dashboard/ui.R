@@ -230,49 +230,57 @@ shinyUI(
 
         # Fourth tab content
         tabItem(tabName = 'databaseTable',
-          fluidPage(
-            tags$head(includeCSS('./www/styles.css')),
-            wellPanel(
-              # Table filters
-              selectInput('selectDBTable',
-              label = h5(strong('Select database table to generate')),
-              choices = DATABASE_TABLES
-              ),
-              radioButtons('selectCCAADBTableTotal',
-              label = h5(strong('Select CCAAs or Total')),
-              choices = CCAA_UI_SELECT,
-              selected = 'all'
-              ),
-              uiOutput('selectCCAADBTableUIOutput'),
-              radioButtons('selectAgeGroupsDBTableTotal',
-                label = h5(strong('Select Age group or Total')),
-                choices = AGE_GROUPS_UI_SELECT,
+          sidebarLayout(
+            sidebarPanel(
+              tags$head(includeCSS('./www/styles.css')),
+                # Table filters
+                selectInput('selectDBTable',
+                label = h5(strong('Select database table to generate')),
+                choices = DATABASE_TABLES
+                ),
+                radioButtons('selectCCAADBTableTotal',
+                label = h5(strong('Select CCAAs or Total')),
+                choices = CCAA_UI_SELECT,
                 selected = 'all'
+                ),
+                uiOutput('selectCCAADBTableUIOutput'),
+                radioButtons('selectAgeGroupsDBTableTotal',
+                  label = h5(strong('Select Age group or Total')),
+                  choices = AGE_GROUPS_UI_SELECT,
+                  selected = 'all'
+                ),
+                uiOutput('selectAgeGroupsDBTableUIOutput'),
+                selectInput('selectSexesDBTable',
+                  label = h5(strong('Select Sex/Total')),
+                  choices = SEXES,
+                  selected = 'T'
+                ),
+                sliderInput('weekSliderSelectorDBTable',
+                  label = h5(strong('Select week range to filter')),
+                  min = 1,
+                  max = 52,
+                  value = c(1,52),
+                  step = 1
+                ),
+                sliderInput('yearSliderSelectorDBTable',
+                  label = h5(strong('Select year range to filter')),
+                  min = min(YEAR),
+                  max = max(YEAR),
+                  value = c(min(YEAR), max(YEAR)),
+                  step = 1
+                ),
+                br(),
+                downloadButton('downloadDBTable',
+                label=h4(strong('Download the filtered data'))
+                )    
               ),
-              uiOutput('selectAgeGroupsDBTableUIOutput'),
-              selectInput('selectSexesDBTable',
-                label = h5(strong('Select Sex/Total')),
-                choices = SEXES,
-                selected = 'T'
-              ),
-              sliderInput('weekSliderSelectorDBTable',
-                label = h5(strong('Select week range to filter')),
-                min = 1,
-                max = 52,
-                value = c(1,52),
-                step = 1
-              ),
-              sliderInput('yearSliderSelectorDBTable',
-                label = h5(strong('Select year range to filter')),
-                min = min(YEAR),
-                max = max(YEAR),
-                value = c(min(YEAR), max(YEAR)),
-                step = 1
-              ),
-              br(),
-              downloadButton('downloadDBTable',
-              label=h4(strong('Download the filtered data'))
-              )        
+
+            mainPanel(
+              wellPanel(
+                tags$head(includeCSS('./www/styles.css')),
+                # Table display for preview
+                dataTableOutput('tableDownloadPreviewDBTable')
+              )
             )
           )
         ),

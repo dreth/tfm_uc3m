@@ -253,7 +253,7 @@ It also gives us a perspective on perhaps how developed a country is, given that
 
 For the purposes of this application, it is useful to track the effect mortality has on how long we should expect the Spanish population to live. In particular, mortality as a result of the COVID-19 pandemic has affected life expectancy significantly, however, perhaps not in a permanent way, as mortality eventually goes back to the mean, and with it, so does life expectancy.
 
-As we need to compute $LE$ 
+As we need to compute $LE$ for specific weeks/years and display them as a time series, we must then calculate a *life table* per week.
 
 ### Computation
 
