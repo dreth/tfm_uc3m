@@ -104,7 +104,7 @@ The application computes the following 5 different metrics:
 
 - [[Cumulative relative mortality rate]{color="black"}](#CRMR)
 
-- [[Mortality improvement factor]{color="black"}](#MIF)
+- [[Mortality improvement factor]{color="black"}](#CMIF)
 
 - [[Life expectancy]{color="black"}](#LE)
 
@@ -129,7 +129,7 @@ For the years between 2021 and 2027 inclusive, the application uses the same 5-y
 
 ### Computation
 
-The EM for week $w$ of year $y$ is computed as follows:
+The $EM$ for week $w$ of year $y$ is computed as follows:
 
 $$EM_{w, y} = \frac{D_{w, y}}{\overline{D_{w, y-5, y}}}$$
 
@@ -159,7 +159,7 @@ The *cumulative mortality rate* ($CMR$) represents the ratio between the sum of 
 
 ### Purpose
 
-This ratio can be used standalone to gauge the amount of deaths in a time period divided by the population alive at that time period, but, it is most commonly used in this project as a component of the more informational *[[cumulative relative mortality rate]{color="black"}](#CRMR)* or *[[mortality improvement factor]{color="black"}](#MIF)*. 
+This ratio can be used standalone to gauge the amount of deaths in a time period divided by the population alive at that time period, but, it is most commonly used in this project as a component of the more informational *[[cumulative relative mortality rate]{color="black"}](#CRMR)* or *[[mortality improvement factor]{color="black"}](#CMIF)*. 
 
 ### Specification
 
@@ -167,7 +167,7 @@ The ratio is computed, depending on user selection, for years stretching as far 
 
 ### Computation
 
-The CMR for year $y$ and up to week $s$ is computed as follows:
+The $CMR$ for year $y$ and up to week $s$ is computed as follows:
 
 $$CMR_{w, y} = \frac{\sum^{s}_{w=1} D_{w, y}}{P_{w, y}}$$
 
@@ -183,7 +183,7 @@ Where:
 
 ## Cumulative relative mortality rate {#CRMR}
 
-The *cumulative relative mortality rate* ($CRMR$) corresponds to the ratio of the difference between the cumulative mortality rate (CMR) at a specified week and the average CMR between the years 2010 and 2019 inclusive, and the average CMR between the years 2010 and 2019 for the last week of those years (the 52nd week).
+The *cumulative relative mortality rate* ($CRMR$) corresponds to the ratio of the difference between the cumulative mortality rate ($CMR$) at a specified week and the average $CMR$ between the years 2010 and 2019 inclusive, and the average $CMR$ between the years 2010 and 2019 for the last week of those years (the 52nd week).
 
 ### Purpose
 
@@ -195,13 +195,13 @@ This particular metric can be affected significantly by events which we might pe
 
 ### Specification
 
-The metric is computed using the average CMR for years between 2010 and 2019. 2020 is explicitly excluded, as the effect of the COVID-19 pandemic would skew our perspective on 2021 mortality and further years. 
+The metric is computed using the average $CMR$ for years between 2010 and 2019. 2020 is explicitly excluded, as the effect of the COVID-19 pandemic would skew our perspective on 2021 mortality and further years. 
 
-The CMR for the last week of those years is averaged as it includes the entire year, given that the CMR is computed for a range of weeks starting at week 1 and ending at week $s$, for this metric we compute the denominator for week $s=52$ and the numerator for a specified week range.
+The $CMR$ for the last week of those years is averaged as it includes the entire year, given that the CMR is computed for a range of weeks starting at week 1 and ending at week $s$, for this metric we compute the denominator for week $s=52$ and the numerator for a specified week range.
 
 ### Computation
 
-The CRMR for week $w$ of year $y$ is computed as follows:
+The $CRMR$ for week $w$ of year $y$ is computed as follows:
 
 $$CRMR_{w, y} = \frac{CMR_{w, y} - \frac{1}{10} \sum^{2019}_{y=2010} CMR_{w, y}}{\frac{1}{10} \sum^{2019}_{y=2010} CMR_{w=52, y}}$$
 
@@ -209,11 +209,53 @@ Where:
 
 - $CMR_{w, y}$ is the *cumulative mortality rate* at week $w$ of year $y$
 
-## Mortality improvement factor {#MIF}
+\newpage
 
+## Cumulative mortality improvement factor {#CMIF}
 
+The *cumulative mortality improvement factor* ($CMIF$) at a specific week $w$ of a year $y$ is an actuarial measure defined as the ratio of the difference between the $CMR$ at week $w$ for the previous year $y-1$ and the $CMR$ at week $w$ for the current year $y$, and the $CMR$ at week 52 for the previous year $y-1$.
+
+### Purpose
+
+The $CMIF$ is used to assess how much mortality is improving within specific age ranges, or the population as a whole. By "improvement factor" we mean that it could either get "better" or get "worse", the "better" the $CMIF$ gets, the lower the mortality is, the "worse" it gets, the opposite, meaning mortality will be higher.
+
+This measure is an excellent one when it comes to determining a population's longevity. If the improvement factor is high, then the older the population can become, in some ways, very similarly to life expectancy.
+
+The trend is particularly useful for older age groups, which during the COVID-19 pandemic saw a significant increase in mortality as a result of it being a virus especially dangerous to older age groups and it also being very easily spread throughout populations. In Spain in particular, retirement homes are very commonly used to house retired elderly people. The virus was unfortunately spread among some retirement homes causing very high mortality. These events directly affect the improvement factor negatively. 
+
+Comparatively we can say that rises in $CRMR$ correspond with declines in $CMIF$. 
+
+### Specification
+
+For the application in particular, the $CMIF$ can be computed for years above 2011, as the data only stretches as far back as 2010 and the measure looks back 1 year. 
+
+### Computation
+
+The $CMIF$ for week $w$ of year $y$ is computed as follows:
+
+$$CMIF_{w, y} = \frac{CMR_{w, y-1} - CMR_{w, y}}{CMR_{w=52, y-1}}$$
+
+Where:
+
+- $CMR_{w, y}$ is the *cumulative mortality rate* at week $w$ of year $y$
 
 ## Life expectancy {#LE}
+
+*Life expectancy* ($LE$) is a measure that estimates the time an organism is expected to live. It is computed for a specific age group $A$ using a *life table*. $LE$ at birth would correspond to the $LE$ of the youngest age group in the table, assumming we don't have the *infant mortality rate* ($IMR$).
+
+### Purpose
+
+The purpose of this measure is to track how long we should expect our population to live. As an upper limit on how old we should expect the population to become. It is widely used in insurance to calculate insurance premiums on life insurace policies, and to determine if it's even profitable to offer such policies to an individual. A very old individual would be surcharged for a life insurance policy or be rejected altogether when attempting to acquire the policy given their high risk of death and very low life expectancy.
+
+It also gives us a perspective on perhaps how developed a country is, given that most developed countries a have relatively high life expectancy for their population.
+
+### Specification
+
+For the purposes of this application, it is useful to track the effect mortality has on how long we should expect the Spanish population to live. In particular, mortality as a result of the COVID-19 pandemic has affected life expectancy significantly, however, perhaps not in a permanent way, as mortality eventually goes back to the mean, and with it, so does life expectancy.
+
+As we need to compute $LE$ 
+
+### Computation
 
 
 # Methodology
@@ -266,7 +308,7 @@ The project consists of two repositories and their respectives [**subfolders**]{
         4. Assign the names of the databases from where the data was fetched.
         5. Define all the variables used in the [**ui.R**]{color="red"} script for all the fields used in the app's UI.
         6. Load the shapefiles and append the CCAA codes and IDs to their respective databases.
-        7. Define all the functions used to calculate the measures the app calculates, so the *CMR*, *CRMR*, *MIF*, *EF*, *LE* and the *death count* hidden option.
+        7. Define all the functions used to calculate the measures the app calculates, so the *CMR*, *CRMR*, *CMIF*, *EF*, *LE* and the *death count* hidden option.
         8. Define all the functions to generate the tables used in the plotting function *plot_metric()* defined in [**server.R**]{color="red"}.
     - [**server.R**]{color="red"}: This is the server file for the shiny app, it has all the definitions for what each input or output should take and do during runtime.
     - [**ui.R**]{color="red"}: This is the UI file, it defines how the entire UI and controls for the application are.

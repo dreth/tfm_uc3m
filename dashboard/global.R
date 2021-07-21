@@ -284,12 +284,16 @@ factors_df <- function(wk, yr, ccaas, age_groups, sexes, type='crmr', cmr_c_yrs=
     
     # Improvement factor
     } else if (type == 'mif') {
-        for (j in wk) {
-            yrs <- c(yrs, yr)
-            wks <- c(wks, rep(j,length(yr)))
-            metric <- c(metric, MIF(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+        if (min(yr) < 2011) {
+            result <- c('error', 'The lower bound for year must be greater than or equal to 2011')
+        } else {
+            for (j in wk) {
+                yrs <- c(yrs, yr)
+                wks <- c(wks, rep(j,length(yr)))
+                metric <- c(metric, MIF(wk=j, yr=yr, ccaas=ccaas, age_groups=age_groups, sexes=sexes))
+            }
+            result <- data.frame(week=wks, year=yrs, mif=metric)
         }
-        result <- data.frame(week=wks, year=yrs, mif=metric)
     
     # Cumulative mortality rate
     } else if (type == 'cmr') {
