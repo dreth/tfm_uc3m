@@ -216,6 +216,11 @@ Where:
 ## Life expectancy {#LE}
 
 
+# Methodology
+
+## Data querying and pre-processing pipeline
+
+## 
 
 # Appendix
 

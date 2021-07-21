@@ -200,13 +200,11 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
         # Filtering and aggregating the dataframe
         filtered <- death %>% dplyr::filter(year %in% (min(yr)-5):max(yr) & week == wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
         agg <- aggregate(filtered$death, list(year = filtered$year), FUN=sum)
-        print(agg)
 
         # If a year is incomplete, add a NA, to avoid plotting a straight line
         if (length(agg[agg$year %in% yr,'x']) < length(yr)) {
             agg <- rbind(agg, data.frame(year=max(yr), x=NA))
         }
-        print(agg)
 
         # generate moving average with a window of ma to calculate excess mortality
         # and lag it to fit it to the dataframe (as the current year can't be part of the average)
@@ -215,7 +213,6 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
         agg[agg$year >= 2021 & agg$year <= 2027,'ma'] <- agg[agg$year == 2020,'ma']
         # appending results to df
         result_df <- agg[agg$year %in% yr,]
-        print(result_df)
         return(result_df$x - result_df$ma)
 
     # If only a single value is desired to be calculated
@@ -506,3 +503,4 @@ gen_chloropleth <- function(dataset, metric, library='leaflet', leaflet_provider
             ) 
     }
 }
+
