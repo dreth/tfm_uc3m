@@ -14,6 +14,7 @@ require(leaflet)
 require(rgdal)
 require(RColorBrewer)
 require(zoo)
+require(Rcpp)
 require(RcppRoll)
 
 # Running last eurostat update check
