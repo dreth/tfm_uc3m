@@ -235,8 +235,6 @@ EM <- function(wk, yr, ccaas, age_groups, sexes, ma=5) {
     }
 }
 
-EM(1, 2015:2021, CCAA, AGE_GROUPS, 'T')
-
 # Death count
 DC <- function(wk, yr, ccaas, age_groups, sexes) {
     # If more than one year is desired to be calculated
