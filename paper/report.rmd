@@ -221,39 +221,43 @@ Where:
 
 ## Appendix A: Python
 
+
+
 ## Appendix B: R
 
 ## Appendix C: Project repository tree structure
 
-The project consists of two repositories and their respectives [**subfolders**]{color="green"}/[**files**]{color="red"}:
+\definecolor{darkspringgreen}{rgb}{0.09, 0.45, 0.27}
+
+The project consists of two repositories and their respectives [**subfolders**]{color="darkspringgreen"}, [**files**]{color="red"} and [**databases**]{color="purple"}:
 
 ### [**The main project repository** (*dreth/tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
 
-- [**api**]{color="green"}: Contains all files related to the querying, acquisition, manipulation of new data from the two aggregated data sources (INE and Eurostat), along with various log files used to keep track of some metadata from the data sources (last updated data and provisional data). 
-    - [**logs**]{color="green"}: This folder contains log files used in the DB info section of the application to display diagnostic info about the databases.
+- [**api**]{color="darkspringgreen"}: Contains all files related to the querying, acquisition, manipulation of new data from the two aggregated data sources (INE and Eurostat), along with various log files used to keep track of some metadata from the data sources (last updated data and provisional data). 
+    - [**logs**]{color="darkspringgreen"}: This folder contains log files used in the DB info section of the application to display diagnostic info about the databases.
         - [**earliest_eurostat_provisional.log**]{color="red"}: Eurostat marks data as provisional when it can still be updated, as new deaths might occur. This file logs the earliest data entry marked as provisional.
         - [**last_eurostat_update.log**]{color="red"}: This file logs the last week for which there is available and updated data from Eurostat for Spain within the database *demo_r_mwk2_05*.  
         - [**last_ine_update.log**]{color="red"}: This file logs the last week for which there is available and updated data from INE for table No. *9681*.
-    - [**dbs_check.py**]{color="red"}: This script obtains a small sample of data from Eurostat and Ine and checks when the earliest provisional data point is, what is the latest obtainable week of data from both Eurostat and INE and writes it in the log files contained within [**logs**]{color="green"}.
+    - [**dbs_check.py**]{color="red"}: This script obtains a small sample of data from Eurostat and Ine and checks when the earliest provisional data point is, what is the latest obtainable week of data from both Eurostat and INE and writes it in the log files contained within [**logs**]{color="darkspringgreen"}.
     - [**functions.py**]{color="red"}: This script contains all the functions used for fetching, manipulating and outputting the data obtained from the aggregated data sources' respective APIs (Eurostat and INE).
-    - [**query.py**]{color="red"}: This script will run a pre-constructed pipeline where the data is systematically queried per age group, manipulated and where new entries are added to the *.csv* files contained within the [**data**]{color="green"} folder.
+    - [**query.py**]{color="red"}: This script will run a pre-constructed pipeline where the data is systematically queried per age group, manipulated and where new entries are added to the *.csv* files contained within the [**data**]{color="darkspringgreen"} folder.
 
 &nbsp;
 
-- [**dashboard**]{color="green"}: Contains all files that allow the shiny app itself to run along with shapefiles for displaying maps, shell scripts to check the databases' last update and last provisional status and the shell script to update the database from within the app.
-    - [**www**]{color="green"}: This is a special shiny folder that includes files 
-        - [**maps**]{color="green"} Contains 2 folders which themselves contain the shapefiles for the map displayed using leaflet and the map displayed using ggplot2 in the maps section.
-            - [**map_shapefiles**]{color="green"}: Contains the shapefiles used to display the map using the leaflet library.
-            - [**map_shapefiles_ggplot**]{color="green"}: Contains the shapefiles used to display the map using the ggplot2 library.
-        - [**scripts**]{color="green"}: This folder contains some shell scripts used when updating the database or to show diagnostic information about the databases from within the app at launch.
-            - [**check_dbs.sh**]{color="red"}: This script is ran every time the app is launched. This shell script runs [**dbs_check.py**]{color="red"} from the [**api**]{color="green"} folder.
-            - [**update_database.sh**]{color="red"}: This is the update database script, basically checks the date, runs the [**query.py**]{color="red"} and [**dbs_check.py**]{color="red"} script from the [**api**]{color="green"} folder, appending new data (if available) to the data currently in the cloned repository tree. Then it copies the new files into the [**dreth/tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, then it commits and pushes the files to that repository.
+- [**dashboard**]{color="darkspringgreen"}: Contains all files that allow the shiny app itself to run along with shapefiles for displaying maps, shell scripts to check the databases' last update and last provisional status and the shell script to update the database from within the app.
+    - [**www**]{color="darkspringgreen"}: This is a special shiny folder that includes files 
+        - [**maps**]{color="darkspringgreen"} Contains 2 folders which themselves contain the shapefiles for the map displayed using leaflet and the map displayed using ggplot2 in the maps section.
+            - [**map_shapefiles**]{color="darkspringgreen"}: Contains the shapefiles used to display the map using the leaflet library.
+            - [**map_shapefiles_ggplot**]{color="darkspringgreen"}: Contains the shapefiles used to display the map using the ggplot2 library.
+        - [**scripts**]{color="darkspringgreen"}: This folder contains some shell scripts used when updating the database or to show diagnostic information about the databases from within the app at launch.
+            - [**check_dbs.sh**]{color="red"}: This script is ran every time the app is launched. This shell script runs [**dbs_check.py**]{color="red"} from the [**api**]{color="darkspringgreen"} folder.
+            - [**update_database.sh**]{color="red"}: This is the update database script, basically checks the date, runs the [**query.py**]{color="red"} and [**dbs_check.py**]{color="red"} script from the [**api**]{color="darkspringgreen"} folder, appending new data (if available) to the data currently in the cloned repository tree. Then it copies the new files into the [**dreth/tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, then it commits and pushes the files to that repository.
         - [**dimension.js**]{color="red"}: This javascript file is used within the application to capture the screen resolution in order to adjust the height of some plots within the app.
         - [**styles.css**]{color="red"}: This stylesheet is used to modify the style of a few elements in the app like the update database button, width and borther within tables displayed, etc.
     - [**global.R**]{color="red"}: This file does several things: 
         1. Import the libraries required to run the app.
         2. Run the diagnostic database checking script [**check_dbs.sh**]{color="red"}.
-        3. Read the data from the [**data**]{color="green"} folder.
+        3. Read the data from the [**data**]{color="darkspringgreen"} folder.
         4. Assign the names of the databases from where the data was fetched.
         5. Define all the variables used in the [**ui.R**]{color="red"} script for all the fields used in the app's UI.
         6. Load the shapefiles and append the CCAA codes and IDs to their respective databases.
@@ -264,30 +268,36 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 &nbsp;
 
-- [**data**]{color="green"}: This folder is a subtree of the [**dreth/tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, therefore, it contains all the data used in the application along with logs showing diagnostic and historical information about database updates.
-    - [**ccaa_guide**]{color="green"}: This folder contains files used to match CCAA names with their Eurostat denomination, as there can be multiple denominations for a single CCAA at times (like it happens with Madrid and Canarias). The files are in several different formats.
-    - [**logs**]{color="green"}: This folder contains the log files used to display diagnostic information about database updates (dates).
+- [**data**]{color="darkspringgreen"}: This folder is a subtree of the [**dreth/tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, therefore, it contains all the data used in the application along with logs showing diagnostic and historical information about database updates.
+    - [**ccaa_guide**]{color="darkspringgreen"}: This folder contains files used to match CCAA names with their Eurostat denomination, as there can be multiple denominations for a single CCAA at times (like it happens with Madrid and Canarias). The files are in several different formats.
+    - [**logs**]{color="darkspringgreen"}: This folder contains the log files used to display diagnostic information about database updates (dates).
         - [**update_database.log**]{color="red"}: This log file contains the date the database was last updated, it is written to every time the database is updated.
         - [**update_history.log**]{color="red"}: This log file contains the dates in which the database has been updated (historically).
-    - [**death.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *demo_r_mwk2_05* database to Eurostat for Spain data, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="green"} folder.
-    - [**pop.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *9681* database to INE, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="green"} folder.
+    - [**death.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *demo_r_mwk2_05* database to Eurostat for Spain data, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="darkspringgreen"} folder.
+    - [**pop.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *9681* database to INE, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="darkspringgreen"} folder.
 
 &nbsp;
 
-- [**docker**]{color="green"}: This folder contains the *Dockerfile* used to build the docker container.
+- [**docker**]{color="darkspringgreen"}: This folder contains the *Dockerfile* used to build the docker container.
     - [**Dockerfile**]{color="red"}: This file is used to build the docker container.
 
-- [**docs**]{color="green"}: Folder containing the documentation for the application.
+- [**docs**]{color="darkspringgreen"}: Folder containing the documentation for the application.
     - README.md: Application documentation and instructions on use.
 
-- [**paper**]{color="green"}: Folder containing this report and all the files the report depends on.
+- [**paper**]{color="darkspringgreen"}: Folder containing this report and all the files the report depends on.
 
 - *README.md*: Readme file explaining how to run the app and some basic information about it.
 
 ### [**The data repository** (*dreth/tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
 
-- [**ccaa_guide**]{color="green"}
-    - *guide_ccaa.json*
-    - *guide_ccaa.txt*
-    - *guide_ccaa_python_dict.p*
+- [**ccaa_guide**]{color="darkspringgreen"}: This folder contains files used to match CCAA names with their Eurostat denomination, as there can be multiple denominations for a single CCAA at times (like it happens with Madrid and Canarias). The files are in several different formats, like *.txt* and *.p*. The *.p* file corresponds to a binarized python object representing a python dictionary with the contents of the *.txt* file.
+
+- [**logs**]{color="darkspringgreen"}: This folder contains the log files used to display diagnostic information about database updates (dates).
+    - [**update_database.log**]{color="red"}: This log file contains the date the database was last updated, it is written to every time the database is updated.
+    - [**update_history.log**]{color="red"}: This log file contains the dates in which the database has been updated (historically).
+- [**death.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *demo_r_mwk2_05* database to Eurostat for Spain data, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="darkspringgreen"} folder.
+- [**pop.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *9681* database to INE, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="darkspringgreen"} folder.
+
+- *README.md*: Readme file explaining the source of the data and where the repository stems from, as well as linking to the main repository [*dreth/tfm_uc3m*](https://github.com/dreth/tfm_uc3m)
+
 
