@@ -128,6 +128,8 @@ Given the host of other possible metrics to be included, which are also related 
 
 - [[Life expectancy]{color="black"}](#LE)
 
+\newpage
+
 ## Excess mortality {#EM}
 
 The term *excess mortality* ($EM$) refers to a measurement which corresponds to the difference between the average deaths which have ocurred during the $n$ years prior to the current $t$ time. Typically, the window of years to compute the average deaths is often $n = 5$. For the application, a window of $n = 5$ years is used to compute the measurement.
@@ -137,6 +139,12 @@ If excess mortality is very high and above zero, then there have been more death
 Excess mortality is used to assess how many more or less deaths than the previous years' average have ocurred. This way it's possible to determine if there is an increase in deaths that exceed what has been considered "normal". 
 
 During the COVID-19 pandemic the measurement was particularly useful as mortality spiked beyond the expectations of pretty much any country where the pandemic became widespread. Spain is no exception, and during the time where the deaths were at their peak, the excess mortality of that period of time was a highly publicized measure to illustrate how many deaths above what usually occurs happened.
+
+We can see an example of the most generalized $EM$ plot the application can produce:
+
+![Excess mortality, from 2015 up to week 24 of 2021](./images/em.png)
+
+In Figure 1, we can clearly notice a pattern where 2020 severely exceeded the mortality expected value of the previous 5 years. Particularly during the 1st wave of COVID-19 (around march, april and may), and towards the end of the year (around october, november and december).
 
 As a result of the COVID-19 pandemic, future measures calculated after 2020 must exclude 2020 and 2021 from the calculation as the death counts are anomalous compared to previous and subsequent years prior the COVID-19 pandemic.
 
@@ -198,6 +206,12 @@ The effect of long-lasting events like the COVID-19 pandemic clearly show how mo
 
 This particular metric can be affected significantly by events which we might perceive as not-so-dramatic when they occur (perhaps like a severe heat wave), but it lets us historically see how much worse or better (in terms of mortality) a given time period can be.
 
+Here is an example plot of the $CRMR$ we can generate for all age groups, sexes and CCAA aggregated:
+
+![$CRMR$, from 2015 up to week 24 of 2021](./images/crmr.png)
+
+As we can notice in Figure 2, 2020 severely exceeded the previous years' $CRMR$ throughout the year right after the pandemic started, and the trend was sustained throughout the whole year. The dramatic increase towards the first wave of the pandemic completely skews the y-axis scale of the plot. We can also notice how the start of 2021 was also out of the ordinary, eventually returning to levels seen around 2015 (a year previously considered particularly bad for mortality in Spain), as the pandemic has continued to extend, but with a significantly smaller $CRMR$ than that of 2020 given the widespread vaccinations and more experienced treatment of the virus.
+
 In our particular case, the metric has been computed using the average $CMR$ for years between 2010 and 2019. 2020 is explicitly excluded, as the effect of the COVID-19 pandemic would skew our perspective on 2021 mortality and further years. 
 
 The $CMR$ for the last week of those years is averaged as it includes the entire year, given that the CMR is computed for a range of weeks starting at week 1 and ending at week $s$, for this metric we compute the denominator for week $s=52$ and the numerator for a specified week range.
@@ -221,6 +235,12 @@ The $CMIF$ is used to assess how much mortality is improving within specific age
 This measure is an excellent one when it comes to determining a population's longevity. If the improvement factor is high, then the older the population can become, in some ways, very similarly to life expectancy.
 
 The metric is particularly useful for older age groups, which during the COVID-19 pandemic saw a significant increase in mortality as a result of it being a virus especially dangerous to older age groups and it also being very easily spread throughout populations. In Spain in particular, retirement homes are very commonly used to house retired elderly people. The virus was unfortunately spread among some retirement homes causing very high mortality. These events directly affect the improvement factor negatively. Improvement factors are especially useful in insurance, where they're often used to compute projections for life insurance policies.
+
+As a way to exemplify, we can also show a plot for the $CMIF$, as plotted through the application:
+
+![$CMIF$, from 2015 up to week 24 of 2021](./images/cmif.png)
+
+As for the $CMIF$ visualized in Figure 3, it is clear how significant the decline of the $CMIF$ is for 2020, and how noticeable of an improvement the widespread vaccination has been during 2021.
 
 Comparatively we can say that rises in $CRMR$ correspond with declines in $CMIF$. 
 
@@ -328,6 +348,8 @@ Where:
 **7.** We compute the *life expectancy* ($LE$) of each age group as follows:
 
 $$e_{x} = \frac{T_x}{l_x}$$
+
+\newpage
 
 # Methodology
 
