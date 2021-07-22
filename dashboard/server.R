@@ -284,7 +284,7 @@ shinyServer(
 
         # PLOT DOWNLOAD BUTTON
         output$downloadPlotMortality <- downloadHandler(
-            filename = str_interp("${input$plotTypeMortality}"),
+            filename = input$plotTypeMortality,
             content = function(file) {
                 ggsave(
                     file,

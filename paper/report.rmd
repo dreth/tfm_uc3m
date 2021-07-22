@@ -220,9 +220,7 @@ The $CMIF$ is used to assess how much mortality is improving within specific age
 
 This measure is an excellent one when it comes to determining a population's longevity. If the improvement factor is high, then the older the population can become, in some ways, very similarly to life expectancy.
 
-The metric is particularly useful for older age groups, which during the COVID-19 pandemic saw a significant increase in mortality as a result of it being a virus especially dangerous to older age groups and it also being very easily spread throughout populations. In Spain in particular, retirement homes are very commonly used to house retired elderly people. The virus was unfortunately spread among some retirement homes causing very high mortality. These events directly affect the improvement factor negatively. 
-
-
+The metric is particularly useful for older age groups, which during the COVID-19 pandemic saw a significant increase in mortality as a result of it being a virus especially dangerous to older age groups and it also being very easily spread throughout populations. In Spain in particular, retirement homes are very commonly used to house retired elderly people. The virus was unfortunately spread among some retirement homes causing very high mortality. These events directly affect the improvement factor negatively. Improvement factors are especially useful in insurance, where they're often used to compute projections for life insurance policies.
 
 Comparatively we can say that rises in $CRMR$ correspond with declines in $CMIF$. 
 
@@ -238,7 +236,9 @@ Where:
 
 ## Life expectancy {#LE}
 
-*Life expectancy* ($LE$) is a measure that estimates the time an organism is expected to live. It is computed for a specific age group $A$ using a *life table*. $LE$ at birth would correspond to the $LE$ of the youngest age group in the table, assumming we don't have the *infant mortality rate* ($IMR$).
+*Life expectancy* ($LE$) is a measure that estimates the time an organism is expected to live. It is computed for a specific age group $A$ using a *life table*, which is a table commonly used in actuarial science, demography and life insurance policy risk modelling that shows the probability that a person of a certain age or age group will die before reaching their next birthday or entering the next age group. The last column of it commonly corresponds with the *life expectancy* for that age or age group based on that probability of death.
+
+$LE$ at birth would correspond to the $LE$ of the youngest age group in the table, assumming we don't have the *infant mortality rate* ($IMR$).
 
 The purpose of this measure is to track how long we should expect our population to live. As an upper limit on how old we should expect the population to become. It is widely used in insurance to calculate insurance premiums on life insurace policies, and to determine if it's even profitable to offer such policies to an individual. A very old individual would be surcharged for a life insurance policy or be rejected altogether when attempting to acquire the policy given their high risk of death and very low life expectancy.
 
@@ -325,6 +325,9 @@ Where:
 
 |       - The sum goes up to 19, as there are 19 age groups in our computation.
 
+**7.** We compute the *life expectancy* ($LE$) of each age group as follows:
+
+$$e_{x} = \frac{T_x}{l_x}$$
 
 # Methodology
 
