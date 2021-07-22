@@ -255,8 +255,72 @@ For the purposes of this application, it is useful to track the effect mortality
 
 As we need to compute $LE$ for specific weeks/years and display them as a time series, we must then calculate a *life table* per week.
 
-### Computation
+The process is largely inspired from the following methodology explained on the [MEASURE evaluation website](https://www.measureevaluation.org/resources/training/online-courses-and-resources/non-certificate-courses-and-mini-tutorials/multiple-decrement-life-tables/lesson-3.html). However, it was adapted to fit weekly measures by taking data one year prior to the specified week. Calculations after the step 2 described in the [[Computation section]{color="black"}](#LEComputation) below are nearly identical to those displayed on the previously linked article.
 
+\newpage
+
+### Computation {#LEComputation}
+
+To compute $LE$ we must first compute a life table as follows, note that each step also corresponds to a column of the life table in the same order:
+
+**1.** Compute the age-specific death rate ${}_{n}m_{x}$:
+
+$${}_{n}m_{x} = \frac{\sum \text{ } {}_{x,x+n}D_{w,y}}{{}_{x,x+n}P_{w,y}}$$
+
+Where:
+
+|       - $\sum \text{ } {}_{x,x+n}D_{w,y}$ corresponds to the sum of deaths between week $w$ of the year $y$ and week $w$ of the year $y-1$ for individuals aged between $x$ and $x+n$.
+
+|       - ${}_{x,x+n}P_{w,y}$ corresponds to the population at week $w$ of the year $y$  for individuals aged between $x$ and $x+n$.
+
+**2.** Compute the proportion of individuals alive at the start of an age interval which are no longer alive at the end of that age interval (they die at some point during the interval), ${}_{n}q_{x}$:
+
+|       a. For non open-ended age groups:
+
+$${}_{n}q_{x} = 1 - \frac{1}{e^{n * {}_{n}m_{x}}}$$
+
+|       b. For open-ended age groups (ex. 90+ year olds):
+
+$${}_{n}q_{x} = 1$$
+
+Where:
+
+- $n$ is the length of the age interval. INE and Eurostat data is grouped in age interval lengths of $n = 5$.
+
+- $e$ is the exponential function.
+
+
+**3.** Use the previously calculated measure ${}_{n}q_{x}$ to compute $l_x$:
+
+|       a. For the first value we set $l_0 = 100,000$
+
+|       b. For the subsequent values, we calculate the next values using the previous one as a sequence:
+
+$$l_{x + n} = l_x * (1 - {}_{n}q_{x})$$
+
+Where:
+
+|       - $x$ corresponds to the numbering of the age group, (ex. for *less than 5 year olds* which is our first age group, we have $l_0$, then $l_1$, and so on)
+
+|       - $x+n$ corresponds to the next age group after $x$
+
+**4.** Compute the number of deaths ocurred within each age interval ${}_{n}d_{x}$:
+
+$${}_{n}d_{x} = l_x * {}_{n}q_{x}$$
+
+Where:
+
+|       - The measure is calculated for individuals aged between $x$ and $x+n$
+
+**5.** Calculate the person-years of life of all individuals in each age interval $x$ to $x+n$, ${}_{n}L_{x}$:
+
+$${}_{n}L_{x} = \frac{{}_{n}d_{x}}{{}_{n}m_{x}}$$
+
+**6.** We calculate the cumulative person-years of life after age $x$, $T_x$. Therefore, for the first age group in the table, the value of $T_x$ will correspond to the sum of all ${}_{n}L_{x}$, the entire 5th column. For the second age group, it'll be the sum of all ${}_{n}L_{x}$ with the exception of the ${}_{n}L_{x}$ value of the first age group, and so on.
+
+So:
+
+$${}_{n}L_{x} = $$
 
 # Methodology
 
