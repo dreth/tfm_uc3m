@@ -2,8 +2,6 @@
 title: "Development of an automatic tool for periodic surveillance of actuarial and demographic indicators"
 author: "Daniel Alonso, María Luz Durbán Reguera, Bernardo D'Auria"
 date: "July-August 2021"
-header-includes:
-    - \usepackage{setspace}\doublespacing
 output: 
     pdf_document:
         extra_dependencies: ["xcolor"]
@@ -11,7 +9,9 @@ output:
         latex_engine: xelatex
         toc: true
         toc_depth: 4
+classoption: a4paper
 urlcolor: blue
+linestretch: 1.35
 ---
 
 ```{r setup, include=FALSE}
@@ -24,15 +24,19 @@ fig.path = "./figures/"
 
 \newpage
 
-# Abstract
+# Summary
 
-As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic and future similarly deadly events has become increasingly important. It is intended with this project to develop a tool in order to easily monitor a selection of demographic measures relating to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously. The tool consists of a shiny dashboard (developed in R) where such measures are displayed in different visualizations across time.
+As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic and future similarly deadly events has become increasingly important. It is intended with this project to develop a tool in order to easily monitor a selection of demographic measures relating to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously, or perhaps other smaller scale events which could increase mortality in a likely fashion. 
+
+The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) shiny dashboard (developed in R) where such measures are displayed in different visualizations across time. The dashboard is containerized using Docker, as to make it possible to run and use in any operating system. Moreover, the database is managed by several Python scripts which acquire the data from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs, treat it, and allocate in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated by anyone running the application with the click of a button within the application itself.
 
 # Introduction
 
 The COVID-19 pandemic has led to a widespread and noticeable temporary increase in mortality and reduction in life expectancy throughout Spain. This arises a need to monitor these demographic measures more closely and in real time. 
 
-This project consists of a shiny dashboard with several features:
+This project consists of an application which allows for active, real-time monitoring of mortality and life expectancy of the population of Spain, through an [open-source](https://github.com/dreth/tfm_uc3m) shiny web-based dashboard. 
+
+The application itself consists of the following functionality:
 
 - Visualizing several mortality metrics:
     - Excess mortality
@@ -48,25 +52,39 @@ All metrics are calculated weekly with data stretching back as far back as 2010.
 
 # Objectives
 
-- Provide a simple-to-use, web-based, OS-agnostic tool to compute and visualize common mortality and life expectancy metrics in time series plots/maps
+The main objectives of the project are the following:
 
-- Provide the user the ability to customize the plot parameters significantly
+- Provide an open-source, simple-to-use, web-based, OS-agnostic tool to compute and visualize common mortality-related metrics and life expectancy in time series plots, and static or interactive maps.
 
-- Provide the user the ability to download the plots and the data (with or without filtering)
+    + A big focus of the project was to make this application as simple-to-use as possible, while maintaining the management of system requirements extremely low. The purpose of such approach is to allow virtually anyone that desires to monitor any of the metrics to do so by running a simple shell command. We want any user or institution with access to a computer and the internet to be able to monitor these metrics, or any such metrics which could be possibly added in the future without much hassle. 
 
-- Allow the user to update and push the data to the corresponding github repository hosting the data from within the application
+    + The project being open-source is also very important, as this allows anyone to take the project and further it, add extra components to it, perhaps other useful mortality-related measures. This makes the project fully auditable and free to use, modify and extend.
 
-- Have data updated in real-time from the official Spanish sources and Eurostat (also provided by INE)
+- Provide the user the ability to customize the plot parameters significantly.
+
+    + The application itself should have several controls that allow the user to modify visualizations. Some of them are: what years to visualize, what metrics to visualize, what range of weeks to visualize (between 1 and 52), which CCAAs or age groups to aggregate, whether to make the plots interactive (using *plotly*) or static (using *ggplot2*), and so on. Different options will be available for different plots.
+
+- Provide the user the ability to download the plots and the data (with or without filtering).
+
+    + The application shall include a download button with several options for all plots displayed within the application. The user can select the size of the plot from a list of predefined sizes, or specify the image resolution and the format from a list of available ones. We intend to make it so that any plot generated within the app can be downloaded.
+
+- Allow the user to update and upload the data to the corresponding GitHub [repository](https://github.com/dreth/tfm_uc3m_data) hosting the data, from within the application.
+
+    + The data is constantly changing, and as soon as the data sources have new data available, the application will tell the user there is new data, and the user will be able to update the data with the click of a button. The updated data will be fetched, ran through the pipeline, and uploaded to the [data repository](https://github.com/dreth/tfm_uc3m_data) for the project on GitHub. This ensures that the data is always updated and anyone is able to do so for everyone else from anywhere in the world.
+
+- Have data updated in real-time from the official Spanish sources (INE) and Eurostat (also provided by INE).
+
+    + Every time the app runs, it'll check if there's available data and display the most recent week for which there is data available, this way we allow anyone running the application to see if there is new data whenever the app is ran so they can update it if they desire to do so.
 
 # Motivation
 
-As we saw during the COVID-19 pandemic, the most widely publicized measures shown to the public in order to explain the status of the pandemic and the country as a whole were always related to incidence of the virus, death counts, recovery counts, amount of patients at ICU, hospitalized patients by COVID-19 vs total hospitalized patients, etc. However, **Death counts do not tell the whole story**, a death count merely tells us that an amount of people died, it does not tell us how much that amount of deaths affect the population. Also, **all these measures are static**, therefore, we cannot see the effect they cause on the population all by themselves, which is where measures like the *cumulative relative mortality rate* or *life expectancy* come in, measures that show the impact of deaths and their long lasting effect relative to the population over time. 
+As we saw during the COVID-19 pandemic, the most widely publicized measures shown to the public in order to explain the status of the pandemic and the country as a whole were always related to incidence of the virus, death counts, recovery counts, amount of patients at ICU, hospitalized patients by COVID-19 vs total hospitalized patients, etc. However, **Death counts do not tell the whole story**, a death count merely tells us that an amount of people died, it does not tell us how much that amount of deaths affect the population. Also, **all these measures are static**, therefore, we cannot see the effect they cause on the population in the long term, which is where measures like the *cumulative relative mortality rate* or *life expectancy* come in, these show the impact of deaths and their long lasting effect relative to the population over time. 
 
-As an example, 100 people dying over the course of a week within a commune of 10,000 inhabitants represents 1% of the population; that same amount of deaths would represent less than 0.01% of the population within a commune of 1 million inhabitants. Therefore, more robust measures to determine the impact of the deaths caused by a pandemic are needed to really gauge the effect of the pandemic as a whole.
+As an example, 100 people dying over the course of a week within a municipality of 10,000 inhabitants represents 1% of the population; that same amount of deaths would represent less than 0.01% of the population within a municipality of 1 million inhabitants. Therefore, more robust measures to determine the impact of the deaths caused by a pandemic are needed to really gauge the effect of the pandemic as a whole.
 
-The application allows monitoring some of these measures in real time. Whenever it is desired to fetch new data (if available), the data can be fetched with a click. The measures can be instantly computed with a click and visualized to observe the evolution of the population at any time and by region of Spain. Showing particular usefulness within events that cause large amounts of deaths or that reduce the general population life expectancy (as the application can also visualize evolution of life expectancy).
+The application allows monitoring some of these measures in real time. Whenever it is desired to fetch new data (if available), the data can be fetched with a click. The measures can be instantly computed with a click and visualized to observe the evolution of the population at any time, by age group, sex and by autonomous community (CCAA) of Spain. Showcasing particular usefulness within events that cause large amounts of deaths (like a pandemic, war, or heat wave) or that reduce the general populations life expectancy (as the application can also visualize the evolution of life expectancy over time).
 
-## Inspiration
+## Inspiration (needs work)
 
 As somewhat of an inspiration, reports like the [COVID-19 vaccine surveillance report: Week 27](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1000512/Vaccine_surveillance_report_-_week_27.pdf), published by the PHE (Public Health England), show visualizations and analyses where the evolution of mortality metrics is a section of the report. Along with this, the INE currently does not have a report or application calculating these metrics on a per-week basis.
 
@@ -88,23 +106,25 @@ There are several advantages an application could potentially have over static, 
 
 As it is with any demographic measure, knowing general metrics about population is important to many companies, institutions and individuals, to list a few:
 
-- The government and the ministry of health, the main decisionmakers in terms of public health related issues. These two institutions can use these metrics to construct policies or regulations to protect the general health of the population, prioritize or purchase particular medication or medical utensils if needed, etc.
+- The Government and the Ministry of Health, the main decisionmakers in terms of public health related issues. These two institutions can use these metrics to construct policies or regulations to protect the general health of the population, prioritize or purchase particular medication or medical utensils if needed, etc.
 
-- Insurance companies, the companies which customers, companies, governments and other institutions transfer risk to in order to protect themselves financially from health related liabilities or death. Insurance companies directly use life tables to measure risk when providing life insurance to customers, and in order to remain profitable and offer a risk-assessed quality service to their customers these metrics modulate insurance premiums and aid in the process of decisionmaking when it comes to offering a policy to what the company could deem high or low risk customers.
+- Insurance companies, those to which customers, companies, governments and other institutions transfer risk in order to protect themselves financially from health-related liabilities or death. Insurance companies directly use life tables to measure risk when providing life insurance to customers, and in order to remain profitable and offer a risk-assessed quality service to their customers these metrics modulate insurance premiums and aid in the process of decisionmaking when it comes to offering a policy to what the company could deem high or low risk customers.
 
 - Ordinary people. Perhaps mere curiosity or desire to be informed, being able to know in a timely manner whether the population is at risk or healthy helps people make choices regarding how to take care of themselves or how to take care of their loved ones.
 
 # Metrics computed by the application
 
-The application computes the following 5 different metrics:
-
-- [[Excess mortality]{color="black"}](#EM)
+The application's visualizations are especially focused on 3 specific mortality metrics inspired by [the regular rolling report by UK's Institute and Faculty of Actuaries]():
 
 - [[Cumulative mortality rate]{color="black"}](#CMR)
 
 - [[Cumulative relative mortality rate]{color="black"}](#CRMR)
 
 - [[Mortality improvement factor]{color="black"}](#CMIF)
+
+Given the host of other possible metrics to be included, which are also related to the ones previously mentioned, we decided to include the following two additional metrics as a way to extend the capabilities of the application: 
+
+- [[Excess mortality]{color="black"}](#EM)
 
 - [[Life expectancy]{color="black"}](#LE)
 
@@ -114,20 +134,13 @@ The term *excess mortality* ($EM$) refers to a measurement which corresponds to 
 
 If excess mortality is very high and above zero, then there have been more deaths than the previous $n$ year average, if the number is smaller than zero, then there have been less deaths than the previous $n$ year average.
 
-### Purpose
-
 Excess mortality is used to assess how many more or less deaths than the previous years' average have ocurred. This way it's possible to determine if there is an increase in deaths that exceed what has been considered "normal". 
 
 During the COVID-19 pandemic the measurement was particularly useful as mortality spiked beyond the expectations of pretty much any country where the pandemic became widespread. Spain is no exception, and during the time where the deaths were at their peak, the excess mortality of that period of time was a highly publicized measure to illustrate how many deaths above what usually occurs happened.
 
-
-### Specification
-
 As a result of the COVID-19 pandemic, future measures calculated after 2020 must exclude 2020 and 2021 from the calculation as the death counts are anomalous compared to previous and subsequent years prior the COVID-19 pandemic.
 
 For the years between 2021 and 2027 inclusive, the application uses the same 5-year moving average used for 2020, meaning the average deaths corresponding to week $w$ for $2015 \leq y \leq 2019$. After 2027 or prior to 2021 the average death counts used are computed from the 5 year window prior to the year(s) selected. For example, the average deaths for $w = 1$, 2019 will correspond to the average deaths during $w = 1$ for the years $2014 \leq y \leq 2018$, and the average deaths for $w = 1$, 2022 will correspond to the same average deaths observed on $w = 1$ for the years $2015 \leq y \leq 2019$.
-
-### Computation
 
 The $EM$ for week $w$ of year $y$ is computed as follows:
 
@@ -155,17 +168,11 @@ Where:
 
 ## Cumulative mortality rate {#CMR}
 
-The *cumulative mortality rate* ($CMR$) represents the ratio between the sum of all deaths between the first week of a year or years up to a user-defined week, where weeks must be $1 \leq w \leq 52$.
-
-### Purpose
+The *cumulative mortality rate* ($CMR$) represents the ratio between the sum of all deaths during the first week of a year up to a user-defined week of the same year, and the population at that same user-defined week and year, where weeks must be $1 \leq w \leq 52$.
 
 This ratio can be used standalone to gauge the amount of deaths in a time period divided by the population alive at that time period, but, it is most commonly used in this project as a component of the more informational *[[cumulative relative mortality rate]{color="black"}](#CRMR)* or *[[mortality improvement factor]{color="black"}](#CMIF)*. 
 
-### Specification
-
 The ratio is computed, depending on user selection, for years stretching as far back as 2010 and as updated as the current year. It can only be computed for any specified range between 1 and week $w$. 
-
-### Computation
 
 The $CMR$ for year $y$ and up to week $s$ is computed as follows:
 
@@ -183,9 +190,7 @@ Where:
 
 ## Cumulative relative mortality rate {#CRMR}
 
-The *cumulative relative mortality rate* ($CRMR$) corresponds to the ratio of the difference between the cumulative mortality rate ($CMR$) at a specified week and the average $CMR$ between the years 2010 and 2019 inclusive, and the average $CMR$ between the years 2010 and 2019 for the last week of those years (the 52nd week).
-
-### Purpose
+The *cumulative relative mortality rate* ($CRMR$) corresponds to the ratio of the difference between the cumulative mortality rate ($CMR$) at a specified week and the average $CMR$ between years $n-k$ and $n-1$ inclusive, and the average $CMR$ in that same range of years for their last week (the 52nd week).
 
 The $CRMR$ allows us to show the medium to long-term effect of catastrophic or mortality-rising events on the population based on the $CMR$. 
 
@@ -193,15 +198,11 @@ The effect of long-lasting events like the COVID-19 pandemic clearly show how mo
 
 This particular metric can be affected significantly by events which we might perceive as not-so-dramatic when they occur (perhaps like a severe heat wave), but it lets us historically see how much worse or better (in terms of mortality) a given time period can be.
 
-### Specification
-
-The metric is computed using the average $CMR$ for years between 2010 and 2019. 2020 is explicitly excluded, as the effect of the COVID-19 pandemic would skew our perspective on 2021 mortality and further years. 
+In our particular case, the metric has been computed using the average $CMR$ for years between 2010 and 2019. 2020 is explicitly excluded, as the effect of the COVID-19 pandemic would skew our perspective on 2021 mortality and further years. 
 
 The $CMR$ for the last week of those years is averaged as it includes the entire year, given that the CMR is computed for a range of weeks starting at week 1 and ending at week $s$, for this metric we compute the denominator for week $s=52$ and the numerator for a specified week range.
 
-### Computation
-
-The $CRMR$ for week $w$ of year $y$ is computed as follows:
+The $CRMR$ for week $w$ of year $y$ has been computed as follows:
 
 $$CRMR_{w, y} = \frac{CMR_{w, y} - \frac{1}{10} \sum^{2019}_{y=2010} CMR_{w, y}}{\frac{1}{10} \sum^{2019}_{y=2010} CMR_{w=52, y}}$$
 
@@ -215,21 +216,17 @@ Where:
 
 The *cumulative mortality improvement factor* ($CMIF$) at a specific week $w$ of a year $y$ is an actuarial measure defined as the ratio of the difference between the $CMR$ at week $w$ for the previous year $y-1$ and the $CMR$ at week $w$ for the current year $y$, and the $CMR$ at week 52 for the previous year $y-1$.
 
-### Purpose
-
 The $CMIF$ is used to assess how much mortality is improving within specific age ranges, or the population as a whole. By "improvement factor" we mean that it could either get "better" or get "worse", the "better" the $CMIF$ gets, the lower the mortality is, the "worse" it gets, the opposite, meaning mortality will be higher.
 
 This measure is an excellent one when it comes to determining a population's longevity. If the improvement factor is high, then the older the population can become, in some ways, very similarly to life expectancy.
 
-The trend is particularly useful for older age groups, which during the COVID-19 pandemic saw a significant increase in mortality as a result of it being a virus especially dangerous to older age groups and it also being very easily spread throughout populations. In Spain in particular, retirement homes are very commonly used to house retired elderly people. The virus was unfortunately spread among some retirement homes causing very high mortality. These events directly affect the improvement factor negatively. 
+The metric is particularly useful for older age groups, which during the COVID-19 pandemic saw a significant increase in mortality as a result of it being a virus especially dangerous to older age groups and it also being very easily spread throughout populations. In Spain in particular, retirement homes are very commonly used to house retired elderly people. The virus was unfortunately spread among some retirement homes causing very high mortality. These events directly affect the improvement factor negatively. 
+
+
 
 Comparatively we can say that rises in $CRMR$ correspond with declines in $CMIF$. 
 
-### Specification
-
 For the application in particular, the $CMIF$ can be computed for years above 2011, as the data only stretches as far back as 2010 and the measure looks back 1 year. 
-
-### Computation
 
 The $CMIF$ for week $w$ of year $y$ is computed as follows:
 
@@ -243,23 +240,17 @@ Where:
 
 *Life expectancy* ($LE$) is a measure that estimates the time an organism is expected to live. It is computed for a specific age group $A$ using a *life table*. $LE$ at birth would correspond to the $LE$ of the youngest age group in the table, assumming we don't have the *infant mortality rate* ($IMR$).
 
-### Purpose
-
 The purpose of this measure is to track how long we should expect our population to live. As an upper limit on how old we should expect the population to become. It is widely used in insurance to calculate insurance premiums on life insurace policies, and to determine if it's even profitable to offer such policies to an individual. A very old individual would be surcharged for a life insurance policy or be rejected altogether when attempting to acquire the policy given their high risk of death and very low life expectancy.
 
 It also gives us a perspective on perhaps how developed a country is, given that most developed countries a have relatively high life expectancy for their population.
-
-### Specification
 
 For the purposes of this application, it is useful to track the effect mortality has on how long we should expect the Spanish population to live. In particular, mortality as a result of the COVID-19 pandemic has affected life expectancy significantly, however, perhaps not in a permanent way, as mortality eventually goes back to the mean, and with it, so does life expectancy.
 
 As we need to compute $LE$ for specific weeks/years and display them as a time series, we must then calculate a *life table* per week.
 
-The process is largely inspired from the following methodology explained on the [MEASURE evaluation website](https://www.measureevaluation.org/resources/training/online-courses-and-resources/non-certificate-courses-and-mini-tutorials/multiple-decrement-life-tables/lesson-3.html). However, it was adapted to fit weekly measures by taking data one year prior to the specified week. Calculations after the step 2 described in the [[Computation section]{color="black"}](#LEComputation) below are nearly identical to those displayed on the previously linked article.
+The process is largely inspired from the following methodology explained on the [MEASURE evaluation website](https://www.measureevaluation.org/resources/training/online-courses-and-resources/non-certificate-courses-and-mini-tutorials/multiple-decrement-life-tables/lesson-3.html). However, it was adapted to fit weekly measures by taking data one year prior to the specified week. Calculations after the step 2 described below are nearly identical to those displayed on the previously linked article.
 
 \newpage
-
-### Computation {#LEComputation}
 
 To compute $LE$ we must first compute a life table as follows, note that each step also corresponds to a column of the life table in the same order:
 
@@ -320,19 +311,52 @@ $${}_{n}L_{x} = \frac{{}_{n}d_{x}}{{}_{n}m_{x}}$$
 
 So:
 
-$${}_{n}L_{x} = $$
+|       a. For the last age group:
+
+$$T_x = {}_{n}L_{x}$$
+
+|       b. For the other age groups:
+
+$$T_x = \sum^{19}_{k=g} {}_{n}L_{x}$$
+
+Where:
+
+|       - $g$ is the number of the age group for which we want to compute the measure, so for group 1, $g=1$, and so on.
+
+|       - The sum goes up to 19, as there are 19 age groups in our computation.
+
 
 # Methodology
 
-## Data querying and pre-processing pipeline
+## Data querying
 
-## 
+The data querying process goes over two APIs, the Eurostat API and the INE API.
+
+### Eurostat API querying
+
+In order to query the Eurostat API, we need to execute several queries using the ```query_eurostat()``` function defined in the [functions.py script, line #23](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L23).
+
+The queries are executed through the [query.py script, lines #26-40](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L26) upon user request.
+
+The steps followed are:
+
+1. Open the [update_database.log](https://github.com/dreth/tfm_uc3m/blob/main/data/logs/update_database.log) log file, in which diagnostic messages related to the query are printed temporarily until the query is over.
+
+2. Create an empty list where obtained raw datasets from the API will be added to.
+
+3. Run a nested loop where we iterate over each age group (19 age groups) and sex (3 sexes, male, females and total) and the Eurostat API is queried for each combination of sex and age group. The queried data is queried as far back as the data is provisional (Week 1, 2020 at the time of writing).
+
+4. Each obtained dataset is passed trough the ```generate_death_df()``` function defined in the [functions.py script, line #84](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L84). Thereby generating a partial dataset for the current *age+sex* looping combination.
+
+5. The previously generated partial dataset is added to the ```death_datasets``` list created previously.
+
+## Data pre-processing pipeline
+
+## Data hosting
 
 # Appendix
 
 ## Appendix A: Python
-
-
 
 ## Appendix B: R
 
@@ -411,4 +435,6 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 - *README.md*: Readme file explaining the source of the data and where the repository stems from, as well as linking to the main repository [*dreth/tfm_uc3m*](https://github.com/dreth/tfm_uc3m)
 
-
+```{bash, echo=FALSE, warning=FALSE, message=FALSE}
+pdftk "./coverpage/coverpage.pdf" "./report.pdf" cat output "./final_report.pdf"
+```

@@ -55,8 +55,8 @@ def check_eurostat_provisional(sex='T', age='Y80-84', ccaa='ES3', earliest=True,
     query = {
         'dataset': 'demo_r_mwk2_05',  # Name of the dataset
         'sinceTimePeriod': f'{curr_year-lookback}W01',  # Starting week of the study
-        'geo': ccaa,                  # CCAAs
-        'unit': 'NR',                  # Units (NR = number)
+        'geo': ccaa,  # CCAAs
+        'unit': 'NR',  # Units (NR = number)
         'sex': sex,
         'age': age
     }
