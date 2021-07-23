@@ -397,7 +397,7 @@ The INE API returns a JSON file with somewhat unique formatting, therefore, in o
 
 2. Open the [update_database.log](https://github.com/dreth/tfm_uc3m/blob/main/data/logs/update_database.log) log file, and log the start of the querying for the dataset.
 
-3. Query the INE database using [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L60).
+3. Query the INE database using [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L60).    
 
 4. Run the data pre-processing pipeline using the function [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L61) as defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L190) script. The steps for this pipeline are detailed its [corresponding section](#PopDatasetPipeline).
 
@@ -405,9 +405,9 @@ The INE API returns a JSON file with somewhat unique formatting, therefore, in o
 
 6. The acquired/updated dataset is exported as a CSV file.
 
-
-
 ## Data pre-processing pipeline
+
+After the data is acquired, 
 
 ### Pipeline for the deaths dataset {#DeathDatasetPipeline}
 
