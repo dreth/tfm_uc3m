@@ -379,7 +379,7 @@ The pipeline followed from when the data is obtained until it's updated the data
 
 6. The datasets within the [```death_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L48) list are all concatenated using the [```pandas.concat```](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.concat.html) function.
 
-7. The updated dataset is passed as a parameter of the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L447) function, which in turn checks the currently available dataset within the repository file tree, imports it, updates all the provisional data and appends the newly obtained data if available.
+7. The updated dataset is passed as a parameter of the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L51) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L447) script, which in turn checks the currently available dataset within the repository file tree, imports it, updates all the provisional data and appends the newly obtained data if available.
 
 8. The acquired/updated dataset is exported as a CSV file.
 
@@ -391,14 +391,27 @@ The function executes a single query with data starting at the date defined by t
 
 #### Population dataset update pipeline
 
-The INE API returns a JSON file with somewhat unique formatting, therefore in order to manipulate the 
+The INE API returns a JSON file with somewhat unique formatting, therefore, in order to generate a clean dataset and update the database with the cleaned up dataset, we need to go through a few steps. The intermediate step detailing the cleaning and pre-processing pipeline is detailed in the [data pre-processing pipeline](#PopDatasetPipeline) section for the population dataset.
+
+1. Gather the latest week updated in the death dataset and assign it to the [```most_recent_week```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L49) object.
+
+2. Open the [update_database.log](https://github.com/dreth/tfm_uc3m/blob/main/data/logs/update_database.log) log file, and log the start of the querying for the dataset.
+
+3. Query the INE database using [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L60).
+
+4. Run the data pre-processing pipeline using the function [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L61) as defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L190) script. The steps for this pipeline are detailed its [corresponding section](#PopDatasetPipeline).
+
+5. The updated dataset is passed as a parameter of the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L63) function, which in turn checks the currently available dataset within the repository file tree, imports it, updates all the provisional data and appends the newly obtained data if available.
+
+6. The acquired/updated dataset is exported as a CSV file.
+
 
 
 ## Data pre-processing pipeline
 
 ### Pipeline for the deaths dataset {#DeathDatasetPipeline}
 
-### Pipeline for the population dataset
+### Pipeline for the population dataset {#PopDatasetPipeline}
 
 ## Data hosting
 
