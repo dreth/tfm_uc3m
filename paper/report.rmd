@@ -270,8 +270,6 @@ As we need to compute $LE$ for specific weeks/years and display them as a time s
 
 The process is largely inspired from the following methodology explained on the [MEASURE evaluation website](https://www.measureevaluation.org/resources/training/online-courses-and-resources/non-certificate-courses-and-mini-tutorials/multiple-decrement-life-tables/lesson-3.html). However, it was adapted to fit weekly measures by taking data one year prior to the specified week. Calculations after the step 2 described below are nearly identical to those displayed on the previously linked article.
 
-\newpage
-
 To compute $LE$ we must first compute a life table as follows, note that each step also corresponds to a column of the life table in the same order:
 
 **1.** Compute the age-specific death rate ${}_{n}m_{x}$:
