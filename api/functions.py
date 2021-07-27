@@ -124,7 +124,7 @@ def generate_death_df(raw_data, date=False):
     else:
         grouping = ['year_week','year','week','ccaa','sex','age']
 
-    # summing marking 53rd weeks to remove
+    # marking 53rd weeks to remove
     for idx,w in zip(df.index,df['week']):
         if w == 53:
             df.iloc[idx,5] = 0
@@ -132,7 +132,7 @@ def generate_death_df(raw_data, date=False):
     # removing 53rd week
     df = df[df['year'] != 0]
 
-    # grouping in order to aggregate W53 with corresponding W01
+    # grouping in order to sum split values
     df = df.groupby(grouping).sum().reset_index()
 
     # dropping year_week

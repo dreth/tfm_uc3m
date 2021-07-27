@@ -462,11 +462,17 @@ The function that performs all these tasks is the [```generate_death_df```](http
 
 4. A [``df``](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L107) dictionary is defined with its keys being the names of the columns of the final dataset to be outputted and its values being the values which the dataframe will contain with the exception of the *year_week* key which will later on be split into *week* and *year* columns.
 
-    + The *year_week* column contains the values for the weeks times the amount of CCAAs queried, in our case, there will be 19 CCAAs queried, given that Spain has 19 CCAAs.
+    + The *year_week* column contains the values for the weeks times the amount of CCAAs queried, in our case, there will be 19 CCAAs queried, given that Spain has 19 CCAAs at the time of writing. 
 
-5. 
+5. The ``df`` dictionary is then converted into a pandas DataFrame and the *year* and *week* columns are generated from splitting the *year_week* column.
+
+6. Data points marked as 53rd week are marked with a '0' to be removed and are then subsequently removed.
+
+7. The *year_week* column is dropped and the resulting, cleaned up DataFrame is returned.
 
 ### Pipeline for the population dataset {#PopDatasetPipeline}
+
+
 
 ## Data hosting
 
