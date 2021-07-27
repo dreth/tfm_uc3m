@@ -388,7 +388,13 @@ In order to query the Eurostat API, we need to execute several queries using the
 
 The queries are executed through the [query.py](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L26) script upon user request.
 
-In order to query the Eurostat API, we have to use the [Eurostat Query Builder](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/query-builder). 
+In order to query the Eurostat API: 
+
+1. We have to use the [Eurostat Query Builder](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/query-builder). 
+
+2. Pass in the database ID, in our case it's **demo_r_mwk2_05**, we select the parameters and then query the API. The parameters can be concatenated. 
+
+The previously mentioned  [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L23) function does this, thereby simplifying the process of querying by just passing the parameters to the function as desired.
 
 #### Death dataset update pipeline
 
@@ -417,6 +423,8 @@ The pipeline followed from when the data is obtained until it's updated the data
 To query the INE API, a single query is executed using the [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L146) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. 
 
 The function executes a single query with data starting at the date defined by the *start* parameter of the function, whose default value is *20100101*, corresponding to the 1st of January, 2010. This single query returns a JSON response with all the data.
+
+In order to query from INE we have to use their [data request](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=1259945947373) (in Spanish) methods. In particular, the ones described in the "*Obtención de datos Sistema Tempus3*" section. In our case, we must create a URL like: ["https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/{df_id}?date={start}:{end}"]{color="green"}, where *df_id* is the ID of the database (**9681** for us), and *start* being where the time series will start and *end* where it will end. If *end* is left empty, then it'll fetch the most recent data.
 
 #### Population dataset update pipeline
 
