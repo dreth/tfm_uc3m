@@ -408,7 +408,7 @@ The pipeline followed from when the data is obtained until it's updated the data
 
 3. Run a nested loop where we iterate over each age group (19 age groups) and sex (3 sexes, male, females and total) and the Eurostat API is queried for each combination of sex and age group. The queried data is queried as far back as the data is provisional (Week 1, 2020 at the time of writing).
 
-4. Each obtained dataset is passed trough the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script, which runs the steps described in the [pipeline for the death dataset](#DeathDatasetPipeline) section. Thereby generating a partial dataset for the current *age+sex* looping combination.
+4. Each obtained dataset is passed through the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script, which runs the steps described in the [pipeline for the death dataset](#DeathDatasetPipeline) section. Thereby generating a partial dataset for the current *age+sex* looping combination.
 
 5. The previously generated partial dataset is added to the [```death_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L31) list created previously.
 
@@ -444,9 +444,27 @@ The INE API returns a JSON file with somewhat unique formatting, therefore, in o
 
 ## Data pre-processing pipeline
 
-After the data is acquired, 
+After the data is acquired, then a pipeline to convert the raw JSON response from the APIs must be ran in order to construct actionable dataframes to store and use for the app. In these two sections there will be a description of all the steps in the pipeline for each of the two datasets. 
 
 ### Pipeline for the deaths dataset {#DeathDatasetPipeline}
+
+The biggest challenge that the *deaths* dataset imposed was dealing with the indexing for the JSON response, as it had additional, and admittedly useless or empty data entries within the JSON. Also, the data obtained included a 53rd week for those years that don't fit the same exact number of weeks, this must be dealt with as well.
+
+The function that performs all these tasks is the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
+
+1. We define a [```fields```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L88) dictionary to obtain  all the relevant elements we want from the response JSON object. Each one of them corresponds to either the ```keys``` or ```values``` of the object, as JSONs are interpreted as *dictionaries* in python, which makes them easier to work with.
+
+    + Here we exclude weeks marked as *W99* by Eurostat, which are basically empty values.
+
+2. The amount of values in the raw data is obtained from the length of the ```values``` key in the ```fields``` dictionary. The amount of "region codes" is obtained from the length of the ```region_codes``` key in the ```fields``` dictionary, which are the CCAAs (autonomous communities of Spain). These two values are used to compute the amount of *weeks* obtained from the raw data, the result of this ratio is allocated in the ```weeks_queried``` object.
+
+3. The ```timeframes``` key of the ```fields``` object that keeps track of the week label for each data point is cut up to the present date, as the current week always includes empty data. This cutoff is a way to keep the dataset with the same amount of data points and make it a multiple of the amount of CCAAs queried.
+
+4. A [``df``](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L107) dictionary is defined with its keys being the names of the columns of the final dataset to be outputted and its values being the values which the dataframe will contain with the exception of the *year_week* key which will later on be split into *week* and *year* columns.
+
+    + The *year_week* column contains the values for the weeks times the amount of CCAAs queried, in our case, there will be 19 CCAAs queried, given that Spain has 19 CCAAs.
+
+5. 
 
 ### Pipeline for the population dataset {#PopDatasetPipeline}
 
@@ -533,7 +551,7 @@ The project consists of two repositories and their respectives [**subfolders**]{
 - [**death.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *demo_r_mwk2_05* database to Eurostat for Spain data, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="darkspringgreen"} folder.
 - [**pop.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *9681* database to INE, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="darkspringgreen"} folder.
 
-- *README.md*: Readme file explaining the source of the data and where the repository stems from, as well as linking to the main repository [*dreth/tfm_uc3m*](https://github.com/dreth/tfm_uc3m)
+- [**README.md**]{color="red"}: Readme file explaining the source of the data and where the repository stems from, as well as linking to the main repository [*dreth/tfm_uc3m*](https://github.com/dreth/tfm_uc3m)
 
 ```{bash, echo=FALSE, warning=FALSE, message=FALSE}
 pdftk "./coverpage/coverpage.pdf" "./report.pdf" cat output "./final_report.pdf"
