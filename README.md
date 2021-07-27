@@ -143,3 +143,7 @@ docker kill <Container ID>
 And replacing ```<Container ID>``` with the copied container ID from running ```docker ps```.
 
 If the container ID and tag do not show up when running ```docker ps```, the container's execution was successfully halted.
+
+## License
+
+This project is licensed under the GNU General Public License v3, the license can be seen on the [COPYING](https://github.com/dreth/tfm_uc3m/COPYING) file in the root directory of this repository.

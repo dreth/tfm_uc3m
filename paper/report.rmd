@@ -2,6 +2,7 @@
 title: "Development of an automatic tool for periodic surveillance of actuarial and demographic indicators"
 author: "Daniel Alonso, María Luz Durbán Reguera, Bernardo D'Auria"
 date: "July-August 2021"
+header-includes: \usepackage{amsmath}
 output: 
     pdf_document:
         extra_dependencies: ["xcolor"]
@@ -26,15 +27,15 @@ fig.path = "./figures/"
 
 # Summary
 
-As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic and future similarly deadly events has become increasingly important. It is intended with this project to develop a tool in order to easily monitor a selection of demographic measures relating to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously, or perhaps other smaller scale events which could increase mortality in a likely fashion. 
+As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic and future similarly deadly events has become increasingly important. It is intended with this project to develop a tool to easily monitor a selection of demographic measures. All related to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously, or perhaps other smaller scale events which could increase mortality in a likely fashion.
 
-The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) shiny dashboard (developed in R) where such measures are displayed in different visualizations across time. The dashboard is containerized using Docker, as to make it possible to run and use in any operating system. Moreover, the database is managed by several Python scripts which acquire the data from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs, treat it, and allocate in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated by anyone running the application with the click of a button within the application itself.
+The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) shiny dashboard (developed in R) where such measures are displayed in different visualizations across time. The dashboard is containerized using Docker, in order to make possible to run and use in in any operating system. The data is acquired from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs. It is then treated by several Python scripts and stored in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated by anyone running the application.
 
 # Introduction
 
-The COVID-19 pandemic has led to a widespread and noticeable temporary increase in mortality and reduction in life expectancy throughout Spain. This arises a need to monitor these demographic measures more closely and in real time. 
+The COVID-19 pandemic has led to a widespread and noticeable temporary increase in mortality, as well as to a reduction in life expectancy throughout Spain. This arises a need to monitor these demographic measures more closely and in real time. 
 
-This project consists of an application which allows for active, real-time monitoring of mortality and life expectancy of the population of Spain, through an [open-source](https://github.com/dreth/tfm_uc3m) shiny web-based dashboard. 
+This project consists in developing an application which allows for active, real-time monitoring of mortality and life expectancy of the population of Spain, through an [open-source](https://github.com/dreth/tfm_uc3m) shiny web-based dashboard.
 
 The application itself consists of the following functionality:
 
@@ -48,23 +49,23 @@ The application itself consists of the following functionality:
 
 - Visualizing a map of Spain with the previous metrics per autonomous community (CCAA)
 
-All metrics are calculated weekly with data stretching back as far back as 2010.
+All metrics are calculated weekly with data obtained from INE and Eurostat, starting from the year 2010.
 
 # Objectives
 
 The main objectives of the project are the following:
 
-- Provide an open-source, simple-to-use, web-based, OS-agnostic tool to compute and visualize common mortality-related metrics and life expectancy in time series plots, and static or interactive maps.
+- To provide an open-source, simple-to-use, web-based, OS-agnostic tool to compute and visualize common mortality-related metrics and life expectancy in time series plots, and static or interactive maps.
 
     + A big focus of the project was to make this application as simple-to-use as possible, while maintaining the management of system requirements extremely low. The purpose of such approach is to allow virtually anyone that desires to monitor any of the metrics to do so by running a simple shell command. We want any user or institution with access to a computer and the internet to be able to monitor these metrics, or any such metrics which could be possibly added in the future without much hassle. 
 
-    + The project being open-source is also very important, as this allows anyone to take the project and further it, add extra components to it, perhaps other useful mortality-related measures. This makes the project fully auditable and free to use, modify and extend.
+    + An important prerequisite was to make the proyect open-source. This allows anyone to freely use and improve the project by adding extra components like other useful mortality-related measures. This makes the project fully auditable and free to use, modify and extend. The project is licensed using the [GNU General Public License V3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-- Provide the user the ability to customize the plot parameters significantly.
+- To provide the user with the ability to meaningfully customize the plot parameters.
 
-    + The application itself should have several controls that allow the user to modify visualizations. Some of them are: what years to visualize, what metrics to visualize, what range of weeks to visualize (between 1 and 52), which CCAAs or age groups to aggregate, whether to make the plots interactive (using *plotly*) or static (using *ggplot2*), and so on. Different options will be available for different plots.
+    + The application itself should have several controls that allow the user to customize visualizations. Some of them are: what years to visualize, what metrics to visualize, what range of weeks to visualize (between 1 and 52), which CCAAs or age groups to aggregate, whether to make the plots interactive (using *plotly*) or static (using *ggplot2*), and so on. Different options will be available for different plots.
 
-- Provide the user the ability to download the plots and the data (with or without filtering).
+- To p3rovide the user the ability to download the plots and the data (with or without filtering).
 
     + The application shall include a download button with several options for all plots displayed within the application. The user can select the size of the plot from a list of predefined sizes, or specify the image resolution and the format from a list of available ones. We intend to make it so that any plot generated within the app can be downloaded.
 
@@ -88,17 +89,17 @@ The application allows monitoring some of these measures in real time. Whenever 
 
 As somewhat of an inspiration, reports like the [COVID-19 vaccine surveillance report: Week 27](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1000512/Vaccine_surveillance_report_-_week_27.pdf), published by the PHE (Public Health England), show visualizations and analyses where the evolution of mortality metrics is a section of the report. Along with this, the INE currently does not have a report or application calculating these metrics on a per-week basis.
 
-## Advantages an open source application over weekly reports in PDF format
+## Advantages of an open source application over weekly reports in PDF format
 
-There are several advantages an application could potentially have over static, weekly PDF reports like the one previously linked:
+There are several advantages an application could potentially have over static, weekly PDF reports like the one previously linked in the [Inspiration] section:
 
-- The user has control over the visualizations they desire to see, as there are controls to manipulate the parameters of the visualizations and interact with them.  
+- The user has control over the visualizations, as there are controls to manipulate the parameters of the visualizations and interact with them.  
 
 - The user can download the customized visualizations in their desired resolution or format.
 
 - The user can choose what measures of those available to show.
 
-- As the application is [fully open source](https://github.com/dreth/tfm_uc3m), developers wanting to expand the application and add extra features and contribute directly to the project's development.
+- As the application is [open source](https://github.com/dreth/tfm_uc3m), developers could expand the application and add extra features and contribute directly to the project's development.
 
 - The measures will be as up-to-date as the data source is. As these reports take time to construct and analyze, they will take longer to be released, so the user can simply open the application and update the database whenever they desire to do so.
 
@@ -274,7 +275,9 @@ To compute $LE$ we must first compute a life table as follows, note that each st
 
 **1.** Compute the age-specific death rate ${}_{n}m_{x}$:
 
-$${}_{n}m_{x} = \frac{\sum \text{ } {}_{x,x+n}D_{w,y}}{{}_{x,x+n}P_{w,y}}$$
+\begin{equation}
+{}_{n}m_{x} = \frac{\sum \text{ } {}_{x,x+n}D_{w,y}}{{}_{x,x+n}P_{w,y}}
+\end{equation}
 
 Where:
 
@@ -286,11 +289,17 @@ Where:
 
 |       a. For non open-ended age groups:
 
-$${}_{n}q_{x} = 1 - \frac{1}{e^{n * {}_{n}m_{x}}}$$
+\begin{equation}
+\tag{2.1}
+{}_{n}q_{x} = 1 - \frac{1}{e^{n * {}_{n}m_{x}}}
+\end{equation}
 
 |       b. For open-ended age groups (ex. 90+ year olds):
 
-$${}_{n}q_{x} = 1$$
+\begin{equation}
+\tag{2.2}
+{}_{n}q_{x} = 1
+\end{equation}
 
 Where:
 
@@ -305,7 +314,10 @@ Where:
 
 |       b. For the subsequent values, we calculate the next values using the previous one as a sequence:
 
-$$l_{x + n} = l_x * (1 - {}_{n}q_{x})$$
+\begin{equation}
+\tag{3}
+l_{x + n} = l_x * (1 - {}_{n}q_{x})
+\end{equation}
 
 Where:
 
@@ -315,7 +327,10 @@ Where:
 
 **4.** Compute the number of deaths ocurred within each age interval ${}_{n}d_{x}$:
 
-$${}_{n}d_{x} = l_x * {}_{n}q_{x}$$
+\begin{equation}
+\tag{4}
+{}_{n}d_{x} = l_x * {}_{n}q_{x}
+\end{equation}
 
 Where:
 
@@ -323,19 +338,28 @@ Where:
 
 **5.** Calculate the person-years of life of all individuals in each age interval $x$ to $x+n$, ${}_{n}L_{x}$:
 
-$${}_{n}L_{x} = \frac{{}_{n}d_{x}}{{}_{n}m_{x}}$$
+\begin{equation}
+\tag{5}
+{}_{n}L_{x} = \frac{{}_{n}d_{x}}{{}_{n}m_{x}}
+\end{equation}
 
 **6.** We calculate the cumulative person-years of life after age $x$, $T_x$. Therefore, for the first age group in the table, the value of $T_x$ will correspond to the sum of all ${}_{n}L_{x}$, the entire 5th column. For the second age group, it'll be the sum of all ${}_{n}L_{x}$ with the exception of the ${}_{n}L_{x}$ value of the first age group, and so on.
 
 So:
 
-|       a. For the last age group:
+|       a. For age groups different to the last one:
 
-$$T_x = {}_{n}L_{x}$$
+\begin{equation}
+\tag{6.1}
+T_x = \sum^{19}_{k=g} {}_{n}L_{x}
+\end{equation}
 
-|       b. For the other age groups:
+|       b. For the last age group:
 
-$$T_x = \sum^{19}_{k=g} {}_{n}L_{x}$$
+\begin{equation}
+\tag{6.2}
+T_x = {}_{n}L_{x}
+\end{equation}
 
 Where:
 
@@ -345,7 +369,10 @@ Where:
 
 **7.** We compute the *life expectancy* ($LE$) of each age group as follows:
 
-$$e_{x} = \frac{T_x}{l_x}$$
+\begin{equation}
+\tag{7}
+e_{x} = \frac{T_x}{l_x}
+\end{equation}
 
 \newpage
 
@@ -359,7 +386,9 @@ The data querying process goes over two APIs, the Eurostat API and the INE API.
 
 In order to query the Eurostat API, we need to execute several queries using the [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L23) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
 
-The queries are executed through the [query.py script, lines #26-40](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L26) upon user request.
+The queries are executed through the [query.py](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L26) script upon user request.
+
+In order to query the Eurostat API, we have to use the [Eurostat Query Builder](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/query-builder). 
 
 #### Death dataset update pipeline
 
@@ -482,7 +511,9 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 - [**paper**]{color="darkspringgreen"}: Folder containing this report and all the files the report depends on.
 
-- *README.md*: Readme file explaining how to run the app and some basic information about it.
+- [**COPYING**]{color="red"}: This file contains the GNU General Public License V3, as the project is licensed under it.
+
+- [**README.md**]{color="red"}: Readme file explaining how to run the app and some basic information about it.
 
 ### [**The data repository** (*dreth/tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
 
