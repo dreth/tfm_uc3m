@@ -85,9 +85,11 @@ As an example, 100 people dying over the course of a week within a municipality 
 
 The application allows monitoring some of these measures in real time. Whenever it is desired to fetch new data (if available), the data can be fetched with a click. The measures can be instantly computed with a click and visualized to observe the evolution of the population at any time, by age group, sex and by autonomous community (CCAA) of Spain. Showcasing particular usefulness within events that cause large amounts of deaths (like a pandemic, war, or heat wave) or that reduce the general populations life expectancy (as the application can also visualize the evolution of life expectancy over time).
 
-## Inspiration (needs work)
+## Inspiration
 
-As somewhat of an inspiration, reports like the [COVID-19 vaccine surveillance report: Week 27](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1000512/Vaccine_surveillance_report_-_week_27.pdf), published by the PHE (Public Health England), show visualizations and analyses where the evolution of mortality metrics is a section of the report. Along with this, the INE currently does not have a report or application calculating these metrics on a per-week basis.
+The [Mortality monitor reports](https://www.actuaries.org.uk/learn-and-develop/continuous-mortality-investigation/other-cmi-outputs/mortality-monitor) published on a weekly basis by the Institute and Faculty of Actuaries of the UK was the strongest influece. The application essentially offers the same metrics and more. The intention is to improve this already quite good and useful report, make it interactive and customizable, and localize it to Spain. Currently, neither the INE (National Statistics Institute of Spain) or any other Spanish institution offer these metrics along with the rest of the features the app offers (visualizing maps, life expectancy, etc) on a per-week basis.
+
+The [COVID-19 vaccine surveillance report: Week 27](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1000512/Vaccine_surveillance_report_-_week_27.pdf), published by the PHE (Public Health England) also partly exemplifies a similar idea in its "direct impact on infection and mortality" section. 
 
 ## Advantages of an open source application over weekly reports in PDF format
 
@@ -508,7 +510,7 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
     + The rest of the data is acquired, appended to lists and a date column is generated.
 
-3. 
+3. The ```df``` dictionary is [converted](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L247) to a pandas DataFrame for easier manipulation.
 
 
 
