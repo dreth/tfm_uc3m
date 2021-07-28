@@ -386,7 +386,7 @@ The data querying process goes over two APIs, the Eurostat API and the INE API.
 
 ### Eurostat API querying
 
-In order to query the Eurostat API, we need to execute several queries using the [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L23) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
+In order to query the Eurostat API, we need to execute several queries using the [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L23) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
 
 The queries are executed through the [query.py](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L26) script upon user request.
 
@@ -396,7 +396,7 @@ In order to query the Eurostat API:
 
 2. Pass in the database ID, in our case it's **demo_r_mwk2_05**, we select the parameters and then query the API. The parameters can be concatenated. 
 
-The previously mentioned  [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L23) function does this, thereby simplifying the process of querying by just passing the parameters to the function as desired.
+The previously mentioned  [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L23) function does this, thereby simplifying the process of querying by just passing the parameters to the function as desired.
 
 #### Death dataset update pipeline
 
@@ -410,19 +410,19 @@ The pipeline followed from when the data is obtained until it's updated the data
 
 3. Run a nested loop where we iterate over each age group (19 age groups) and sex (3 sexes, male, females and total) and the Eurostat API is queried for each combination of sex and age group. The queried data is queried as far back as the data is provisional (Week 1, 2020 at the time of writing).
 
-4. Each obtained dataset is passed through the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script, which runs the steps described in the [pipeline for the death dataset](#DeathDatasetPipeline) section. Thereby generating a partial dataset for the current *age+sex* looping combination.
+4. Each obtained dataset is passed through the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script, which runs the steps described in the [pipeline for the death dataset](#DeathDatasetPipeline) section. Thereby generating a partial dataset for the current *age+sex* looping combination.
 
 5. The previously generated partial dataset is added to the [```death_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L31) list created previously.
 
 6. The datasets within the [```death_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L48) list are all concatenated using the [```pandas.concat```](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.concat.html) function.
 
-7. The updated dataset is passed as a parameter of the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L51) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L447) script, which in turn checks the currently available dataset within the repository file tree, imports it, updates all the provisional data and appends the newly obtained data if available.
+7. The updated dataset is passed as a parameter of the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L51) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L447) script, which in turn checks the currently available dataset within the repository file tree, imports it, updates all the provisional data and appends the newly obtained data if available.
 
 8. The acquired/updated dataset is exported as a CSV file.
 
 ### INE API querying
 
-To query the INE API, a single query is executed using the [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L146) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. 
+To query the INE API, a single query is executed using the [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L146) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. 
 
 The function executes a single query with data starting at the date defined by the *start* parameter of the function, whose default value is *20100101*, corresponding to the 1st of January, 2010. This single query returns a JSON response with all the data.
 
@@ -438,7 +438,7 @@ The INE API returns a JSON file with somewhat unique formatting, therefore, in o
 
 3. Query the INE database using [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L60).    
 
-4. Run the data pre-processing pipeline using the function [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L61) as defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L190) script. The steps for this pipeline are detailed its [corresponding section](#PopDatasetPipeline).
+4. Run the data pre-processing pipeline using the function [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L61) as defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L190) script. The steps for this pipeline are detailed its [corresponding section](#PopDatasetPipeline).
 
 5. The updated dataset is passed as a parameter of the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py#L63) function, which in turn checks the currently available dataset within the repository file tree, imports it, updates all the provisional data and appends the newly obtained data if available.
 
@@ -452,11 +452,11 @@ After the data is acquired, then a pipeline to convert the raw JSON response fro
 
 The biggest challenge that the *deaths* dataset imposed was dealing with the indexing for the JSON response, as it had additional, and admittedly useless or empty data entries within the JSON. Also, the data obtained included a 53rd week for those years that don't fit the same exact number of weeks, this must be dealt with as well.
 
-The function that performs all these tasks is the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
+The function that performs all these tasks is the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
 
 The pipeline steps are the following:
 
-1. We define a [```fields```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L88) dictionary to obtain  all the relevant elements we want from the response JSON object. Each one of them corresponds to either the ```keys``` or ```values``` of the object, as JSONs are interpreted as *dictionaries* in python, which makes them easier to work with.
+1. We define a [```fields```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L88) dictionary to obtain  all the relevant elements we want from the response JSON object. Each one of them corresponds to either the ```keys``` or ```values``` of the object, as JSONs are interpreted as *dictionaries* in python, which makes them easier to work with.
 
     + Here we exclude weeks marked as *W99* by Eurostat, which are basically empty values.
 
@@ -464,7 +464,7 @@ The pipeline steps are the following:
 
 3. The ```timeframes``` key of the ```fields``` object that keeps track of the week label for each data point is cut up to the present date, as the current week always includes empty data. This cutoff is a way to keep the dataset with the same amount of data points and make it a multiple of the amount of CCAAs queried.
 
-4. A [``df``](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L107) dictionary is defined with its keys being the names of the columns of the final dataset to be outputted and its values being the values which the dataframe will contain with the exception of the *year_week* key which will later on be split into *week* and *year* columns.
+4. A [``df``](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L107) dictionary is defined with its keys being the names of the columns of the final dataset to be outputted and its values being the values which the dataframe will contain with the exception of the *year_week* key which will later on be split into *week* and *year* columns.
 
     + The *year_week* column contains the values for the weeks times the amount of CCAAs queried, in our case, there will be 19 CCAAs queried, given that Spain has 19 CCAAs at the time of writing. 
 
@@ -488,32 +488,35 @@ The population dataset response JSON came with challenges:
 
 - The data came for individual ages, therefore, to match and be able to perform the computation of the metrics [previously mentioned](#Metrics), grouping the people within the same specific age groups present in the previous dataset is needed.
 
-All the steps are performed within the [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L190) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. The pipeline steps are the following:
+All the steps are performed within the [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L190) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. The pipeline steps are the following:
 
 1. Define several dictionaries with reference data and replacements to align the formatting with the deaths dataset. The dictionaries defined are:
     
-    + [```df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L197), which is going to eventually become the final population dataset. It contains as keys the names of the columns of the final population dataset and as values empty lists.
+    + [```df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L197), which is going to eventually become the final population dataset. It contains as keys the names of the columns of the final population dataset and as values empty lists.
 
-    + [```date_ref```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L206) is a dictionary that includes the week as obtained from the API, which originally labels the January data point as 26 and the June data point as 27. These are matched in the object with roughly equivalent dates, Jan. 1st for 26 and Jul. 1st for 27. The conversion performed by this object remains only if the parameter **date** is **True**.
+    + [```date_ref```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L206) is a dictionary that includes the week as obtained from the API, which originally labels the January data point as 26 and the June data point as 27. These are matched in the object with roughly equivalent dates, Jan. 1st for 26 and Jul. 1st for 27. The conversion performed by this object remains only if the parameter **date** is **True**.
 
-    + [```ccaa_eurostat_replace_dict```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L212) is a dictionary that will serve as a reference for replacing the CCAA full names with the shorter Eurostat standard, which consists of the country's ISO 3166-1 alpha-2 code (*ES* for Spain) and a number per NUTS 2 statistical region (ex. *ES11* = *Galicia*).
+    + [```ccaa_eurostat_replace_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L212) is a dictionary that will serve as a reference for replacing the CCAA full names with the shorter Eurostat standard, which consists of the country's ISO 3166-1 alpha-2 code (*ES* for Spain) and a number per NUTS 2 statistical region (ex. *ES11* = *Galicia*).
 
-    + [```sex_dict```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L235) defines how the Spanish names for the sexes are determined, so longer, full names corresponding to each sex are replaced by the Eurostat standard, M (males), F (females) and T (total).
+    + [```sex_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L235) defines how the Spanish names for the sexes are determined, so longer, full names corresponding to each sex are replaced by the Eurostat standard, M (males), F (females) and T (total).
 
-    + [```week_dict```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L235) is a dictionary with the month (1 and 7) as keys and the corresponding week of the year (1 and 26) for which the data will be matched. This object is similar to ```date_ref```, however, the conversion made by ```date_ref``` is dependent on the parameter **date** of the function, which is not the case with ```week_dict```.
+    + [```week_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L235) is a dictionary with the month (1 and 7) as keys and the corresponding week of the year (1 and 26) for which the data will be matched. This object is similar to ```date_ref```, however, the conversion made by ```date_ref``` is dependent on the parameter **date** of the function, which is not the case with ```week_dict```.
 
-2. A [loop](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L247) goes through the raw data points and performs several actions inside of it:
+2. A [loop](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L247) goes through the raw data points and performs several actions inside of it:
 
     + Data points for the country's total are omitted given that we intend to perform these aggregations from within the Shiny App. These would also occupy unnecessary space in the repository.
 
-    + The metadata elements from each entry's header which contain sex, age and CCAA are [split](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L251) and passed onto the previously defined dictionaries. This replaces each entry's basic identifying information with the Eurostat standard.
+    + The metadata elements from each entry's header which contain sex, age and CCAA are [split](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L251) and passed onto the previously defined dictionaries. This replaces each entry's basic identifying information with the Eurostat standard.
 
     + The rest of the data is acquired, appended to lists and a date column is generated.
 
-3. The ```df``` dictionary is [converted](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L247) to a pandas DataFrame for easier manipulation.
+3. The ```df``` dictionary is [converted](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L247) to a pandas DataFrame for easier manipulation. Then an empty *age_group* column is created, which later on will replace the *age* column, as to classify individuals by age group using the Eurostat format from the deaths dataset.
 
+4. After assigning all individuals of all ages an age group, the *age* column is [dropped](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L297), and the *age_group* column is [renamed](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L298) to *age*, to match the column names of the deaths dataset. 
 
+5. The dataset is grouped by all identifying columns (CCAA, sex, date and age) and applied the [```sum()```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L301) method on the grouping. The purpose of this is to sum individuals of specific ages as to have the sum of each age group instead of multiple instances of each age group per set of the identifying columns.
 
+6. The *year* and *week* columns are obtained from the *date* column. And subsequently, a *marker* column is created as a way to identify entries when
 
 ## Data hosting
 

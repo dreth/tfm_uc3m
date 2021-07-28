@@ -83,6 +83,8 @@ def check_eurostat_provisional(sex='T', age='Y80-84', ccaa='ES3', earliest=True,
 # %% GENERATE DEATH DF
 def generate_death_df(raw_data, date=False):
     """
+    raw_data         : json object obtained from the query_eurostat function
+    date             : whether to keep or remove date (YYYY-MM-DD) in the dataset
     """
     # column fields
     fields = {
@@ -314,7 +316,7 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
 
     # obtain amount of unique years, however, we add one if
     # we end the last marker date in july (so that our 
-    # prediction continues until the following year)
+    # interpolation continues until the following year)
     if df.loc[df['marker'] == umarkers[0], 'date'].values[-1].month == 7:
         uyears = df['year'].nunique() + 1
     else:
@@ -326,7 +328,7 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
         'week':6
     }
 
-    # weekly population prediction
+    # weekly population interpolation
     # Size of the new df will be 52 (weeks in a year) times amount of ccaa+sex+age group times amount of
     # unique years
     df_array = np.zeros((52*len(umarkers)*uyears,8), dtype=object)
@@ -363,7 +365,7 @@ def generate_pop_df(raw_data, most_recent_week, date=False):
 
         # looping through the matched values for marker m
         for i in range(entries):
-            # obtaining the prediction range (rolling window of 2)
+            # obtaining the interpolation range (rolling window of 2)
             pred_range = dat[i:i+2,]
 
             # obtaining starting week (either 1 or 26)
