@@ -520,7 +520,29 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
 7. The unique markers are [obtained](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L313) from the *marker* column. These are then [used](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L315-L321) to obtain the amount of unique years in the dataset, the purpose of this is to determine whether we need to interpolate one year ahead or not. This means that the last data point obtained from the INE API was a week 26 data point, which would require us to look ahead until week 26 of the following year, if the data point was a week 1 data point, we would only need to look ahead within the current year.
 
-8. 
+8. The [```idx```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L324-L327) dictionary is defined to keep track of the indexes of the *pop* and *week* columns, which are referenced repeatedly in the following [loop](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L335). After defining ```idx```, then an empty array [```df_array```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L332) of the expected size of the resulting dataframe is defined. The array ```df_array``` is an array which will eventually contain the contents of the resulting dataframe, it's size is always slightly overestimated, but this won't matter, as empty rows will be dropped.
+
+9. A long [loop](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L335-L419) is initiated iterating between 0 and the length of the ```umarkers``` object, meaning the total amount of possible *CCAA*, *age* and *sex* combinations. The loop performs the following actions:
+
+    + The loop goes [through every unique marker](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L337), obtains an array for the elements of the DataFrame matching that marker in their *marker* column.
+
+    + An empty row is [added](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L338-L339) to the previous array.
+
+    + The last row is essentially a [clone](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L342) of the previous one, but with the date [modified](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L346-L352). This is done to later on be able to interpolate and add population up to a year after the previously obtained data point. If the data point is at week 26, a full year is added, otherwise, the next one remains in the same year but with the month changed to match week 26.
+
+    + The last element's population is [estimated](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L355) using the ratio of the previous two as a way to keep the population consistent with the previously observed trend.
+
+10. A second, nested [loop](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L365-L388) is initiated, this loop goes through the entries of the array defined previously and performs the interpolation betweeen each pair of points. The steps the loop takes to perform the interpolation are the following:
+
+    + A 2-row array is obtained with the 2 points between which to interpolate. Then the starting week is obtained from these two and a new array [```new_p```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L373) is created with size corresponding to the amount of weeks between the two data points previously selected. Usually, the size of this will be 26 weeks, as there are 26 weeks between week 1 and week 26 (inclusive). 
+
+    + This array is [filled](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L381) with linearly spaced values between the initial and ending population. For periods starting in week 26, the amount of values obtained is of 25, given that week 26 is already included and we want to [avoid repetition](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L388).
+
+    + The population column of the previously created array ```new_p``` is [replaced](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L391) with the interpolation. Then the values of the array which shall constitute the finalized dataframe (```df_array```) are [filled](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L394) with the prediction and the rest of the data.
+
+11. After the nested loop, the last value is saved to the [```last_val```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L397) variable. The ending week is saved to the [```week_end```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L400) variable. The interpolation ranges for the future population prediction (the one up to one year after the last data point) is estimated using the ratio between the starting population of the 
+
+
 
 ## Data hosting
 
