@@ -492,17 +492,17 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
 1. Define several dictionaries with reference data and replacements to align the formatting with the deaths dataset. The dictionaries defined are:
     
-    + [```df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L197), which is going to eventually become the final population dataset. It contains as keys the names of the columns of the final population dataset and as values empty lists.
+    + [```df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L197-L203), which is going to eventually become the final population dataset. It contains as keys the names of the columns of the final population dataset and as values empty lists.
 
-    + [```date_ref```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L206) is a dictionary that includes the week as obtained from the API, which originally labels the January data point as 26 and the June data point as 27. These are matched in the object with roughly equivalent dates, Jan. 1st for 26 and Jul. 1st for 27. The conversion performed by this object remains only if the parameter **date** is **True**.
+    + [```date_ref```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L206-L209) is a dictionary that includes the week as obtained from the API, which originally labels the January data point as 26 and the June data point as 27. These are matched in the object with roughly equivalent dates, Jan. 1st for 26 and Jul. 1st for 27. The conversion performed by this object remains only if the parameter **date** is **True**.
 
-    + [```ccaa_eurostat_replace_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L212) is a dictionary that will serve as a reference for replacing the CCAA full names with the shorter Eurostat standard, which consists of the country's ISO 3166-1 alpha-2 code (*ES* for Spain) and a number per NUTS 2 statistical region (ex. *ES11* = *Galicia*).
+    + [```ccaa_eurostat_replace_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L212-L232) is a dictionary that will serve as a reference for replacing the CCAA full names with the shorter Eurostat standard, which consists of the country's ISO 3166-1 alpha-2 code (*ES* for Spain) and a number per NUTS 2 statistical region (ex. *ES11* = *Galicia*).
 
-    + [```sex_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L235) defines how the Spanish names for the sexes are determined, so longer, full names corresponding to each sex are replaced by the Eurostat standard, M (males), F (females) and T (total).
+    + [```sex_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L235-L239) defines how the Spanish names for the sexes are determined, so longer, full names corresponding to each sex are replaced by the Eurostat standard, M (males), F (females) and T (total).
 
-    + [```week_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L235) is a dictionary with the month (1 and 7) as keys and the corresponding week of the year (1 and 26) for which the data will be matched. This object is similar to ```date_ref```, however, the conversion made by ```date_ref``` is dependent on the parameter **date** of the function, which is not the case with ```week_dict```.
+    + [```week_dict```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L242-L245) is a dictionary with the month (1 and 7) as keys and the corresponding week of the year (1 and 26) for which the data will be matched. This object is similar to ```date_ref```, however, the conversion made by ```date_ref``` is dependent on the parameter **date** of the function, which is not the case with ```week_dict```.
 
-2. A [loop](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L247) goes through the raw data points and performs several actions inside of it:
+2. A [loop](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L247-L279) goes through the raw data points and performs several actions inside of it:
 
     + Data points for the country's total are omitted given that we intend to perform these aggregations from within the Shiny App. These would also occupy unnecessary space in the repository.
 
@@ -510,13 +510,17 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
     + The rest of the data is acquired, appended to lists and a date column is generated.
 
-3. The ```df``` dictionary is [converted](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L247) to a pandas DataFrame for easier manipulation. Then an empty *age_group* column is created, which later on will replace the *age* column, as to classify individuals by age group using the Eurostat format from the deaths dataset.
+3. The ```df``` dictionary is [converted](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L282) to a pandas DataFrame for easier manipulation. Then an empty *age_group* column is created, which later on will replace the *age* column, as to classify individuals by age group using the Eurostat format from the deaths dataset.
 
 4. After assigning all individuals of all ages an age group, the *age* column is [dropped](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L297), and the *age_group* column is [renamed](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L298) to *age*, to match the column names of the deaths dataset. 
 
 5. The dataset is grouped by all identifying columns (CCAA, sex, date and age) and applied the [```sum()```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L301) method on the grouping. The purpose of this is to sum individuals of specific ages as to have the sum of each age group instead of multiple instances of each age group per set of the identifying columns.
 
-6. The *year* and *week* columns are obtained from the *date* column. And subsequently, a *marker* column is created as a way to identify entries when
+6. The *year* and *week* columns are [obtained](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L304-L307) from the *date* column. And subsequently, a *marker* column is created as a way to identify entries at a later step. The *marker* column is created by [concatenating](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L310) the *CCAA*, *sex* and *age* columns, which are the most important columns to identify entries.
+
+7. The unique markers are [obtained](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L313) from the *marker* column. These are then [used](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L315-L321) to obtain the amount of unique years in the dataset, the purpose of this is to determine whether we need to interpolate one year ahead or not. This means that the last data point obtained from the INE API was a week 26 data point, which would require us to look ahead until week 26 of the following year, if the data point was a week 1 data point, we would only need to look ahead within the current year.
+
+8. 
 
 ## Data hosting
 
