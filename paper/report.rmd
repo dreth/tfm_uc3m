@@ -113,7 +113,7 @@ As it is with any demographic measure, knowing general metrics about population 
 
 - Ordinary people. Perhaps mere curiosity or desire to be informed, being able to know in a timely manner whether the population is at risk or healthy helps people make choices regarding how to take care of themselves or how to take care of their loved ones.
 
-# Metrics computed by the application
+# Metrics computed by the application {#Metrics}
 
 The application's visualizations are especially focused on 3 specific mortality metrics inspired by [the regular rolling report by UK's Institute and Faculty of Actuaries]():
 
@@ -452,6 +452,8 @@ The biggest challenge that the *deaths* dataset imposed was dealing with the ind
 
 The function that performs all these tasks is the [```generate_death_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L84) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
 
+The pipeline steps are the following:
+
 1. We define a [```fields```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L88) dictionary to obtain  all the relevant elements we want from the response JSON object. Each one of them corresponds to either the ```keys``` or ```values``` of the object, as JSONs are interpreted as *dictionaries* in python, which makes them easier to work with.
 
     + Here we exclude weeks marked as *W99* by Eurostat, which are basically empty values.
@@ -471,6 +473,43 @@ The function that performs all these tasks is the [```generate_death_df```](http
 7. The *year_week* column is dropped and the resulting, cleaned up DataFrame is returned.
 
 ### Pipeline for the population dataset {#PopDatasetPipeline}
+
+The population dataset response JSON came with challenges:
+
+- The raw data had the full names of the CCAAs, so in order to keep the Eurostat standard, as it is shorter and would occupy less space in the repo, they were replaced.
+
+- The sex also needed to be replaced, as it was in Spanish and it didn't go in line with the deaths dataset.
+
+- The data is gathered on a bi-yearly basis, therefore, a linear interpolation between the two data points that INE records (in January and June) had to be applied to have weekly data. The linear interpolation had to also look ahead about 6 months, given that the data recorded by INE in either June or January takes about a month to be published. The deaths data is often much more up to date, as it is already recorded on a weekly basis, which sometimes causes the deaths data to go ahead of the population data. 
+
+- The sheer size of the obtained JSON and its somewhat odd formatting compared to the previous one obtained from Eurostat requires a large inefficient loop to process. This looping was done using *numpy* arrays, which are often much faster than *pandas* DataFrames, this introduced a few new challenges in order to keep the updating script much more efficient.
+
+- The data came for individual ages, therefore, to match and be able to perform the computation of the metrics [previously mentioned](#Metrics), grouping the people within the same specific age groups present in the previous dataset is needed.
+
+All the steps are performed within the [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L190) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. The pipeline steps are the following:
+
+1. Define several dictionaries with reference data and replacements to align the formatting with the deaths dataset. The dictionaries defined are:
+    
+    + [```df```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L197), which is going to eventually become the final population dataset. It contains as keys the names of the columns of the final population dataset and as values empty lists.
+
+    + [```date_ref```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L206) is a dictionary that includes the week as obtained from the API, which originally labels the January data point as 26 and the June data point as 27. These are matched in the object with roughly equivalent dates, Jan. 1st for 26 and Jul. 1st for 27. The conversion performed by this object remains only if the parameter **date** is **True**.
+
+    + [```ccaa_eurostat_replace_dict```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L212) is a dictionary that will serve as a reference for replacing the CCAA full names with the shorter Eurostat standard, which consists of the country's ISO 3166-1 alpha-2 code (*ES* for Spain) and a number per NUTS 2 statistical region (ex. *ES11* = *Galicia*).
+
+    + [```sex_dict```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L235) defines how the Spanish names for the sexes are determined, so longer, full names corresponding to each sex are replaced by the Eurostat standard, M (males), F (females) and T (total).
+
+    + [```week_dict```](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L235) is a dictionary with the month (1 and 7) as keys and the corresponding week of the year (1 and 26) for which the data will be matched. This object is similar to ```date_ref```, however, the conversion made by ```date_ref``` is dependent on the parameter **date** of the function, which is not the case with ```week_dict```.
+
+2. A [loop](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L247) goes through the raw data points and performs several actions inside of it:
+
+    + Data points for the country's total are omitted given that we intend to perform these aggregations from within the Shiny App. These would also occupy unnecessary space in the repository.
+
+    + The metadata elements from each entry's header which contain sex, age and CCAA are [split](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py#L251) and passed onto the previously defined dictionaries. This replaces each entry's basic identifying information with the Eurostat standard.
+
+    + The rest of the data is acquired, appended to lists and a date column is generated.
+
+3. 
+
 
 
 
