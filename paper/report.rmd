@@ -444,7 +444,7 @@ The INE API returns a JSON file with somewhat unique formatting, therefore, in o
 
 6. The acquired/updated dataset is exported as a CSV file.
 
-## Data pre-processing pipeline
+## Data pre-processing pipeline {#PreProcessingPipeline}
 
 After the data is acquired, then a pipeline to convert the raw JSON response from the APIs must be ran in order to construct actionable dataframes to store and use for the app. In these two sections there will be a description of all the steps in the pipeline for each of the two datasets. 
 
@@ -540,7 +540,17 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
     + The population column of the previously created array ```new_p``` is [replaced](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L391) with the interpolation. Then the values of the array which shall constitute the finalized dataframe (```df_array```) are [filled](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L394) with the prediction and the rest of the data.
 
-11. After the nested loop, the last value is saved to the [```last_val```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L397) variable. The ending week is saved to the [```week_end```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L400) variable. The interpolation ranges for the future population prediction (the one up to one year after the last data point) is estimated using the ratio between the starting population of the 
+11. After the nested loop, the last value is saved to the [```last_val```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L397) variable. The ending week is saved to the [```week_end```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L400) variable. The interpolation ranges for the future population prediction (the one up to one year after the last data point) is estimated using the ratio between the population at the starting week of the period in question and the population at the subsequent weeks.
+
+12. If the last week of the last data point obtained from INE is a 1st week, then the weeks added forward span the time between week 1 and week 26 of that same year, if it's a 26th week, then the weeks added forward span the time between week 26 and week 52 of that same year. 
+
+13. The estimation is then added to the array at its corresponding position. Then the array is [converted](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L422) into a DataFrame, the columns are [renamed](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L423) with the previously defined names. The marker column is [dropped](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L425). Empty values are [removed](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L428) (as we had previously overestimated the size of the DataFrame).
+
+14. Only data up until the latest week in the deaths dataset is [kept](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L431). Empty values are [removed](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L434) from the DataFrame, and the columns are finally [reordered](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L441) prior to being outputted in order to match the column order of the deaths dataset.
+
+## Dataset update methodology after pre-processing
+
+After the data is ran through the [pre-processing pipeline](#PreProcessingPipeline), the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L447-L488) is ran when performing an update. This function goes through several steps in order to avoid replacing the entire datasets with each update.
 
 
 
