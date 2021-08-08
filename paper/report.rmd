@@ -550,9 +550,17 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
 ## Dataset update methodology after pre-processing
 
-After the data is ran through the [pre-processing pipeline](#PreProcessingPipeline), the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L447-L488) is ran when performing an update. This function goes through several steps in order to avoid replacing the entire datasets with each update.
+After the data is ran through the [pre-processing pipeline](#PreProcessingPipeline), the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L447-L488) is ran when performing an update. This function goes through several steps in order to avoid replacing the entire datasets with each update. The steps are as follows:
 
+1. First the data is [read](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L454) from the repository.
 
+2. A marker column is [created](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L457-L458) to identify entries in both the current dataset within the repository tree and the fully updated dataset (the one obtained and treated by the previous two functions ```generate_death_df``` and ```generate_pop_df``` in the pre-processing steps).
+
+3. A [```to_add```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L461) object is created filtering the elements in the updated dataset that are not in the current dataset, the new elements.
+
+4. Only elements in the current dataset are [kept](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L464) in the updated dataset, this way we define what is going to be updated.
+
+5. A [```to_keep```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L467) object is created filtering only elements in the current dataset that are
 
 ## Data hosting
 
