@@ -560,17 +560,37 @@ After the data is ran through the [pre-processing pipeline](#PreProcessingPipeli
 
 4. Only elements in the current dataset are [kept](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L464) in the updated dataset, this way we define what is going to be updated.
 
-5. A [```to_keep```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L467) object is created filtering only elements in the current dataset that are
+5. A [```to_keep```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L467) object is created filtering only elements in the current dataset that are not in the modified ```updated_dataset``` DataFrame, these are elements that are no longer provisional or new and will be kept in the database.
+
+6. A [```to_update```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L470) object is created with only the ielements in the current dataset that are in the modified ```updated dataset```, these are values that are still considered provisional and could carry some updates (perhaps mode deaths or births being registered in the provisional period). These are then subsequently [updated](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L473).
+
+7. All three datasets are [concatenated](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L482), the marker column is [dropped](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L485) and the dataset is [returned](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L488) with a clean index.
 
 ## Data hosting
 
+The data is hosted in both the [dreth/tfm_uc3m](https://github.com/dreth/tfm_uc3m) repository and the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository, however, the newest data, and the one that is pulled every time the app is launched from docker (to check for changes) is contained in the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository.
+
+Every time a user performs a database update through the docker container, the application will push the changes to the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository.
+
 # Appendix
+
+This project has a very large amount of code, therefore only some code chunks from the Python, R and Docker parts will be shown in this appendix. All the code shown in the appendix is from what has been written up to August 2021. Any future extra additions to the application will be in the displayed in the project's [repository](https://github.com/dreth/tfm_uc3m).
+
+The last appendix will show the project repository tree structure, with an explanation of each file in the [main repository's](https://github.com/dreth/tfm_uc3m) file tree, their purpose and what they contain.
 
 ## Appendix A: Python
 
+The first component of the project is the data. All the data querying and pre-processing parts of the project are written in python. There's several functions that do different things. In this section, each one will be explained and linked to the specific lines of code on github that define them. 
+
+There are 3 python scripts in this project:
+
+- [**dbs_check.py**](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/dbs_check.py): is a script ran first at the application's runtime
+
 ## Appendix B: R
 
-## Appendix C: Project repository tree structure
+## Appendix C: Docker
+
+## Appendix D: Project repository tree structure
 
 \definecolor{darkspringgreen}{rgb}{0.09, 0.45, 0.27}
 
