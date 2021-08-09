@@ -378,6 +378,18 @@ e_{x} = \frac{T_x}{l_x}
 
 \newpage
 
+# Technologies used
+
+The application utilizes several tools/services to perform the entire process of data querying, pre-processing, hosting and plotting.
+
+- [**Python**](https://www.python.org/) is general purpose object-oriented programming language used within this project for the entirety of the data querying, pre-processing and updating. 
+
+- [**R**](https://www.r-project.org/) is a programming language and statistical computing environment. It's used within the project for the front end and back end of the dashboard, along with computations of all the metrics, visualizations and generation of maps within the application.
+
+- [**Docker**](https://www.docker.com/) is a set of platform as a service products that use OS-level virtualization to package software in *containers*. It's used within the project to containerize the application into a simple package, which allows users to run the application with minimal setup and by installing virtually no requirements (other than Docker itself). The container is also hosted in [Docker Hub](https://hub.docker.com/r/dreth/tfm_uc3m).
+
+- [**GitHub**](https://github.com) is a hosting provider for software development projects and version control using Git. We use it to host the application's [code](https://github.com/dreth/tfm_uc3m), the [Docker container](https://github.com/dreth/tfm_uc3m/pkgs/container/tfm_uc3m) and the [data](https://github/tfm_uc3m_data) used by the application.
+
 # Methodology
 
 ## Data querying and updating
@@ -576,7 +588,7 @@ Every time a user performs a database update through the docker container, the a
 
 # Appendix
 
-This project has a very large amount of code, therefore only some code chunks from the Python, R and Docker parts will be shown in this appendix. All the code shown in the appendix is from what has been written up to August 2021. Any future extra additions to the application will be in the displayed in the project's [repository](https://github.com/dreth/tfm_uc3m).
+This project has a large amount of code, therefore only some code chunks from the Python, R and Docker parts will be shown in this appendix. All the code shown in the appendix is from what has been written up to August 2021. Any future extra additions to the application will be in the displayed in the project's [repository](https://github.com/dreth/tfm_uc3m).
 
 The last appendix will show the project repository tree structure, with an explanation of each file in the [main repository's](https://github.com/dreth/tfm_uc3m) file tree, their purpose and what they contain.
 
@@ -666,6 +678,7 @@ There are many other functions defined in the [**functions.py**](https://github.
 
 The script is somewhat long with between 70 and 80 lines of code and it can be fully seen on its [corresponding page](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py) within the repository file tree.
 
+\newpage
 
 ## Appendix B: R
 
@@ -770,9 +783,122 @@ label = h4(strong('Generate plot'))
 
 \normalsize
 
+\newpage
+
 ## Appendix C: Docker
 
+In order to containerize the application, Docker was used. The container to create the application was created from the following [**Dockerfile**](https://github.com/dreth/tfm_uc3m/blob/main/docker/Dockerfile). 
 
+To showcase each block, the file performs the following steps:
+
+1. The rocker/shiny-verse image is imported with all its previous imports. This saves us the trouble of having to manually acquire the base system and all the requirements to run Shiny.
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+FROM rocker/shiny-verse:latest
+```
+
+\normalsize
+
+2. Some basic system requirements are pulled from the repositories, like python and git.
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+# Get required packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    python3.8 \
+    python3-pip \
+    python3-setuptools \
+    python3-dev \
+    libudunits2-dev \
+    libgdal-dev \
+    git
+```
+
+\normalsize
+
+3. The python and R packages required to run the application are installed.
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+# installing python libraries
+RUN pip3 install pandas
+RUN pip3 install numpy
+RUN pip3 install datetime
+RUN pip3 install requests
+
+# installing r libraries
+RUN R -e "install.packages('shinydashboard')"
+RUN R -e "install.packages('shinyjs')"
+RUN R -e "install.packages('shinythemes')"
+RUN R -e "install.packages('pracma')"
+RUN R -e "install.packages('ggplot2')"
+RUN R -e "install.packages('stringr')"
+RUN R -e "install.packages('MASS')"
+RUN R -e "install.packages('plotly')"
+RUN R -e "install.packages('leaflet')"
+RUN R -e "install.packages('rgdal')"
+RUN R -e "install.packages('zoo')"
+RUN R -e "install.packages('devtools')"
+RUN R -e "require(devtools); install.packages('Rcpp', version='1.0.7')"
+RUN R -e "install.packages('RcppRoll')"
+```
+
+\normalsize
+
+4. The repositories are cloned.
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+# cloning the project repos
+RUN git clone https://github.com/dreth/tfm_uc3m.git
+RUN git clone https://github.com/dreth/tfm_uc3m_data.git
+```
+
+\normalsize
+
+\newpage
+
+5. TCP Port 3838 is exposed in order to locally run the app at [http://0.0.0.0:3838]{color="blue"}. 
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+# select port
+EXPOSE 3838/tcp
+```
+
+\normalsize
+
+6. The following somewhat long command is the one launched by the container every time it opens, it performs the following steps:
+
+    + Browse to the main cloned repository folder and pull from GitHub (in case there's any new changes).
+
+    + Browse to the data cloned repository folder and pull from GitHub (in case there's any new changes).
+
+    + Copy and replace the content from the data repository into the main repository's data folder. Effectively locally updating the data in the main repository if there's changes.
+
+    + Run the application.
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+# running app from repo
+CMD cd ./tfm_uc3m && git pull && cd ../tfm_uc3m_data && 
+    git pull && cp -r ./* ../tfm_uc3m/data && 
+    cd ../tfm_uc3m/dashboard && 
+    R -e "shiny::runApp(port = 3838, host = '0.0.0.0', launch.browser=FALSE)"
+```
+
+\normalsize
+
+\newpage
 
 ## Appendix D: Project repository tree structure {#AppendixD}
 
