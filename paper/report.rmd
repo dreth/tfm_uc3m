@@ -13,6 +13,8 @@ output:
 classoption: a4paper
 urlcolor: blue
 linestretch: 1.35
+bibliography: references.bib
+nocite: '@*'
 ---
 
 ```{r setup, include=FALSE}
@@ -382,7 +384,7 @@ e_{x} = \frac{T_x}{l_x}
 
 The application utilizes several tools/services to perform the entire process of data querying, pre-processing, hosting and plotting.
 
-- [**Python**](https://www.python.org/) is general purpose object-oriented programming language used within this project for the entirety of the data querying, pre-processing and updating. 
+- [**Python**](https://www.python.org/) is an interpreted general-purpose object-oriented programming language. It's used within this project for the entirety of the data querying, pre-processing and updating. 
 
 - [**R**](https://www.r-project.org/) is a programming language and statistical computing environment. It's used within the project for the front end and back end of the dashboard, along with computations of all the metrics, visualizations and generation of maps within the application.
 
@@ -742,7 +744,7 @@ The function can compute several CMRs if the given parameters are vectors of siz
 
 This is the longest script of the project with ~750+ lines of code, some are whitespace or comments, but the script is quite long. 
 
-Here we can see a preview of a function being defined as an [event handler for the ```plotMortalityButton```](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L252-L264), which is a button shown in the mortality section of the app. Its specific functionality is to run a function that generates a plot as a result of the button being clicked. This very small chunk of the code simply passes values from the applications input fields into a function called [```gen_df_and_plot_mortality```](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L114-L131), which in turn calls 2 functions, one being [```factors_df``` in **global.R***](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/global.R#L269-L336) and another one being [```plot_metric``` in **server.R**](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L18-L111), both of these work together to generate a DataFrame and then a plot with the specified parameters. 
+Here we can see a preview of a function being defined as an [event handler for the ```plotMortalityButton```](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L252-L264), which is a button shown in the mortality section of the app. Its specific functionality is to run a function that generates a plot as a result of the button being clicked. This very small chunk of the code simply passes values from the applications input fields into a function called [```gen_df_and_plot_mortality```](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L114-L131), which in turn calls 2 functions, one being [```factors_df``` in **global.R**](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/global.R#L269-L336) and another one being [```plot_metric``` in **server.R**](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L18-L111), both of these work together to generate a DataFrame and then a plot with the specified parameters. 
 
 The code chunk is the following:
 
@@ -976,6 +978,12 @@ The project consists of two repositories and their respectives [**subfolders**]{
 - [**pop.csv**]{color="purple"}: This plaintext file is the database file for the app containing the deaths database, corresponds to a query to the *9681* database to INE, with all the cleaning and manipulation seen in the python scripts within the [**api**]{color="darkspringgreen"} folder.
 
 - [**README.md**]{color="red"}: Readme file explaining the source of the data and where the repository stems from, as well as linking to the main repository [*dreth/tfm_uc3m*](https://github.com/dreth/tfm_uc3m)
+
+\newpage
+
+# References
+
+<div id="refs"></div>
 
 ```{bash, echo=FALSE, warning=FALSE, message=FALSE}
 pdftk "./coverpage/coverpage.pdf" "./report.pdf" cat output "./final_report.pdf"
