@@ -548,7 +548,7 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
 14. Only data up until the latest week in the deaths dataset is [kept](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L431). Empty values are [removed](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L434) from the DataFrame, and the columns are finally [reordered](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L441) prior to being outputted in order to match the column order of the deaths dataset.
 
-## Dataset update methodology after pre-processing
+## Dataset update methodology after pre-processing {#DatasetUpdateMethodology}
 
 After the data is ran through the [pre-processing pipeline](#PreProcessingPipeline), the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L447-L488) is ran when performing an update. This function goes through several steps in order to avoid replacing the entire datasets with each update. The steps are as follows:
 
@@ -572,6 +572,8 @@ The data is hosted in both the [dreth/tfm_uc3m](https://github.com/dreth/tfm_uc3
 
 Every time a user performs a database update through the docker container, the application will push the changes to the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository.
 
+\newpage
+
 # Appendix
 
 This project has a very large amount of code, therefore only some code chunks from the Python, R and Docker parts will be shown in this appendix. All the code shown in the appendix is from what has been written up to August 2021. Any future extra additions to the application will be in the displayed in the project's [repository](https://github.com/dreth/tfm_uc3m).
@@ -582,15 +584,197 @@ The last appendix will show the project repository tree structure, with an expla
 
 The first component of the project is the data. All the data querying and pre-processing parts of the project are written in python. There's several functions that do different things. In this section, each one will be explained and linked to the specific lines of code on github that define them. 
 
-There are 3 python scripts in this project:
+There are 3 python scripts in this project, these are explained in detail along with all the files in the repository in the [Appendix D](#AppendixD):
 
-- [**dbs_check.py**](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/dbs_check.py): is a script ran first at the application's runtime
+- [**dbs_check.py**](https://github.com/dreth/tfm_uc3m/blob/main/api/dbs_check.py): The script imports the [```check_eurostat_provisional```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L50-L142) and [```check_INE_latest```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L153-L187) functions from the [**functions.py**](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. After doing so, it runs them and writes the information obtained to the log files contained in the logs folder and prints a diagnostic message. 
+
+Here we can see the entire script as it is quite short:
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+# %% IMPORTING FUNCTIONS TO USE
+from functions import check_eurostat_provisional, check_INE_latest
+
+# %% RUN SCRIPT AND UPDATE LOG FILES
+print('\nCalculating database information...\n')
+
+# obtaining eurostat info
+eurostat_dates = check_eurostat_provisional(earliest='both')
+
+# logging dates
+with open('./logs/last_eurostat_update.log', 'w+') as f:
+    latest_date = eurostat_dates[1]
+    f.write(f'Last date obtainable from Eurostat DB: {latest_date[0:4]}, week: {latest_date[-2:]}')
+
+with open('./logs/last_ine_update.log', 'w+') as f:
+    latest_date = check_INE_latest()
+    f.write(f'Last date obtainable from INE DB: {latest_date[0:4]}, week: {latest_date[-2:]}')
+
+with open('./logs/earliest_eurostat_provisional.log', 'w+') as f:
+    earliest_date = eurostat_dates[0]
+    f.write(f'Earliest provisional date from Eurostat DB: {earliest_date[0:4]}, week: {earliest_date[-2:]}')
+
+# done (:
+print('\nDatabase information obtained, Check DB info section for more information\n')
+```
+
+\normalsize
+
+\newpage
+
+- [**functions.py**](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py): This script includes all the function definitions for querying, pre-processing and updating the database. 
+
+Here we can see the [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L22-L47) function, which is used to query the Eurostat API and obtain a response JSON with the data for the deaths dataset. The function essentially concatenates the fields used to filter the database into a URL that when performing a GET request to, returns the JSON. It is as follows:
+
+\footnotesize
+
+```{python, eval=FALSE, echo=TRUE}
+# %% QUERY EUROSTAT FUNCTION
+def query_eurostat(**kwargs):
+    # Iterating through kwargs to fill URL fields
+    for param, value in kwargs.items():
+        # URL
+        if param == 'dataset':
+            url = f'http://ec.europa.eu/eurostat/wdds/rest/data/v2.1/json/en/{value}?'
+        elif param == 'sinceTimePeriod':
+            field = f'sinceTimePeriod={value}&'
+        elif param == 'geo':
+            if type(value) == list:
+                field = ''.join([f'geo={x}&' for x in value])
+            else:
+                field = f'geo={value}'
+        elif param == 'age':
+            field = f'age={value}'
+        elif param == 'unit':
+            field = f'unit={value}'
+        elif param == 'sex':
+            field = f'sex={value}'
+        # appending to URL
+        if param != 'dataset':
+            url = f'{url}&{field}'
+
+    # appending to URL
+    return json.loads(requests.get(url).text)
+```
+
+\normalsize
+
+There are many other functions defined in the [**functions.py**](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script, it has well over 400 lines of code.
+
+- [**query.py**](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py): This script is essentially the set of steps performed to update the database. It queries the data, passes it to the corresponding pre-processing functions (whose steps are described in its corresponding [section](#PreProcessingPipeline)), and then it updates the database in an efficient manner as described in the [update methodology](#DatasetUpdateMethodology) section.
+
+The script is somewhat long with between 70 and 80 lines of code and it can be fully seen on its [corresponding page](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py) within the repository file tree.
+
 
 ## Appendix B: R
 
+Everything coded in R corresponds to the application itself. There are 3 R scripts in particular, these are described in detail in [Appendix D](#AppendixD)
+
+- [**global.R**](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/global.R): This script includes many object definitions used for the UI along with some key elements ran sequentially during runtime and all the functions used to compute the previously mentioned [metrics](#Metrics).
+
+The script is very long with over 500 lines of code. It can be entirely seen in the [public repository](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/global.R). However, due to how key this script is, and how important the **CMR** function in particular is, as it is the baseline of most other mortality measures computed by the application, it's reasonable to show it and briefly describe it:
+
+\tiny
+
+```{R, eval=FALSE, echo=TRUE}
+# Cumulative mortality rate
+CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
+    # initialize number of deaths
+    death_num <- 0
+
+    # assuming multiple years
+    # cumulative deaths
+    numerator <- death %>% dplyr::filter(year %in% yr & week %in% 1:wk & ccaa %in% ccaas & age %in% age_groups & sex == sexes)
+
+    if (length(yr) > 1) {
+        # multiple years
+        numerator <- aggregate(numerator$death, list(year = numerator$year), FUN=sum)
+        death_num <- numerator$x
+    } else {
+        # individual years+weeks
+        numerator <- aggregate(numerator$death, list(year = numerator$year, week = numerator$week), FUN=sum)
+        death_num <- sum(numerator$x)
+    }    
+    
+    # pop for week wk
+    period_pop <- pop %>% dplyr::filter(year %in% yr & week == wk & sex == sexes & age %in% age_groups & ccaa %in% ccaas)
+
+    # assuming multiple years
+    if (length(yr) > 1) {
+        # multiple years
+        period_pop <- aggregate(period_pop$pop, list(year = period_pop$year), FUN=sum)
+        if (cmr_c==TRUE) {
+            ratio <- tryCatch(mean(death_num / period_pop$x), warning=function(w) {return(c(mean(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1]),NA))})
+        } else {
+            ratio <- tryCatch(death_num / period_pop$x, warning=function(w) {return(c(death_num[1:length(yr)-1] / period_pop$x[1:length(yr)-1],NA))})
+        }
+    } else {
+        # individual years+weeks
+        period_pop <- aggregate(period_pop$pop, list(year = period_pop$year, week = period_pop$week), FUN=sum)
+        ratio <- death_num / sum(period_pop$x)
+    }
+    
+    return(ratio)
+} 
+```
+
+\normalsize
+
+The **CMR** function takes as imput the week, year, CCAA, age group, sex and whether it's computing ```cmr_c``` which is a boolean value used by another function to average a set of cumulative mortality rates. After taking these parameters the function basically filters the death and population datasets by the previously mentioned parameters, then aggregates the values for the amount of deaths between week 1 and *wk* (the parameter passed to the function) and population at week *wk*, then it computes the ration between them.
+
+The function can compute several CMRs if the given parameters are vectors of size larger than 1. This allows us to compute a large amount of CMRs in a single function call.
+
+- [**server.R**](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/server.R): The server script handles the entire back end for the application and gives functionality to the elements in the front end. 
+
+This is the longest script of the project with ~750+ lines of code, some are whitespace or comments, but the script is quite long. 
+
+Here we can see a preview of a function being defined as an [event handler for the ```plotMortalityButton```](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L252-L264), which is a button shown in the mortality section of the app. Its specific functionality is to run a function that generates a plot as a result of the button being clicked. This very small chunk of the code simply passes values from the applications input fields into a function called [```gen_df_and_plot_mortality```](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L114-L131), which in turn calls 2 functions, one being [```factors_df``` in **global.R***](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/global.R#L269-L336) and another one being [```plot_metric``` in **server.R**](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L18-L111), both of these work together to generate a DataFrame and then a plot with the specified parameters. 
+
+The code chunk is the following:
+
+\footnotesize
+
+```{R, eval=FALSE, echo=TRUE}
+# Action button to generate mortality plots
+genMortPlot <- eventReactive(input$plotMortalityButton, {
+    gen_df_and_plot_mortality(
+        wk=WEEK, 
+        yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
+        ccaas=switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
+        age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
+        sexes=input$selectSexesMortality,
+        type=input$plotTypeMortality,
+        week_range_plot=input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2],
+        yr_range_plot=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2],
+        device_plot=input$usePlotlyOrGgplotMortality
+    )
+})
+```
+
+\normalsize
+
+The function [```gen_df_and_plot_mortality```](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/server.R#L114-L131) is defined a few lines before.
+
+- [**ui.R**](https://github.com/dreth/tfm_uc3m/blob/main/dashboard/ui.R): this script defines the entire front end for the app. It's also quite a long script at over 300 lines of code. 
+
+Here we can see the definition to plot the life expectancy plots in the life expectancy section. It's simply an [actionButton called *plotLifeExpButton*](https://github.com/dreth/tfm_uc3m/blob/report_ref/dashboard/ui.R#L140-L142). It's defined as follows:
+
+\footnotesize
+
+```{R, eval=FALSE, echo=TRUE}
+actionButton('plotLifeExpButton',
+label = h4(strong('Generate plot'))
+)
+```
+
+\normalsize
+
 ## Appendix C: Docker
 
-## Appendix D: Project repository tree structure
+
+
+## Appendix D: Project repository tree structure {#AppendixD}
 
 \definecolor{darkspringgreen}{rgb}{0.09, 0.45, 0.27}
 
@@ -603,7 +787,7 @@ The project consists of two repositories and their respectives [**subfolders**]{
         - [**earliest_eurostat_provisional.log**]{color="red"}: Eurostat marks data as provisional when it can still be updated, as new deaths might occur. This file logs the earliest data entry marked as provisional.
         - [**last_eurostat_update.log**]{color="red"}: This file logs the last week for which there is available and updated data from Eurostat for Spain within the database *demo_r_mwk2_05*.  
         - [**last_ine_update.log**]{color="red"}: This file logs the last week for which there is available and updated data from INE for table No. *9681*.
-    - [**dbs_check.py**]{color="red"}: This script obtains a small sample of data from Eurostat and Ine and checks when the earliest provisional data point is, what is the latest obtainable week of data from both Eurostat and INE and writes it in the log files contained within [**logs**]{color="darkspringgreen"}.
+    - [**dbs_check.py**]{color="red"}: This script obtains a small sample of data from Eurostat and INE and checks when the earliest provisional data point is, what is the latest obtainable week of data from both Eurostat and INE and writes it in the log files contained within [**logs**]{color="darkspringgreen"}.
     - [**functions.py**]{color="red"}: This script contains all the functions used for fetching, manipulating and outputting the data obtained from the aggregated data sources' respective APIs (Eurostat and INE).
     - [**query.py**]{color="red"}: This script will run a pre-constructed pipeline where the data is systematically queried per age group, manipulated and where new entries are added to the *.csv* files contained within the [**data**]{color="darkspringgreen"} folder.
 
