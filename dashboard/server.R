@@ -736,7 +736,9 @@ shinyServer(
             gen_chloropleth(
                 dataset=df,
                 library=input$plotLibraryMaps,
-                metric=input$plotMetricMaps
+                metric=input$plotMetricMaps,
+                wk=input$weekSliderSelectorMaps, 
+                yr=input$yearSliderSelectorMaps
             )
         })
 

@@ -455,7 +455,7 @@ gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp_leafl
 }
 
 # GENERATE MAP
-gen_chloropleth <- function(dataset, metric, library='leaflet', leaflet_provider="CartoDB.DarkMatterNoLabels", palette="Reds") {
+gen_chloropleth <- function(dataset, metric, wk, yr, library='leaflet', leaflet_provider="CartoDB.DarkMatterNoLabels", palette="Reds") {
     # USING LEAFLET
     if (library == 'leaflet') {
         # colours
@@ -487,8 +487,10 @@ gen_chloropleth <- function(dataset, metric, library='leaflet', leaflet_provider
         esp_df <- esp_df %>% left_join(dataset@data, by = 'id') %>% fill(metric)
 
         # plot title
+        plotTitle <- str_interp("${MAPS_PLOT_TYPE_R[metric]} for week: ${wk} of year: ${yr}")
 
         # legend title
+        legendTitle <- MAPS_PLOT_TYPE_R[metric]
 
         # plotting the map
         ggplot() + 
@@ -503,9 +505,11 @@ gen_chloropleth <- function(dataset, metric, library='leaflet', leaflet_provider
                 legend.text.align = 0,
                 legend.text = element_text(size = 14, hjust = 0),
                 legend.title = element_text(size = 20),
-                plot.title = element_text(size = 28, hjust = 0.8),
+                plot.title = element_text(size = 20, hjust = 0.8),
                 panel.border = element_blank()
-            ) 
+            ) +
+            labs(fill=legendTitle) +
+            ggtitle(plotTitle)
     }
 }
 

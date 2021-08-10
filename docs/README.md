@@ -1,5 +1,3 @@
-# Docs
+# Documentation
 
-Documentation for the app.
-
-Coming soon.
+## Sections
