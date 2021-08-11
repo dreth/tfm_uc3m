@@ -102,7 +102,7 @@ If you have the anaconda distribution installed as your python interpreter, most
 conda install requests json numpy pandas datetime copy
 ```
 
-#### Bash scripts
+#### Shell scripts
 
 Your system should also be able to run shell scripts, therefore it is recommended that you use a *linux* or *macOS* system or the *WSL* on *Windows*.
 
