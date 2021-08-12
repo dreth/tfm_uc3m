@@ -121,7 +121,7 @@ As it is with any demographic measure, knowing general metrics about population 
 
 # Metrics computed by the application {#Metrics}
 
-The application's visualizations are especially focused on 3 specific mortality metrics inspired by [the regular rolling report by UK's Institute and Faculty of Actuaries]():
+The application's visualizations are especially focused on 3 specific mortality metrics inspired by [the regular rolling report by UK's Institute and Faculty of Actuaries](https://www.actuaries.org.uk/learn-and-develop/continuous-mortality-investigation/other-cmi-outputs/mortality-monitor):
 
 - [[Cumulative mortality rate]{color="black"}](#CMR)
 
@@ -590,9 +590,41 @@ Every time a user performs a database update through the docker container, the a
 
 # Application Layout
 
-The application consists of 6 sections (or tabs):
+The application consists of 6 sections (or tabs). Each tab has a set of controls and features which will be described in this section.
 
-- 
+## Mortality
+
+- **Description**: The mortality tab produces a time series plot with *week* in the x-axis and the specific mortality metric chosen (of those described in the [metrics](#Metrics)) section in the y-axis. The metrics that can be selected are: [[Cumulative mortality rate]{color="black"}](#CMR), [[Cumulative relative mortality rate]{color="black"}](#CRMR), [[Mortality improvement factor]{color="black"}](#CMIF) and [[Excess mortality]{color="black"}](#EM).
+
+
+- **Controls**: The parameters that can be modified for the plot are the following:
+
+    + *Selection of [metric](#metrics)* to plot.
+    + *Selection of the plotting library* to be used, either [*ggplot2*](https://ggplot2.tidyverse.org/) or [*plotly*](https://plotly.com/r/)
+    + *Selection of CCAA* to plot for (or aggregate for all of them). Individual CCAAs can be selected, but also multiple CCAAs can be selected, if multiple are selected, their values will be aggregated.
+    + *Selection of age group* to plot for (or aggregate for all of them). Individual age groups can be selected, but also multiple age groups can be selected, just as with CCAA, if multiple are selected, their values are aggregated.
+    + *Selection of sex* (either M/F) or total (T, which is a sum of the M and F values).
+    + *Selection of week range* to plot, between week 1 and 52. This filter applies to all the years selected.
+    + *Selection of year range* to plot. This is a discrete slider, so any range of years between 2010 and 2021 can be selected. As more data is added in the future, both the week and year slider should increase.
+    + *Generate plot* button, which should be pressed whenever the parameters are changed in order to generate the configured plot.
+
+- **Download controls**
+
+    + *Selection of predefined or custom image size*, if predefined is selected, there will be a dimension selector at the end. If custom is selected there will be 2 fields, one to select width and the second one to select height.
+    + *Selection of image format*, which will return the image using the desired formatting, the default is PNG.
+    + *Selection of image size*, if predefined, the dimension selector will show. All sizes in the predefined dimension selector are square. If custom, two number selectors show with width and height selection, any number can be inputted in them.
+
+## Maps
+
+- **Description**: The 
+
+## Life expectancy {#LifeExpLayout}
+
+## Database tables
+
+## DB info and update
+
+## Documentation
 
 \newpage
 

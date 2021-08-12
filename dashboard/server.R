@@ -681,9 +681,8 @@ shinyServer(
             } else if (input$selectAgeGroupsLifeExpTotalMaps == 'select') {
                 selectInput("selectAgeMaps",
                   label = h5(strong("Select Age group")),
-                  choices = c("",AGE_GROUPS),
-                  selected = 'Y_LT5',
-                  options = AGE_GROUPS
+                  choices = AGE_GROUPS,
+                  selected = 'Y_LT5'
                 )
             }
         })
@@ -716,11 +715,11 @@ shinyServer(
         # PLOT/TABLE OUTPUTS
         # Map data table output
         output$mapDataOutput <- renderTable({
-            genChloroplethTable()
+            genChoroplethTable()
         }, digits=10)
 
-        # Generate chloropleth map event
-        genChloropleth <- eventReactive(input$plotMapsButton, {
+        # Generate choropleth map event
+        genChoropleth <- eventReactive(input$plotMapsButton, {
             shinyjs::show('leafletMapsPlot')
             shinyjs::show('mapDataOutput')
             shinyjs::show('mapDataLabels1')
@@ -733,7 +732,7 @@ shinyServer(
                 metric=input$plotMetricMaps,
                 shape_data=switch(input$plotLibraryMaps, 'leaflet'=esp_leaflet, 'ggplot2'=esp_ggplot)
             )
-            gen_chloropleth(
+            gen_choropleth(
                 dataset=df,
                 library=input$plotLibraryMaps,
                 metric=input$plotMetricMaps,
@@ -742,8 +741,8 @@ shinyServer(
             )
         })
 
-        # Generate chloropleth map TABLE event
-        genChloroplethTable <- eventReactive(input$plotMapsButton, {
+        # Generate choropleth map TABLE event
+        genChoroplethTable <- eventReactive(input$plotMapsButton, {
             df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 
@@ -761,12 +760,12 @@ shinyServer(
         # outputting the map upon switching the plotting library
         observeEvent(input$plotLibraryMaps, {
             if (input$plotLibraryMaps == 'leaflet') {
-                output$leafletMapsPlot <- renderLeaflet({genChloropleth()})
+                output$leafletMapsPlot <- renderLeaflet({genChoropleth()})
                 shinyjs::show('leafletMapsPlot')
                 shinyjs::show('leafletMapOutput')
                 shinyjs::hide('ggplo2MapPlot')
             } else if (input$plotLibraryMaps == 'ggplot2') {
-                output$ggplot2MapPlot <- renderPlot({genChloropleth()}, 
+                output$ggplot2MapPlot <- renderPlot({genChoropleth()}, 
                                                     height = function () {session$clientData$output_ggplot2MapPlot_width})
                 shinyjs::show('ggplot2MapPlot')
                 shinyjs::hide('leafletMapsPlot')

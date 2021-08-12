@@ -458,7 +458,7 @@ gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp_leafl
 }
 
 # GENERATE MAP
-gen_chloropleth <- function(dataset, metric, wk, yr, library='leaflet', leaflet_provider="CartoDB.DarkMatterNoLabels", palette="Reds") {
+gen_choropleth <- function(dataset, metric, wk, yr, library='leaflet', leaflet_provider="CartoDB.DarkMatterNoLabels", palette="Reds") {
     # USING LEAFLET
     if (library == 'leaflet') {
         # colours

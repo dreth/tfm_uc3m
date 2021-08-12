@@ -104,69 +104,6 @@ shinyUI(
         ),
 
         # Second tab content
-        tabItem(tabName = 'lifeExp',
-          sidebarLayout(
-            sidebarPanel(
-              tags$head(includeCSS('./www/styles.css')),
-              tags$head(tags$script(src = 'dimension.js')),
-              h4(strong('Life expectancy')),
-              uiOutput('lifeExpOrTableHeaderUIOutput'),
-              radioButtons('showLifeExpPlotOrLifeTable',
-                label = h5(strong('Show plot or life table')),
-                choices = SHOW_PLOT_OR_LT,
-                selected = 'plot'
-              ),
-              radioButtons('usePlotlyOrGgplotLifeExp',
-                label = h5(strong('Plotting library')),
-                choices = PLOT_DEVICE_UI_SELECT,
-                selected = 'ggplot2'
-              ),
-              radioButtons('selectCCAALifeExpTotal',
-                label = h5(strong('Select CCAAs or Total')),
-                choices = CCAA_UI_SELECT,
-                selected = 'all'
-              ),
-              uiOutput('selectCCAALifeExpUIOutput'),
-              radioButtons('selectAgeGroupsLifeExpTotal',
-                label = h5(strong('Plot life expectancy at birth or otherwise')),
-                choices = AGE_GROUPS_UI_SELECT_LE,
-                selected = 'at_birth'
-              ),
-              uiOutput('selectAgeGroupsLifeExpUIOutput'),
-              selectInput('selectSexesLifeExp',
-                label = h5(strong('Select Sex/Total')),
-                choices = SEXES,
-                selected = 'T'
-              ),
-              uiOutput('weekSliderSelectorLifeExpUIOutput'),
-              uiOutput('yearSliderSelectorLifeExpUIOutput'),
-              actionButton('plotLifeExpButton',
-                label = h4(strong('Generate plot'))
-              ),
-              hr(),
-              uiOutput('lifeExpOrTableDownloadHeaderUIOutput'),
-              uiOutput('lifeExpPlotDownloadFormatUIOutput'),
-              radioButtons('plotDownloadSizeSelectorLifeExp',
-                label = h5(strong('Predefined or custom image size')),
-                choices = DOWNLOAD_SIZE_TOGGLE,
-                selected = 'predefined'
-              ),
-              uiOutput('plotDownloadSizeControlsLifeExpUIOutput'),
-              uiOutput('plotDownloadSizeControlsLifeExpUIOutputNS2'),
-              uiOutput('downloadPlotOrTableUIOutput')
-            ),
-
-            mainPanel(
-              plotOutput('lifeExpPlot'),
-              uiOutput('plotlyUIGenLifeExp'),
-              hidden(
-                tableOutput('lifeTableOutput')
-              )
-            )
-          )
-        ),
-
-        # Third tab content
         tabItem(tabName = 'maps',
           sidebarLayout(
             sidebarPanel(
@@ -227,6 +164,69 @@ shinyUI(
               br(),
               uiOutput('leafletMapOutput'),
               plotOutput('ggplot2MapPlot')
+            )
+          )
+        ),
+
+        # Third tab content
+        tabItem(tabName = 'lifeExp',
+          sidebarLayout(
+            sidebarPanel(
+              tags$head(includeCSS('./www/styles.css')),
+              tags$head(tags$script(src = 'dimension.js')),
+              h4(strong('Life expectancy')),
+              uiOutput('lifeExpOrTableHeaderUIOutput'),
+              radioButtons('showLifeExpPlotOrLifeTable',
+                label = h5(strong('Show plot or life table')),
+                choices = SHOW_PLOT_OR_LT,
+                selected = 'plot'
+              ),
+              radioButtons('usePlotlyOrGgplotLifeExp',
+                label = h5(strong('Plotting library')),
+                choices = PLOT_DEVICE_UI_SELECT,
+                selected = 'ggplot2'
+              ),
+              radioButtons('selectCCAALifeExpTotal',
+                label = h5(strong('Select CCAAs or Total')),
+                choices = CCAA_UI_SELECT,
+                selected = 'all'
+              ),
+              uiOutput('selectCCAALifeExpUIOutput'),
+              radioButtons('selectAgeGroupsLifeExpTotal',
+                label = h5(strong('Plot life expectancy at birth or otherwise')),
+                choices = AGE_GROUPS_UI_SELECT_LE,
+                selected = 'at_birth'
+              ),
+              uiOutput('selectAgeGroupsLifeExpUIOutput'),
+              selectInput('selectSexesLifeExp',
+                label = h5(strong('Select Sex/Total')),
+                choices = SEXES,
+                selected = 'T'
+              ),
+              uiOutput('weekSliderSelectorLifeExpUIOutput'),
+              uiOutput('yearSliderSelectorLifeExpUIOutput'),
+              actionButton('plotLifeExpButton',
+                label = h4(strong('Generate plot'))
+              ),
+              hr(),
+              uiOutput('lifeExpOrTableDownloadHeaderUIOutput'),
+              uiOutput('lifeExpPlotDownloadFormatUIOutput'),
+              radioButtons('plotDownloadSizeSelectorLifeExp',
+                label = h5(strong('Predefined or custom image size')),
+                choices = DOWNLOAD_SIZE_TOGGLE,
+                selected = 'predefined'
+              ),
+              uiOutput('plotDownloadSizeControlsLifeExpUIOutput'),
+              uiOutput('plotDownloadSizeControlsLifeExpUIOutputNS2'),
+              uiOutput('downloadPlotOrTableUIOutput')
+            ),
+
+            mainPanel(
+              plotOutput('lifeExpPlot'),
+              uiOutput('plotlyUIGenLifeExp'),
+              hidden(
+                tableOutput('lifeTableOutput')
+              )
             )
           )
         ),
