@@ -599,13 +599,13 @@ The application consists of 6 sections (or tabs). Each tab has a set of controls
 
 - **Controls**: The parameters that can be modified for the plot are the following:
 
-    + *Selection of [metric](#metrics)* to plot.
-    + *Selection of the plotting library* to be used, either [*ggplot2*](https://ggplot2.tidyverse.org/) or [*plotly*](https://plotly.com/r/)
+    + *Selection of [metric](#Metrics)* to plot.
+    + *Selection of the plotting library* to be used, either [*ggplot2*](https://ggplot2.tidyverse.org/) or [*plotly*](https://plotly.com/r/).
     + *Selection of CCAA* to plot for (or aggregate for all of them). Individual CCAAs can be selected, but also multiple CCAAs can be selected, if multiple are selected, their values will be aggregated.
     + *Selection of age group* to plot for (or aggregate for all of them). Individual age groups can be selected, but also multiple age groups can be selected, just as with CCAA, if multiple are selected, their values are aggregated.
     + *Selection of sex* (either M/F) or total (T, which is a sum of the M and F values).
     + *Selection of week range* to plot, between week 1 and 52. This filter applies to all the years selected.
-    + *Selection of year range* to plot. This is a discrete slider, so any range of years between 2010 and 2021 can be selected. As more data is added in the future, both the week and year slider should increase.
+    + *Selection of year range* to plot. This is a discrete slider, so any range of years between 2010 and up to the current year can be selected. As more data is added in the future, the year slider should increase.
     + *Generate plot* button, which should be pressed whenever the parameters are changed in order to generate the configured plot.
 
 - **Download controls**
@@ -616,7 +616,16 @@ The application consists of 6 sections (or tabs). Each tab has a set of controls
 
 ## Maps
 
-- **Description**: The 
+- **Description**: The maps tab produces a choropleth map of Spain by CCAA, where each CCAA is coloured according to the metric selected. Any metric from the [metrics](#Metrics) section can be selected.
+
+- **Controls**: The parameters that can be modified for the map are the following:
+
+    + *Selection of [metric](#Metrics)* to plot.
+    + *Selection of the plotting library* to be used, either [*ggplot2*](https://ggplot2.tidyverse.org/) or [*leaflet*](https://rstudio.github.io/leaflet/).
+    + *Selection of age group* to plot for (or aggregate for all of them). Individual age groups can be selected, but also multiple age groups can be selected, if multiple are selected, their values are aggregated. This option will change to a selection oflife expectancy at birth or a selection of a single age group.
+    + *Selection of sex* (either M/F) or total (T, which is a sum of the M and F values).
+    + *Selection of a week* to plot for, between week 1 and 52.
+    + *Selection of a year* to plot for, between 2010 and what the current year is. There are some metrics for which there is not enough historical data to compute, 
 
 ## Life expectancy {#LifeExpLayout}
 
