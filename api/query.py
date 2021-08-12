@@ -44,6 +44,7 @@ for age in age_groups:
                 # if there's 500 errors, exit script
                 if cnt == 500:
                     quit()
+                # generate query
                 new_query = {**query, **{'sex':sex, 'age':age}}
                 new_df = generate_death_df(query_eurostat(**new_query))
                 break
