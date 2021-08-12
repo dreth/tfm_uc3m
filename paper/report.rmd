@@ -588,6 +588,12 @@ The data is hosted in both the [dreth/tfm_uc3m](https://github.com/dreth/tfm_uc3
 
 Every time a user performs a database update through the docker container, the application will push the changes to the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository.
 
+# Application Layout
+
+The application consists of 6 sections (or tabs):
+
+-
+
 \newpage
 
 # Appendix
@@ -961,7 +967,8 @@ The project consists of two repositories and their respectives [**subfolders**]{
     - [**Dockerfile**]{color="red"}: This file is used to build the docker container.
 
 - [**docs**]{color="darkspringgreen"}: Folder containing the documentation for the application.
-    - README.md: Application documentation and instructions on use.
+    - [**section**]{color="darkspringgreen"}: Folder containing the markdown files used by the application to render each section's documentation. There's a markdown file per section with their respective names.
+    - [**README.md**]{color="red"}: Application documentation and instructions on use.
 
 - [**paper**]{color="darkspringgreen"}: Folder containing this report and all the files the report depends on.
 

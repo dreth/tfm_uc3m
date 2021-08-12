@@ -773,6 +773,14 @@ shinyServer(
                 shinyjs::hide('leafletMapOutput')
             }
         })
+
+# DOCS TAB -------------------------------------------------------------------------- 
+        observeEvent(input$docsSectionSelect, {
+            section <- input$docsSectionSelect
+            output$docsSectionUIOutput <- renderUI({
+                includeMarkdown(str_interp('../docs/sections/${section}.md'))
+            })
+        })
     } 
 )
 

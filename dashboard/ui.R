@@ -17,7 +17,10 @@ shinyUI(
       menuItem('Database Tables', tabName = 'databaseTable', icon = icon('hdd', lib='glyphicon')),
 
       # Fifth tab content
-      menuItem('DB info and update', tabName = 'updateDatabase', icon = icon('refresh', lib='glyphicon'))
+      menuItem('DB info and update', tabName = 'updateDatabase', icon = icon('refresh', lib='glyphicon')),
+
+      # Sixth tab content
+      menuItem('Documentation', tabName = 'docs', icon = icon('info-sign', lib='glyphicon'))
       )
     ),
     dashboardBody(id='dashboardBody',
@@ -325,6 +328,24 @@ shinyUI(
               h4(strong('Logs:')),
               br(),
               htmlOutput('consoleLogsUpdateDatabase')
+            )
+          )
+        ),
+
+        # Sixth tab content
+        tabItem(tabName = 'docs',
+          fluidPage(
+            tags$head(includeCSS('./www/styles.css')),
+            useShinyjs(),
+            wellPanel(
+              selectInput('docsSectionSelect',
+                label = h4(strong('Select section to view documentation')),
+                choices = SECTIONS
+              )
+            ),
+            br(),
+            wellPanel(
+              uiOutput('docsSectionUIOutput')
             )
           )
         )

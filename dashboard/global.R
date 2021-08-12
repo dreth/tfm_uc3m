@@ -94,6 +94,9 @@ DOWNLOAD_IMAGE_FORMAT <- c('png','jpeg','tiff','pdf','tex','bmp','eps')
 # MAP PLOT LIBRARY SELECTOR
 PLOT_LIBRARY_MAPS <- c('ggplot2','leaflet')
 names(PLOT_LIBRARY_MAPS) <- c('Static (ggplot2)', 'Interactive (leaflet)')
+# SECTION SELECTOR FOR DOCS
+SECTIONS <- c('mortality','maps','lifeExp','dbTables','dbInfo')
+names(SECTIONS) <- c('Mortality', 'Maps', 'Life expectancy', 'Database tables', 'Database information and update')
 
 # DATABASE VECTOR
 # contains databases indexed by string
