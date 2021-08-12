@@ -31,12 +31,26 @@ with open('../data/logs/update_database.log', 'w+') as f:
 death_datasets = []
 for age in age_groups:
     for sex in sexes:
+        # counter to stop after a certain amount of fails
+        cnt = 0
+        # diagnostic messages
         print(f'Querying deaths for age group: {age}, sex: {sex}...')
         with open('../data/logs/update_database.log', 'r+') as f:
             contents = f.read()
             f.write(f'Querying deaths for age group: {age}, sex: {sex}...\n')
-        new_query = {**query, **{'sex':sex, 'age':age}}
-        new_df = generate_death_df(query_eurostat(**new_query))
+        # infinite loop in case it fails
+        while True:
+            try:
+                # if there's 200 errors, exit script
+                if cnt == 200:
+                    quit()
+                new_query = {**query, **{'sex':sex, 'age':age}}
+                new_df = generate_death_df(query_eurostat(**new_query))
+                break
+            except:
+                cnt += 1 # add one failure to counter
+                print(f'Error querying Eurostat, retrying. Error count: {cnt}')
+                continue # try again
         death_datasets.append(new_df)
 
 # concatenating death datasets
@@ -57,7 +71,20 @@ print('> STEP 3 - Creating pop dataset...\n')
 with open('../data/logs/update_database.log', 'r+') as f:
     contents = f.read()
     f.write('\nSTEP 3 - Creating pop dataset...\n')
-pop_raw = query_INE_pop(start=f'{earliest_prov_date_pop}0101')
+# initiate count in case there's erros querying INE
+cnt = 0 
+while True:
+    try:
+        # if there's 200 errors, exit script
+        if cnt == 200:
+            quit()
+        pop_raw = query_INE_pop(start=f'{earliest_prov_date_pop}0101') # query INE
+        break
+    except:
+        cnt += 1 # add one to counter
+        print(f'Error querying INE, retrying. Error count: {cnt}')
+        continue # try again if there's an error
+# generating the dataframe
 pop = generate_pop_df(raw_data=pop_raw, most_recent_week=most_recent_week)
 # perform database update
 pop = perform_update_datasets(curr_path=f'{datapath}/pop.csv', db_type='pop', updated_dataset=pop)

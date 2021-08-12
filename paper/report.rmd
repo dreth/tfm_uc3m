@@ -592,7 +592,7 @@ Every time a user performs a database update through the docker container, the a
 
 The application consists of 6 sections (or tabs):
 
--
+- 
 
 \newpage
 
