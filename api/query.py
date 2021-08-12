@@ -41,8 +41,8 @@ for age in age_groups:
         # infinite loop in case it fails
         while True:
             try:
-                # if there's 200 errors, exit script
-                if cnt == 200:
+                # if there's 500 errors, exit script
+                if cnt == 500:
                     quit()
                 new_query = {**query, **{'sex':sex, 'age':age}}
                 new_df = generate_death_df(query_eurostat(**new_query))
@@ -75,8 +75,8 @@ with open('../data/logs/update_database.log', 'r+') as f:
 cnt = 0 
 while True:
     try:
-        # if there's 200 errors, exit script
-        if cnt == 200:
+        # if there's 500 errors, exit script
+        if cnt == 500:
             quit()
         pop_raw = query_INE_pop(start=f'{earliest_prov_date_pop}0101') # query INE
         break
