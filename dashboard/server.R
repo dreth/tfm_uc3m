@@ -727,7 +727,7 @@ shinyServer(
             df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 
-                age_groups=ifelse(input$plotMetricMaps != 'le', switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps), switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps)),
+                age_groups=ifelse(input$plotMetricMaps != 'le', switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps), switch(input$selectAgeGroupsLifeExpTotalMaps, 'at_birth'='Y_LT5', 'select'=input$selectAgeMaps)),
                 sexes=input$selectSexesMaps,
                 metric=input$plotMetricMaps,
                 shape_data=switch(input$plotLibraryMaps, 'leaflet'=esp_leaflet, 'ggplot2'=esp_ggplot)
@@ -746,14 +746,14 @@ shinyServer(
             df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 
-                age_groups=switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps),
+                age_groups=ifelse(input$plotMetricMaps != 'le', switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps), switch(input$selectAgeGroupsLifeExpTotalMaps, 'at_birth'='Y_LT5', 'select'=input$selectAgeMaps)),
                 sexes=input$selectSexesMaps,
                 metric=input$plotMetricMaps,
                 shape_data=esp_leaflet
             )@data
             metric <- df$metric
-            df <- data.frame(CCAA=CCAA_SHORT[df$ccaa])
-            df[,MORTALITY_PLOT_TYPE_R[input$plotMetricMaps]] <- metric
+            df <- data.frame(CCAA=CCAA_SHORT[df$ccaa], metric=metric)
+            names(df) <- c("CCAA", MORTALITY_PLOT_TYPE_R[input$plotMetricMaps])
             df
         })
 

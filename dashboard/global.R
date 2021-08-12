@@ -446,13 +446,12 @@ gen_map_data <- function(wk, yr, age_groups, sexes, metric, shape_data=esp_leafl
                     fns[[metric]](wk=wk, yr=yr, ccaas=shape_data@data$ccaa[i], age_groups=age_groups, sexes=sexes)
                 } else {
                     lt <- LT(wk=wk, yr=yr, ccaas=shape_data@data$ccaa[i], sexes=sexes)
-                }
-                
+                    lt <- lt[lt$age == age_groups,'ex']
+                }   
             },
             error=function(e) {NA}
         )
     }
-
     # returning the data
     return(shape_data)
 }
