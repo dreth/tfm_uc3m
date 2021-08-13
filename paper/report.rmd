@@ -629,6 +629,8 @@ The application consists of 6 sections (or tabs). Each tab has a set of controls
 
 ## Life expectancy {#LifeExpLayout}
 
+- **Description**: The life expectancy tab produces either a time series of life expectancy (either at birth or for a selected age group). The time series is based on weekly life tables, therefore it's also possible to individually generate a life table for any week of the available years.
+
 ## Database tables
 
 ## DB info and update

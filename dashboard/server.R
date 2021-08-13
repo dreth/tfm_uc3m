@@ -381,9 +381,7 @@ shinyServer(
         })
 
         # week slider for life table
-        output$weekSliderSelectorLifeExpUIOutput <- renderUI({
-            # load life exp plot after rendering everything
-            delay(1000, click('plotLifeExpButton'))
+        output$weekSliderSelectorLifeExpUIOutput <- renderUI({            
             # life expectancy plot
             if (input$showLifeExpPlotOrLifeTable == 'plot') {
                 sliderInput("weekSliderSelectorLifeExp",
@@ -395,13 +393,24 @@ shinyServer(
                 )
             # life table
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
-                sliderInput("weekSliderSelectorLifeTable",
-                  label = h5(strong("Select week to compute")),
-                  min = 1,
-                  max = 52,
-                  value = 1,
-                  step = 1
-                )
+                if (input$yearSliderSelectorLifeTable == as.numeric(format(Sys.time(),'%Y'))) {
+                    sliderInput("weekSliderSelectorLifeTable",
+                        label = h5(strong("Select week to compute")),
+                        min = 1,
+                        max = MAX_WEEK,
+                        value = 1,
+                        step = 1
+                    )
+                } else {
+                    sliderInput("weekSliderSelectorLifeTable",
+                        label = h5(strong("Select week to compute")),
+                        min = 1,
+                        max = 52,
+                        value = 1,
+                        step = 1
+                    )
+                }
+                
             }
         })
 
@@ -439,7 +448,11 @@ shinyServer(
         # text output for when parameters have been changed
         output$lifeExpTextUIOutput <- renderUI({
             # weeks
+            tryCatch({
             weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
+            }, error = function(e) {
+            # auto-click the button to avoid showing errors
+            delay(1500,click('plotLifeExpButton'))})
             # years
             years <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
             # currently selected params
@@ -570,6 +583,7 @@ shinyServer(
                 shinyjs::hide('plotDownloadSizeControlsLifeExpUIOutputNS2')
                 shinyjs::hide('plotDownloadSizeSelectorLifeExp')
             }
+            delay(1500,click('plotLifeExpButton'))
         })
 
         # toggle between predefined and custom size
@@ -794,6 +808,29 @@ shinyServer(
             }
         })
 
+        # output for week slider selector depending on the year, for current year
+        # the weeks displayed are only those available ones
+        output$weekSliderSelectorUIOutputMaps <- renderUI({
+            # condionals on the week slider output
+            if (input$yearSliderSelectorMaps == as.numeric(format(Sys.time(),'%Y'))) {
+                sliderInput('weekSliderSelectorMaps',
+                    label = h5(strong('Select week to plot')),
+                    min = 1,
+                    max = MAX_WEEK,
+                    value = 1,
+                    step = 1
+                )
+            } else {
+                sliderInput('weekSliderSelectorMaps',
+                    label = h5(strong('Select week to plot')),
+                    min = 1,
+                    max = 52,
+                    value = 1,
+                    step = 1
+                )
+            }
+        })
+
         # text output for when parameters have been changed
         output$mapsTextUIOutput <- renderUI({
             # currently selected params
@@ -904,7 +941,8 @@ shinyServer(
 # INITIALIZE PLOTS -------------------------------------------------------------------------- 
         # Timer to initialize all plots after app is loaded
         delay(1500, click('plotMortalityButton'))
-        delay(1000, click('plotMapsButton'))
+        # delay(4000, click('plotMapsButton'))
+        # delay(2000, click('plotLifeExpButton'))
     }
 )
 

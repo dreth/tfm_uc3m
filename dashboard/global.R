@@ -35,6 +35,8 @@ death <- death[,2:length(death)]
 # Original IDs for reference
 EurostatDBID <- 'demo_r_mwk2_05'
 INEDBID <- '9681'
+# Maximum week for the latest year
+MAX_WEEK <- max(death[death$year == as.numeric(format(Sys.time(),'%Y')),'week'])
 
 # OPTION LISTS
 # CCAAs

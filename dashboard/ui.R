@@ -129,13 +129,7 @@ shinyUI(
                 choices = SEXES,
                 selected = 'T'
               ),
-              sliderInput('weekSliderSelectorMaps',
-                label = h5(strong('Select week to plot')),
-                min = 1,
-                max = 52,
-                value = 1,
-                step = 1
-              ),
+              uiOutput('weekSliderSelectorUIOutputMaps'),
               uiOutput('yearSelectorUIOutputMaps'),
               uiOutput('mapsTextUIOutput'),
               actionButton('plotMapsButton',
