@@ -1,10 +1,6 @@
 # SERVER
 shinyServer(
     function(input, output, session) {
-# INITIALIZATION PLOTS --------------------------------------------------------------------------
-        click('plotMortalityButton')
-        click('plotMapsButton')
-
 # REACTIVE VALUES --------------------------------------------------------------------------
         # Reactive file readers for log files
         updateDBLogs <- reactiveFileReader(intervalMillis=2000, session=session, filePath='../data/logs/update_database.log', readFunc=paste_readLines)
@@ -12,6 +8,10 @@ shinyServer(
         updateEurostatLogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_eurostat_update.log', readFunc=readLines)
         updateEurostatLogsEarliestProvisional <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/earliest_eurostat_provisional.log', readFunc=readLines)
         updateINELogsLast <- reactiveFileReader(intervalMillis=4000, session=session, filePath='../api/logs/last_ine_update.log', readFunc=readLines)
+        # reactive values
+        mortalityRV <- reactiveValues(oldParams=c())
+        mapsRV <- reactiveValues(oldParams=c())
+        lifeExpRV <- reactiveValues(oldParams=c())
 
 # PLOTTING/TABLE FUNCTIONS --------------------------------------------------------------------------
         # mortality plots
@@ -204,6 +204,49 @@ shinyServer(
             }
         })
 
+        # Selector for year, choices depend on what metric is selected
+        output$yearSelectorUIOutputMortality <- renderUI({
+            if (input$plotTypeMortality == 'em') {
+                sliderInput('yearSliderSelectorMortality',
+                    label = h5(strong('Select year range to plot')),
+                    min = min(YEAR)+5,
+                    max = max(YEAR),
+                    value = c(2015, max(YEAR)),
+                    step = 1
+                )
+            } else if (input$plotTypeMortality == 'mif') {
+                sliderInput('yearSliderSelectorMortality',
+                    label = h5(strong('Select year range to plot')),
+                    min = min(YEAR)+1,
+                    max = max(YEAR),
+                    value = c(2015, max(YEAR)),
+                    step = 1
+                )
+            } else {
+                sliderInput('yearSliderSelectorMortality',
+                    label = h5(strong('Select year range to plot')),
+                    min = min(YEAR),
+                    max = max(YEAR),
+                    value = c(2015, max(YEAR)),
+                    step = 1
+                )
+            }
+        })
+
+        # text output for when parameters have been changed
+        output$mortalityTextUIOutput <- renderUI({
+            # currently selected params
+            currParams <- tryCatch(c(input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality), switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality), input$selectSexesMortality, input$plotTypeMortality, input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2], input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2]), error=function(e) {0})
+            # comparing old and currently selected params
+            comparator <- mortalityRV$oldParams == currParams
+            # outputting message or empty string depending on diff
+            if (FALSE %in% comparator) {
+                div(id='mortalityParamsChangedH5',h5(strong('Params changed - Click to regenerate plot')))
+            } else {
+                span('')
+            }
+        })
+
         # plotly output
         # rendering the plotly UI to pass on the height from the session object
         output$plotlyUIGenMortality <- renderUI({
@@ -250,6 +293,9 @@ shinyServer(
         # PLOT OUTPUTS
         # Action button to generate mortality plots
         genMortPlot <- eventReactive(input$plotMortalityButton, {
+            # saving parameters at the time of the plot
+            mortalityRV$oldParams <- c(input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality), switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality), input$selectSexesMortality, input$plotTypeMortality, input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2], input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2])
+            # generate df and plot
             gen_df_and_plot_mortality(
                 wk=WEEK, 
                 yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
@@ -333,6 +379,8 @@ shinyServer(
 
         # week slider for life table
         output$weekSliderSelectorLifeExpUIOutput <- renderUI({
+            # load life exp plot after rendering everything
+            delay(1000, click('plotLifeExpButton'))
             # life expectancy plot
             if (input$showLifeExpPlotOrLifeTable == 'plot') {
                 sliderInput("weekSliderSelectorLifeExp",
@@ -360,7 +408,7 @@ shinyServer(
             if (input$showLifeExpPlotOrLifeTable == 'plot') {
                 sliderInput("yearSliderSelectorLifeExp",
                   label = h5(strong("Select year range to plot")),
-                  min = min(YEAR),
+                  min = min(YEAR)+1,
                   max = max(YEAR),
                   value = c(2015, max(YEAR)),
                   step = 1
@@ -369,7 +417,7 @@ shinyServer(
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
                 sliderInput("yearSliderSelectorLifeTable",
                   label = h5(strong("Select year to compute")),
-                  min = min(YEAR),
+                  min = min(YEAR)+1,
                   max = max(YEAR),
                   value = 2021,
                   step = 1
@@ -385,13 +433,34 @@ shinyServer(
                             height = session$clientData$output_lifeExpPlotly_width)
         })
 
-
+        # text output for when parameters have been changed
+        output$lifeExpTextUIOutput <- renderUI({
+            # weeks
+            weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
+            # years
+            years <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
+            # currently selected params
+            currParams <- tryCatch(c(weeks, years, switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp), switch(input$selectAgeGroupsLifeExpTotal, 'at_birth'='Y_LT5', 'select'=input$selectAgeLifeExp), input$selectSexesLifeExp, switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table')), error=function(e) {0})
+            # comparing entries
+            comparator <- lifeExpRV$oldParams == currParams
+            # outputting the changed params message or empty span
+            if (FALSE %in% comparator) {
+                div(id='lifeExpParamsChangedH5',h5(strong(switch(input$showLifeExpPlotOrLifeTable,'plot'='Params changed - Click to regenerate plot', 'life_table'='Params changed - Click to regenerate table'))))
+            } else {
+                span('')
+            }
+        })
 
         # PLOT/TABLE OUTPUTS
         # Action button to generate life expectancy plots or life table
         genLifeExpOutputs <- eventReactive(input$plotLifeExpButton, {
+            # weeks
             weeks <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$weekSliderSelectorLifeExp[1]:input$weekSliderSelectorLifeExp[2], 'life_table'=input$weekSliderSelectorLifeTable)
+            # years
             years <- switch(input$showLifeExpPlotOrLifeTable, 'plot'=input$yearSliderSelectorLifeExp[1]:input$yearSliderSelectorLifeExp[2], 'life_table'=input$yearSliderSelectorLifeTable)
+            # reactive value to save old params
+            lifeExpRV$oldParams <- c(weeks, years, switch(input$selectCCAALifeExpTotal, 'all'=CCAA, 'select'=input$selectCCAALifeExp), switch(input$selectAgeGroupsLifeExpTotal, 'at_birth'='Y_LT5', 'select'=input$selectAgeLifeExp), input$selectSexesLifeExp, switch(input$showLifeExpPlotOrLifeTable,'plot'='le','life_table'='life_table'))
+            # running the function
             plot_lifeexp_or_lifetable(
                 wk=weeks, 
                 yr=years, 
@@ -692,6 +761,49 @@ shinyServer(
             leafletOutput("leafletMapsPlot", height=input$dimension[2])
         })
 
+        # Selector for year, choices depend on what metric is selected
+        output$yearSelectorUIOutputMaps <- renderUI({
+            if (input$plotMetricMaps == 'em') {
+                sliderInput('yearSliderSelectorMaps',
+                    label = h5(strong('Select year to plot')),
+                    min = min(YEAR)+5,
+                    max = max(YEAR),
+                    value = max(YEAR),
+                    step = 1
+                )
+            } else if (input$plotMetricMaps == 'mif' | input$plotMetricMaps == 'le') {
+                sliderInput('yearSliderSelectorMaps',
+                    label = h5(strong('Select year to plot')),
+                    min = min(YEAR)+1,
+                    max = max(YEAR),
+                    value = max(YEAR),
+                    step = 1
+                )
+            } else {
+                sliderInput('yearSliderSelectorMaps',
+                    label = h5(strong('Select year to plot')),
+                    min = min(YEAR),
+                    max = max(YEAR),
+                    value = max(YEAR),
+                    step = 1
+                )
+            }
+        })
+
+        # text output for when parameters have been changed
+        output$mapsTextUIOutput <- renderUI({
+            # currently selected params
+            currParams <- tryCatch(c(input$weekSliderSelectorMaps, input$yearSliderSelectorMaps, ifelse(input$plotMetricMaps != 'le', switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps), switch(input$selectAgeGroupsLifeExpTotalMaps, 'at_birth'='Y_LT5', 'select'=input$selectAgeMaps)), input$selectSexesMaps, input$plotMetricMaps, input$plotLibraryMaps), error=function(e) {0})
+            # comparing entries
+            comparator <- mapsRV$oldParams == currParams
+            # outputting the changed params message or empty span
+            if (FALSE %in% comparator) {
+                div(id='mapsParamsChangedH5',h5(strong('Params changed - Click to regenerate plot')))
+            } else {
+                span('')
+            }
+        })
+
         # life expectancy at birth or select age group option
         observeEvent(input$plotMetricMaps, {
             if (input$plotMetricMaps != 'le') {
@@ -720,10 +832,14 @@ shinyServer(
 
         # Generate choropleth map event
         genChoropleth <- eventReactive(input$plotMapsButton, {
+            # showing outputs
             shinyjs::show('leafletMapsPlot')
             shinyjs::show('mapDataOutput')
             shinyjs::show('mapDataLabels1')
             shinyjs::show('mapDataLabels2')
+            # saving old params
+            mapsRV$oldParams <- c(input$weekSliderSelectorMaps, input$yearSliderSelectorMaps, ifelse(input$plotMetricMaps != 'le', switch(input$selectAgeGroupsMapsTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMaps), switch(input$selectAgeGroupsLifeExpTotalMaps, 'at_birth'='Y_LT5', 'select'=input$selectAgeMaps)), input$selectSexesMaps, input$plotMetricMaps, input$plotLibraryMaps)
+            # generating map data
             df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 
@@ -732,6 +848,7 @@ shinyServer(
                 metric=input$plotMetricMaps,
                 shape_data=switch(input$plotLibraryMaps, 'leaflet'=esp_leaflet, 'ggplot2'=esp_ggplot)
             )
+            # generating the map
             gen_choropleth(
                 dataset=df,
                 library=input$plotLibraryMaps,
@@ -780,6 +897,10 @@ shinyServer(
                 includeMarkdown(str_interp('../docs/sections/${section}.md'))
             })
         })
-    } 
+# INITIALIZE PLOTS -------------------------------------------------------------------------- 
+        # Timer to initialize all plots after app is loaded
+        delay(1500, click('plotMortalityButton'))
+        delay(1000, click('plotMapsButton'))
+    }
 )
 

@@ -2,6 +2,18 @@ html {
     font-family: ubuntu, sans-serif;
 }
 
+#mortalityParamsChangedH5 {
+    color: red;
+}
+
+#lifeExpParamsChangedH5 {
+    color: red;
+}
+
+#mapsParamsChangedH5 {
+    color: red;
+}
+
 #updateDatabaseButton {
     color: red;
 }

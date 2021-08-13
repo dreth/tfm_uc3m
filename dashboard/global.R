@@ -514,4 +514,3 @@ gen_choropleth <- function(dataset, metric, wk, yr, library='leaflet', leaflet_p
             ggtitle(plotTitle)
     }
 }
-

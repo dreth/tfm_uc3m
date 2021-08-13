@@ -66,13 +66,8 @@ shinyUI(
                 value = c(1,52),
                 step = 1
               ),
-              sliderInput('yearSliderSelectorMortality',
-                label = h5(strong('Select year range to plot')),
-                min = min(YEAR),
-                max = max(YEAR),
-                value = c(2015, max(YEAR)),
-                step = 1
-              ),
+              uiOutput('yearSelectorUIOutputMortality'),
+              uiOutput('mortalityTextUIOutput'),
               actionButton('plotMortalityButton',
                 label = h4(strong('Generate plot'))
               ),
@@ -141,13 +136,8 @@ shinyUI(
                 value = 1,
                 step = 1
               ),
-              sliderInput('yearSliderSelectorMaps',
-                label = h5(strong('Select year to plot')),
-                min = min(YEAR),
-                max = max(YEAR),
-                value = max(YEAR),
-                step = 1
-              ),
+              uiOutput('yearSelectorUIOutputMaps'),
+              uiOutput('mapsTextUIOutput'),
               actionButton('plotMapsButton',
                 label = h4(strong('Generate map'))
               ),
@@ -205,6 +195,7 @@ shinyUI(
               ),
               uiOutput('weekSliderSelectorLifeExpUIOutput'),
               uiOutput('yearSliderSelectorLifeExpUIOutput'),
+              uiOutput('lifeExpTextUIOutput'),
               actionButton('plotLifeExpButton',
                 label = h4(strong('Generate plot'))
               ),
