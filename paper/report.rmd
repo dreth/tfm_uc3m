@@ -590,9 +590,27 @@ Every time a user performs a database update through the docker container, the a
 
 # Application Layout
 
-The application consists of 6 sections (or tabs). Each tab has a set of controls and features which will be described in this section.
+The application consists of 6 sections (or tabs). Each tab has a set of controls and features which will be described in this section. 
 
-## Mortality
+There are 3 sections which generate plots/tables/maps:
+
+- [[**Mortality**]{color="black"}](#MortalityLayout)
+
+- [[**Maps**]{color="black"}](#MapsLayout)
+
+- [[**Life expectancy**]{color="black"}](#LifeExpLayout)
+
+Two sections related to the database:
+
+- [[**Database tables**]{color="black"}](#DBTablesLayout)
+
+- [[**Database information and update**]{color="black"}](#DBInfoLayout)
+
+And the documentation:
+
+- [[**Docs**]{color="black"}](#DocsLayout)
+
+## Mortality {#MortalityLayout}
 
 - **Description**: The mortality tab produces a time series plot with *week* in the x-axis and the specific mortality metric chosen (of those described in the [metrics](#Metrics)) section in the y-axis. The metrics that can be selected are: [[Cumulative mortality rate]{color="black"}](#CMR), [[Cumulative relative mortality rate]{color="black"}](#CRMR), [[Mortality improvement factor]{color="black"}](#CMIF) and [[Excess mortality]{color="black"}](#EM).
 
@@ -605,7 +623,7 @@ The application consists of 6 sections (or tabs). Each tab has a set of controls
     + *Selection of age group* to plot for (or aggregate for all of them). Individual age groups can be selected, but also multiple age groups can be selected, just as with CCAA, if multiple are selected, their values are aggregated.
     + *Selection of sex* (either M/F) or total (T, which is a sum of the M and F values).
     + *Selection of week range* to plot, between week 1 and 52. This filter applies to all the years selected.
-    + *Selection of year range* to plot. This is a discrete slider, so any range of years between 2010 and up to the current year can be selected. As more data is added in the future, the year slider should increase.
+    + *Selection of year range* to plot. This is a discrete slider, so any range of years between 2010 and up to the current year can be selected. As more data is added in the future, the year slider should increase in size.
     + *Generate plot* button, which should be pressed whenever the parameters are changed in order to generate the configured plot.
 
 - **Download controls**
@@ -614,7 +632,7 @@ The application consists of 6 sections (or tabs). Each tab has a set of controls
     + *Selection of image format*, which will return the image using the desired formatting, the default is PNG.
     + *Selection of image size*, if predefined, the dimension selector will show. All sizes in the predefined dimension selector are square. If custom, two number selectors show with width and height selection, any number can be inputted in them.
 
-## Maps
+## Maps {#MapsLayout}
 
 - **Description**: The maps tab produces a choropleth map of Spain by CCAA, where each CCAA is coloured according to the metric selected. Any metric from the [metrics](#Metrics) section can be selected.
 
@@ -624,18 +642,52 @@ The application consists of 6 sections (or tabs). Each tab has a set of controls
     + *Selection of the plotting library* to be used, either [*ggplot2*](https://ggplot2.tidyverse.org/) or [*leaflet*](https://rstudio.github.io/leaflet/).
     + *Selection of age group* to plot for (or aggregate for all of them). Individual age groups can be selected, but also multiple age groups can be selected, if multiple are selected, their values are aggregated. This option will change to a selection oflife expectancy at birth or a selection of a single age group.
     + *Selection of sex* (either M/F) or total (T, which is a sum of the M and F values).
-    + *Selection of a week* to plot for, between week 1 and 52.
-    + *Selection of a year* to plot for, between 2010 and what the current year is. There are some metrics for which there is not enough historical data to compute, 
+    + *Selection of a week* to plot for, between week 1 and 52. The week range allowed will vary depending on the year.
+    + *Selection of a year* to plot for, between the lowest year in the data (2010 at the time of writing) and what the current year may be. As there might have ocurred zero deaths in some CCAAs in some specific weeks, life expectancy may be NA if no deaths were recorded for a specific age group.
 
 ## Life expectancy {#LifeExpLayout}
 
-- **Description**: The life expectancy tab produces either a time series of life expectancy (either at birth or for a selected age group). The time series is based on weekly life tables, therefore it's also possible to individually generate a life table for any week of the available years.
+- **Description**: The life expectancy tab produces either a time series of life expectancy (either at birth or for a selected age group). The time series is based on weekly life tables, therefore it's also possible to individually generate a life table for any week of the available years. The first selector allows selecting between the time series plot and the life table.
 
-## Database tables
+- **Plot controls**: The parameters that can be modified for the life expectancy time series plot are the following:
 
-## DB info and update
+    + *Selection of the plotting library* to be used, either [*ggplot2*](https://ggplot2.tidyverse.org/) or [*plotly*](https://plotly.com/r/).
+    + *Selection of CCAA* to plot for (or aggregate for all of them). Individual CCAAs can be selected, but also multiple CCAAs can be selected, if multiple are selected, their values will be aggregated.
+    + *Selection of age group*. There's a choice between life expectancy at birth (equivalent to life expectancy at the youngest group, which is individuals younger than 5 years of age), or life expectancy for a specific age group.
+    + *Selection of sex* (either M/F) or total (T, which is a sum of the M and F values).
+    + *Selection of week range* to plot, between week 1 and 52. This filter applies to all the years selected.
+    + *Selection of year range* to plot. This is a discrete slider, so any range of years between 2010 and up to the current year can be selected.
 
-## Documentation
+- **Table controls**: The parameters that can be modified for the weekly life table are the following:
+
+    + *Selection of CCAA* to plot for (or aggregate for all of them). Individual CCAAs can be selected, but also multiple CCAAs can be selected, if multiple are selected, their values will be aggregated.
+    + *Selection of sex* (either M/F) or total (T, which is a sum of the M and F values).
+    + *Selection of a week* to compute the life table for, between week 1 and 52.
+    + *Selection of a year* to compute the life table for, between the lowest year in the data (2010) and the what the current year may be. Just like with life expectancy maps, there might be weeks for which zero deaths ocurred for specific age groups in specific CCAAs, therefore, when selecting CCAA, some NAs may appear in the table.
+
+- **Download controls** are identical to those described in the [mortality](#MortalityLayout) section.
+
+## Database tables {#DBTablesLayout}
+
+- **Description**: The database tables section allows anyone to filter the database according to any desired parameters, visualize a sample of their selection and be able to download the filtered raw data in *CSV* format.
+
+- **Controls**: The controls for this section allow for filtering of the database and selection of the database:
+
+    + *Selection of database*. Either the deaths or population database can be selected.
+    + *Selection of CCAA* to include in the dataset to download. All CCAAs, Individual CCAAs can be selected, but also multiple CCAAs can be selected. The data to be included will be that of those selected CCAAs.
+    + *Selection of age group*. Just like with CCAA selection, allows either selecting all or any combination of age groups available.
+    + *Selection of week range* to filter by, between week 1 and 52. This filter applies to all the years selected.
+    + *Selection of year range* to filter by. This is a discrete slider, so any range of years between 2010 and up to the current year can be selected to download.
+    + Button to *download* the filtered dataset.
+
+## DB info and update {#DBInfoLayout}
+
+- **Description**: The database information and update section contains information with respect to the different databases. The information shown is the following:
+
+    + Last time the database was updated by any user of the application.
+    + Last date av
+
+## Documentation {#DocsLayout}
 
 \newpage
 
