@@ -329,8 +329,11 @@ shinyServer(
         })
 
         # PLOT DOWNLOAD BUTTON
-        output$downloadPlotMortality <- downloadHandler(
-            filename = input$plotTypeMortality,
+        output$downloadPlotMortality <- downloadHandler(filename={
+            plotType = input$plotTypeMortality
+            file_format = input$plotDownloadFormatMortality
+            str_interp('${plotType}.${file_format}')
+            },
             content = function(file) {
                 ggsave(
                     file,
@@ -605,8 +608,9 @@ shinyServer(
 
         # DOWNLOAD BUTTONS
         # download plot
-        output$downloadPlotLifeExp <- downloadHandler(
-            filename = str_interp("LifeExpectancy"),
+        output$downloadPlotLifeExp <- downloadHandler(filename={
+            file_format = input$plotDownloadFormatLifeExp
+            str_interp("LifeExpectancy.${file_format}")},
             content = function(file) {
                 ggsave(
                     file,
