@@ -700,8 +700,6 @@ And the documentation:
 
 - **Description**: The documentation section contains the documentation for each tab. It includes description of each section and instructions on use them. 
 
-\newpage
-
 # Appendix
 
 This project has a large amount of code, therefore only some code chunks from the Python, R and Docker parts will be shown in this appendix. All the code shown in the appendix is from what has been written up to August 2021. Any future extra additions to the application will be in the displayed in the project's [repository](https://github.com/dreth/tfm_uc3m).
