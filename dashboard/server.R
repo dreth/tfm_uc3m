@@ -941,8 +941,17 @@ shinyServer(
 # INITIALIZE PLOTS AND DISABLE UPDATE (IF NOT WITHIN DOCKER) -------------------------------------------------------------------------- 
         # Timer to initialize all plots after app is loaded
         delay(1500, click('plotMortalityButton'))
-        if (ISDOCKER != TRUE) {
-            shinjs::disable('updateDatabaseButton')
+        # disable update database button if NOT running inside of the dockerhub or ghcr.io container
+        if (length(ISDOCKER) == 0) {
+            output$updateDBButtonUIOutput <- renderUI({
+                div(id='updateDatabaseButton', h4(strong("This instance of the application is not running from the dreth/tfm_uc3m docker container, therefore it can't update the database. To use the docker container see the 'docker' section in the", a(strong('dreth/tfm_uc3m GitHub repository'),href='https://github.com/dreth/tfm_uc3m'))))
+            })
+        } else {
+            output$updateDBButtonUIOutput <- renderUI({
+                actionButton('updateDatabaseButton',
+                    label = h4(strong('Update Database'))
+                )
+            })
         }
     }
 )

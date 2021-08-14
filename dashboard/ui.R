@@ -306,9 +306,7 @@ shinyUI(
             br(),
             wellPanel(
               # UPDATE DB BUTTON
-              actionButton('updateDatabaseButton',
-                label = h4(strong('Update Database'))
-              ),
+              uiOutput('updateDBButtonUIOutput'),
               hr(),
               h4(strong('Logs:')),
               br(),
