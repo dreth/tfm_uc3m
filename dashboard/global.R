@@ -37,6 +37,9 @@ EurostatDBID <- 'demo_r_mwk2_05'
 INEDBID <- '9681'
 # Maximum week for the latest year
 MAX_WEEK <- max(death[death$year == as.numeric(format(Sys.time(),'%Y')),'week'])
+# determine if app is running inside of a container
+ISDOCKER <- system('cat /isdocker', intern=TRUE)
+print(ISDOCKER)
 
 # OPTION LISTS
 # CCAAs
