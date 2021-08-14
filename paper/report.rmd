@@ -698,7 +698,7 @@ And the documentation:
 
 ## Documentation {#DocsLayout}
 
-- **Description**: The documentation section contains the documentation for each tab in the application.
+- **Description**: The documentation section contains the documentation for each tab. It includes description of each section and instructions on use them. 
 
 \newpage
 
