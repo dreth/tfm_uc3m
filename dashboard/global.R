@@ -39,7 +39,6 @@ INEDBID <- '9681'
 MAX_WEEK <- max(death[death$year == as.numeric(format(Sys.time(),'%Y')),'week'])
 # determine if app is running inside of a container
 ISDOCKER <- ifelse(system('cat /isdocker', intern=TRUE)=="True", TRUE, FALSE)
-print(ISDOCKER)
 
 # OPTION LISTS
 # CCAAs

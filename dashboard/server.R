@@ -938,11 +938,12 @@ shinyServer(
                 includeMarkdown(str_interp('../docs/sections/${section}.md'))
             })
         })
-# INITIALIZE PLOTS -------------------------------------------------------------------------- 
+# INITIALIZE PLOTS AND DISABLE UPDATE (IF NOT WITHIN DOCKER) -------------------------------------------------------------------------- 
         # Timer to initialize all plots after app is loaded
         delay(1500, click('plotMortalityButton'))
-        # delay(4000, click('plotMapsButton'))
-        # delay(2000, click('plotLifeExpButton'))
+        if (ISDOCKER != TRUE) {
+            shinjs::disable('updateDatabaseButton')
+        }
     }
 )
 
