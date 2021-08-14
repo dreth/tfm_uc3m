@@ -944,7 +944,7 @@ shinyServer(
         # disable update database button if NOT running inside of the dockerhub or ghcr.io container
         if (length(ISDOCKER) == 0) {
             output$updateDBButtonUIOutput <- renderUI({
-                div(id='updateDatabaseButton', h4(strong("This instance of the application is not running from the dreth/tfm_uc3m docker container, therefore it can't update the database. To use the docker container see the 'docker' section in the", a(strong('dreth/tfm_uc3m GitHub repository'),href='https://github.com/dreth/tfm_uc3m'))))
+                div(id='updateDatabaseButton', h4(strong("This instance of the application is not running from the dreth/tfm_uc3m docker container, therefore it can't update the database. To use the docker container see the 'docker' section in the", a(strong('README.md file in the dreth/tfm_uc3m repository'),href='https://github.com/dreth/tfm_uc3m/blob/main/README.md'))))
             })
         } else {
             output$updateDBButtonUIOutput <- renderUI({
