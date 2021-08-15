@@ -148,9 +148,7 @@ If excess mortality is very high and above zero, then there have been more death
 
 Excess mortality is used to assess how many more or less deaths than the previous years' average have ocurred. This way it's possible to determine if there is an increase in deaths that exceed what has been considered "normal". 
 
-During the COVID-19 pandemic the measurement was particularly useful as mortality spiked beyond the expectations of pretty much any country where the pandemic became widespread. Spain is no exception, and during the time where the deaths were at their peak, the excess mortality of that period of time was a highly publicized measure to illustrate how many deaths above what usually occurs happened.
-
-As a result of the COVID-19 pandemic, future measures calculated after 2020 must exclude 2020 and 2021 from the calculation as the death counts are anomalous compared to previous and subsequent years prior the COVID-19 pandemic.
+During the COVID-19 pandemic the measurement was particularly useful as mortality spiked beyond the expectations of pretty much any country where the pandemic became widespread. Spain is no exception, and during the time where the deaths were at their peak, the excess mortality of that period of time was a highly publicized measure to illustrate how many deaths above what usually occurs happened. As a result of the COVID-19 pandemic, future measures calculated after 2020 must exclude 2020 and 2021 from the calculation as the death counts are anomalous compared to previous and subsequent years prior the COVID-19 pandemic.
 
 For the years between 2021 and 2027 inclusive, the application uses the same 5-year moving average used for 2020, meaning the average deaths corresponding to week $w$ for $2015 \leq y \leq 2019$. After 2027 or prior to 2021 the average death counts used are computed from the 5 year window prior to the year(s) selected. For example, the average deaths for $w = 1$, 2019 will correspond to the average deaths during $w = 1$ for the years $2014 \leq y \leq 2018$, and the average deaths for $w = 1$, 2022 will correspond to the same average deaths observed on $w = 1$ for the years $2015 \leq y \leq 2019$.
 
@@ -233,6 +231,8 @@ Where:
 
 - $CMR_{w, y}$ is the *cumulative mortality rate* at week $w$ of year $y$
 
+\newpage
+
 Here is an example plot of the $CRMR$ we can generate for all age groups, sexes and CCAA aggregated:
 
 ![$CRMR$, from 2015 up to week 30 of 2021](./images/crmr.png)
@@ -270,6 +270,8 @@ As a way to exemplify, we can also show a plot for the $CMIF$, as plotted throug
 As for the $CMIF$ visualized in Figure 4, it is clear how significant the decline of the $CMIF$ is for 2020, and how noticeable of an improvement the widespread vaccination has been during 2021.
 
 Comparatively we can say that rises in $CRMR$ correspond with declines in $CMIF$. 
+
+\newpage
 
 ## Life expectancy {#LE}
 
@@ -389,6 +391,8 @@ Where:
 \tag{7}
 e_{x} = \frac{T_x}{l_x}
 \end{equation}
+
+\newpage
 
 Here we can see an example of the $LE$ time series computed by the app using the previously described methodology:
 
