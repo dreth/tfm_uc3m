@@ -892,17 +892,18 @@ shinyServer(
                 shape_data=switch(input$plotLibraryMaps, 'leaflet'=esp_leaflet, 'ggplot2'=esp_ggplot)
             )
             # generating the map
-            gen_choropleth(
+            tryCatch({gen_choropleth(
                 dataset=df,
                 library=input$plotLibraryMaps,
                 metric=input$plotMetricMaps,
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps
-            )
+            )}, error=function(e) {delay(1000, click('plotMapsButton'))})
         })
 
         # Generate choropleth map TABLE event
         genChoroplethTable <- eventReactive(input$plotMapsButton, {
+            # generate df and table
             df <- gen_map_data(
                 wk=input$weekSliderSelectorMaps, 
                 yr=input$yearSliderSelectorMaps, 
@@ -931,6 +932,7 @@ shinyServer(
                 shinyjs::hide('leafletMapsPlot')
                 shinyjs::hide('leafletMapOutput')
             }
+            delay(1000, click('plotMapsButton'))
         })
 
 # DOCS TAB -------------------------------------------------------------------------- 
