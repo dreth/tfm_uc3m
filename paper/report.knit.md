@@ -18,13 +18,7 @@ nocite: '@*'
 lof: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>",
-fig.path = "./figures/"
-)
-```
+
 
 \newpage
 
@@ -746,7 +740,8 @@ Here we can see the entire script as it is quite short:
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # %% IMPORTING FUNCTIONS TO USE
 from functions import check_eurostat_provisional, check_INE_latest
 
@@ -783,7 +778,8 @@ Here we can see the [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blo
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # %% QUERY EUROSTAT FUNCTION
 def query_eurostat(**kwargs):
     # Iterating through kwargs to fill URL fields
@@ -830,7 +826,8 @@ The script is very long with over 500 lines of code. It can be entirely seen in 
 
 \tiny
 
-```{R, eval=FALSE, echo=TRUE}
+
+```r
 # Cumulative mortality rate
 CMR <- function(wk, yr, ccaas, age_groups, sexes, cmr_c=FALSE) {
     # initialize number of deaths
@@ -888,7 +885,8 @@ The code chunk is the following:
 
 \footnotesize
 
-```{R, eval=FALSE, echo=TRUE}
+
+```r
 # Action button to generate mortality plots
 genMortPlot <- eventReactive(input$plotMortalityButton, {
     gen_df_and_plot_mortality(
@@ -915,7 +913,8 @@ Here we can see the definition to plot the life expectancy plots in the life exp
 
 \footnotesize
 
-```{R, eval=FALSE, echo=TRUE}
+
+```r
 actionButton('plotLifeExpButton',
 label = h4(strong('Generate plot'))
 )
@@ -935,7 +934,8 @@ To showcase each block, the file performs the following steps:
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 FROM rocker/shiny-verse:latest
 ```
 
@@ -945,7 +945,8 @@ FROM rocker/shiny-verse:latest
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # Get required packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -965,7 +966,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # installing python libraries
 RUN pip3 install pandas
 RUN pip3 install numpy
@@ -995,7 +997,8 @@ RUN R -e "install.packages('RcppRoll')"
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # cloning the project repos
 RUN git clone https://github.com/dreth/tfm_uc3m.git
 RUN git clone https://github.com/dreth/tfm_uc3m_data.git
@@ -1007,7 +1010,8 @@ RUN git clone https://github.com/dreth/tfm_uc3m_data.git
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # creating a file to identify the runtime of the app as a docker container
 RUN touch '/isdocker' && echo "True" > '/isdocker'
 ```
@@ -1020,7 +1024,8 @@ RUN touch '/isdocker' && echo "True" > '/isdocker'
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # select port
 EXPOSE 3838/tcp
 ```
@@ -1039,7 +1044,8 @@ EXPOSE 3838/tcp
 
 \footnotesize
 
-```{python, eval=FALSE, echo=TRUE}
+
+```python
 # running app from repo
 CMD cd ./tfm_uc3m && git pull && cd ../tfm_uc3m_data && 
     git pull && cp -r ./* ../tfm_uc3m/data && 
@@ -1135,6 +1141,4 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 <div id="refs"></div>
 
-```{bash, echo=FALSE, warning=FALSE, message=FALSE}
-pdftk "./coverpage/coverpage.pdf" "./report.pdf" cat output "./final_report.pdf"
-```
+
