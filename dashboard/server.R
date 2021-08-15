@@ -337,8 +337,9 @@ shinyServer(
             content = function(file) {
                 ggsave(
                     file,
-                    width=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=as.numeric(input$selectDimensionsMortalityDownload)*0.01333333, 'custom'=input$widthMortalityDownload*0.01333333),
-                    height=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=as.numeric(input$selectDimensionsMortalityDownload)*0.01333333, 'custom'=input$heightMortalityDownload*0.01333333),
+                    width=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=as.numeric(input$selectDimensionsMortalityDownload), 'custom'=input$widthMortalityDownload),
+                    height=switch(input$plotDownloadSizeSelectorMortality, 'predefined'=as.numeric(input$selectDimensionsMortalityDownload), 'custom'=input$heightMortalityDownload),
+                    units="px",
                     plot=gen_df_and_plot_mortality(
                             wk=WEEK, 
                             yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
@@ -628,8 +629,9 @@ shinyServer(
             content = function(file) {
                 ggsave(
                     file,
-                    width=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$widthLifeExpDownload*0.01333333),
-                    height=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload)*0.01333333, 'custom'=input$heightLifeExpDownload*0.01333333),
+                    width=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload), 'custom'=input$widthLifeExpDownload),
+                    height=switch(input$plotDownloadSizeSelectorLifeExp, 'predefined'=as.numeric(input$selectDimensionsLifeExpDownload), 'custom'=input$heightLifeExpDownload),
+                    units="px",
                     plot=LELT_download(),
                     device=input$plotDownloadFormatLifeExp
                 )

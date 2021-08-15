@@ -31,7 +31,7 @@ fig.path = "./figures/"
 
 As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic and future similarly deadly events has become increasingly important. It is intended with this project to develop a tool to easily monitor a selection of demographic measures. All related to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously, or perhaps other smaller scale events which could increase mortality in a likely fashion.
 
-The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) shiny dashboard (developed in R) where such measures are displayed in different visualizations across time. The dashboard is containerized using Docker, in order to make possible to run and use in in any operating system. The data is acquired from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs. It is then treated by several Python scripts and stored in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated by anyone running the application.
+The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) [Shiny-based](shiny.rstudio.com/) dashboard (developed in R) where such measures are displayed in different visualizations across time. The dashboard is containerized using Docker, in order to make possible to run and use in in any operating system. The data is acquired from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs. It is then treated by several Python scripts and stored in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated by anyone running the application.
 
 # Introduction
 
@@ -52,6 +52,8 @@ The application itself consists of the following functionality:
 - Visualizing a map of Spain with the previous metrics per autonomous community (CCAA)
 
 All metrics are calculated weekly with data obtained from INE and Eurostat, starting from the year 2010.
+
+\newpage
 
 # Objectives
 
@@ -200,8 +202,6 @@ Where:
 - $P_{w, y}$: population at week $w$ of year $y$
 
 - $s$: upper bound of week for which the death count is computed, with $1 \leq s \leq 52$ and $s \in \mathbb{N}$.
-
-\newpage
 
 ## Cumulative relative mortality rate {#CRMR}
 
