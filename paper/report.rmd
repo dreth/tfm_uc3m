@@ -923,9 +923,7 @@ label = h4(strong('Generate plot'))
 
 \normalsize
 
-\newpage
-
-## Appendix C: Docker {AppendixC}
+## Appendix C: Docker {#AppendixC}
 
 In order to containerize the application, Docker was used. The container to create the application was created from the following [**Dockerfile**](https://github.com/dreth/tfm_uc3m/blob/main/docker/Dockerfile). 
 
@@ -961,9 +959,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 \normalsize
 
+\newpage
+
 3. The python and R packages required to run the application are installed.
 
-\footnotesize
+\tiny
 
 ```{python, eval=FALSE, echo=TRUE}
 # installing python libraries
@@ -993,7 +993,7 @@ RUN R -e "install.packages('RcppRoll')"
 
 4. The repositories are cloned.
 
-\footnotesize
+\tiny
 
 ```{python, eval=FALSE, echo=TRUE}
 # cloning the project repos
@@ -1005,7 +1005,7 @@ RUN git clone https://github.com/dreth/tfm_uc3m_data.git
 
 5. An *isdocker* file is created with the content "True", in order for the application to determine whether it is or not running in a Docker container or not. The purpose of this is to disable in-app updating for people running the application through any other medium different to the [Docker Hub](https://hub.docker.com/r/dreth/tfm_uc3m) or [GHCR.io](https://github.com/dreth/tfm_uc3m/pkgs/container/tfm_uc3m) container. This line of code is not present in the Dockerfile within the GitHub repository, as this would allow anyone building the container to attempt to update the data and upload it to the [data repository](https://github.com/dreth/tfm_uc3m_data). The problem with this is that the upload to the repository would fail, as the Dockerfile publicly available in the main repository does not contain the pusher credentials to update the data (unlike the Docker Hub or GHCR.io counterparts).
 
-\footnotesize
+\tiny
 
 ```{python, eval=FALSE, echo=TRUE}
 # creating a file to identify the runtime of the app as a docker container
@@ -1014,11 +1014,9 @@ RUN touch '/isdocker' && echo "True" > '/isdocker'
 
 \normalsize
 
-\newpage
-
 6. TCP Port 3838 is exposed in order to locally run the app at [http://0.0.0.0:3838]{color="blue"}. 
 
-\footnotesize
+\tiny
 
 ```{python, eval=FALSE, echo=TRUE}
 # select port
@@ -1048,8 +1046,6 @@ CMD cd ./tfm_uc3m && git pull && cd ../tfm_uc3m_data &&
 ```
 
 \normalsize
-
-\newpage
 
 ## Appendix D: Project repository tree structure {#AppendixD}
 
