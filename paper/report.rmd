@@ -15,6 +15,7 @@ urlcolor: blue
 linestretch: 1.35
 bibliography: references.bib
 nocite: '@*'
+lof: true
 ---
 
 ```{r setup, include=FALSE}
@@ -254,6 +255,8 @@ Where:
 
 - $CMR_{w, y}$ is the *cumulative mortality rate* at week $w$ of year $y$
 
+\newpage
+
 As a way to exemplify, we can also show a plot for the $CMIF$, as plotted through the application:
 
 ![$CMIF$, from 2015 up to week 24 of 2021](./images/cmif.png)
@@ -382,6 +385,8 @@ e_{x} = \frac{T_x}{l_x}
 \end{equation}
 
 \newpage
+
+![$LE$, from 2015 up to week 30 of 2021](./images/cmif.png)
 
 # Technologies used
 

@@ -329,7 +329,7 @@ shinyServer(
         })
 
         # PLOT DOWNLOAD BUTTON
-        output$downloadPlotMortality <- downloadHandler(filename={
+        output$downloadPlotMortality <- downloadHandler(filename= function() {
             plotType = input$plotTypeMortality
             file_format = input$plotDownloadFormatMortality
             str_interp('${plotType}.${file_format}')
@@ -623,7 +623,7 @@ shinyServer(
 
         # DOWNLOAD BUTTONS
         # download plot
-        output$downloadPlotLifeExp <- downloadHandler(filename={
+        output$downloadPlotLifeExp <- downloadHandler(filename= function() {
             file_format = input$plotDownloadFormatLifeExp
             str_interp("LifeExpectancy.${file_format}")},
             content = function(file) {
