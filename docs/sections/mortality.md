@@ -23,7 +23,13 @@ The mortality tab produces a time series plot with *week* in the x-axis and the 
 +   *Selection of CCAA* to plot for (or aggregate for all of them).
 
     + **Options**:
-      + *All CCAAs*: Aggregates all CCAAs
+      + *All CCAAs*: Aggregates all CCAAs' values
+      + *Select CCAAs*: Allows for a selection of individual or multiple CCAAs. If multiple are selected, their values are aggregated.
+
++ *Selection of Age group* to plot for (or aggregate for all of them).
+
+    + **Options**:
+
 
 ### Download controls
 

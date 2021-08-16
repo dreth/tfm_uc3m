@@ -730,7 +730,29 @@ And the documentation:
 
 - **Description**: The documentation section contains the documentation for each tab. It includes description of each section and instructions on use them. 
 
-\newpage
+# Glossary
+
+This glossary includes definitions to terminology readers might not be familiar with.
+
+- **CCAA**: Autonomous community of Spain
+
+- **API**: application programming interface, which is a connection between computers or programs
+
+- **Repository**: storage location for software packages
+
+- **CSV**: comma-separated values file. It's a plaintext file containing a table with columns and rows separated by commas.
+
+- **open source**: source code made freely available for modification and redistribution. Often under a free software license.
+
+- **ggplot2**: open source data visualization package for R
+
+- **plotly**: refers to a private canadian company which develops data analytics and open source interactive data visualization library of the same name for Python, R, and other programming languages.
+
+- **leaflet**: open source javascript library for web mapping applications.
+
+- **shiny**: R web development package.
+
+- **container**: packaged application which includes all of its requirements and allows users to run the application by shrinking its requirements to only the containerization software itself.
 
 # Appendix
 
