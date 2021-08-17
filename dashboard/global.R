@@ -101,6 +101,8 @@ names(PLOT_LIBRARY_MAPS) <- c('Static (ggplot2)', 'Interactive (leaflet)')
 # SECTION SELECTOR FOR DOCS
 SECTIONS <- c('mortality','maps','lifeExp','dbTables','dbInfo')
 names(SECTIONS) <- c('Mortality', 'Maps', 'Life expectancy', 'Database tables', 'Database information and update')
+# LIFE TABLE/PLOT BUTTON LABEL
+LIFEBUTTON <- ''
 
 # DATABASE VECTOR
 # contains databases indexed by string

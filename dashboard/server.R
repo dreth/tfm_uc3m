@@ -515,6 +515,13 @@ shinyServer(
         # life exp plots or life table
         observeEvent(input$showLifeExpPlotOrLifeTable, {
             if (input$showLifeExpPlotOrLifeTable == 'plot') {
+                # output generate plot button
+                output$lifeExpButtonUIOutput <- renderUI({
+                    actionButton('plotLifeExpButton',
+                        label = h4(strong('Generate plot'))
+                    )
+                })
+
                 # download button for plot
                 output$downloadPlotOrTableUIOutput <- renderUI({
                     downloadButton("downloadPlotLifeExp",
@@ -555,6 +562,13 @@ shinyServer(
                     shinyjs::show('lifeExpPlotly')
                 }
             } else if (input$showLifeExpPlotOrLifeTable == 'life_table') {
+                 # output generate plot button
+                output$lifeExpButtonUIOutput <- renderUI({
+                    actionButton('plotLifeExpButton',
+                        label = h4(strong('Generate table'))
+                    )
+                })
+
                 # download button for table
                 output$downloadPlotOrTableUIOutput <- renderUI({
                     downloadButton("downloadTableLifeExp",

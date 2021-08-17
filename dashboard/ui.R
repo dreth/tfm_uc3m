@@ -190,9 +190,7 @@ shinyUI(
               uiOutput('weekSliderSelectorLifeExpUIOutput'),
               uiOutput('yearSliderSelectorLifeExpUIOutput'),
               uiOutput('lifeExpTextUIOutput'),
-              actionButton('plotLifeExpButton',
-                label = h4(strong('Generate plot'))
-              ),
+              uiOutput('lifeExpButtonUIOutput'),
               hr(),
               uiOutput('lifeExpOrTableDownloadHeaderUIOutput'),
               radioButtons('plotDownloadSizeSelectorLifeExp',
