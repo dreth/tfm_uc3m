@@ -195,14 +195,14 @@ shinyUI(
               ),
               hr(),
               uiOutput('lifeExpOrTableDownloadHeaderUIOutput'),
-              uiOutput('plotDownloadSizeControlsLifeExpUIOutput'),
-              uiOutput('plotDownloadSizeControlsLifeExpUIOutputNS2'),
-              uiOutput('lifeExpPlotDownloadFormatUIOutput'),
               radioButtons('plotDownloadSizeSelectorLifeExp',
                 label = h5(strong('Predefined or custom image size')),
                 choices = DOWNLOAD_SIZE_TOGGLE,
                 selected = 'predefined'
               ),
+              uiOutput('plotDownloadSizeControlsLifeExpUIOutput'),
+              uiOutput('plotDownloadSizeControlsLifeExpUIOutputNS2'),
+              uiOutput('lifeExpPlotDownloadFormatUIOutput'),
               uiOutput('downloadPlotOrTableUIOutput')
             ),
 
