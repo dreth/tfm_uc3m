@@ -70,7 +70,6 @@ The life expectancy tab produces either a time series of life expectancy (either
 
 + *Generate table button*: generates the table, will notify with a red label when parameters have been changed. It has to be clicked to generate the table whenever the paramaters have been changed.
 
-
 ### Download controls
 
 #### Plot download controls (Life expectancy time series)
