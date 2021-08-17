@@ -79,13 +79,13 @@ shinyUI(
                 choices = DOWNLOAD_SIZE_TOGGLE,
                 selected = 'predefined'
               ),
+              uiOutput('plotDownloadSizeControlsMortalityUIOutput'),
+              uiOutput('plotDownloadSizeControlsMortalityUIOutputNS2'),
               selectInput('plotDownloadFormatMortality',
                 label = h5(strong('Select image format')),
                 choices = DOWNLOAD_IMAGE_FORMAT,
                 selected = 'png'
               ),
-              uiOutput('plotDownloadSizeControlsMortalityUIOutput'),
-              uiOutput('plotDownloadSizeControlsMortalityUIOutputNS2'),
               downloadButton('downloadPlotMortality',
                 label=h4(strong('Download plot'))
               )
@@ -195,14 +195,14 @@ shinyUI(
               ),
               hr(),
               uiOutput('lifeExpOrTableDownloadHeaderUIOutput'),
+              uiOutput('plotDownloadSizeControlsLifeExpUIOutput'),
+              uiOutput('plotDownloadSizeControlsLifeExpUIOutputNS2'),
               uiOutput('lifeExpPlotDownloadFormatUIOutput'),
               radioButtons('plotDownloadSizeSelectorLifeExp',
                 label = h5(strong('Predefined or custom image size')),
                 choices = DOWNLOAD_SIZE_TOGGLE,
                 selected = 'predefined'
               ),
-              uiOutput('plotDownloadSizeControlsLifeExpUIOutput'),
-              uiOutput('plotDownloadSizeControlsLifeExpUIOutputNS2'),
               uiOutput('downloadPlotOrTableUIOutput')
             ),
 
