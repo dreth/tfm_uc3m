@@ -4,5 +4,3 @@
 
 ### Controls
 
-### Download controls
-
