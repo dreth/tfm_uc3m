@@ -1,16 +1,16 @@
-## Life expectancy tab
+# Life expectancy tab
 
-### Description
+## Description
 
 The life expectancy tab produces either a time series of life expectancy (either at birth or for a selected age group). The time series is based on weekly life tables, therefore it's also possible to individually generate a life table for any week of the available years. The plot (if life expectancy time series is selected) can be static (using [ggplot2](https://ggplot2.tidyverse.org/reference/ggplot.html)) or interactive (using [plotly](https://plotly.com/r/)).
 
-### Controls
+## Controls
 
 + The first selector allows *selecting between a life expectancy time series plot or a life table*.
     + **Options**:
       + Life expectancy time series
       + Life table
-#### Plotting controls (Life expectancy time series)
+### Plotting controls (Life expectancy time series)
 
 +   *Selection of the plotting library* to be used.
     + **Options**:
@@ -55,7 +55,7 @@ The life expectancy tab produces either a time series of life expectancy (either
 
 + *Generate plot button*: generates the plot, will notify with a red label when parameters have been changed. It has to be clicked to generate the plot whenever the paramaters have been changed.
 
-#### Table controls (Life table)
+### Table controls (Life table)
 
 +   *Selection of CCAA* to plot for (or aggregate for all of them).
     + **Options**:
@@ -78,9 +78,9 @@ The life expectancy tab produces either a time series of life expectancy (either
 
 + *Generate table button*: generates the table, will notify with a red label when parameters have been changed. It has to be clicked to generate the table whenever the paramaters have been changed.
 
-### Download controls
+## Download controls
 
-#### Plot download controls (Life expectancy time series)
+### Plot download controls (Life expectancy time series)
 
 + *Selection of image size* in pixels by pixels.
   + **Options** 
@@ -111,6 +111,6 @@ The life expectancy tab produces either a time series of life expectancy (either
     + .tiff
     + .bmp
 
-#### Table download controls (Life table)
+### Table download controls (Life table)
 
 There will only be a download button when a *life table* is generated. The file is outputted in *CSV* format.

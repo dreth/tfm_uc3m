@@ -1,10 +1,10 @@
-## Maps tab
+# Maps tab
 
-### Description
+## Description
 
 The maps tab produces a choropleth map of Spain by CCAA, where each CCAA is coloured according to the metric selected. The map can be an interactive embedded object (using [leaflet](https://rstudio.github.io/leaflet/)) or a static image (using [ggplot2](https://ggplot2.tidyverse.org/reference/ggplot.html)).
 
-### Controls
+## Controls
 
 
 +  *Selection of metric* to plot.

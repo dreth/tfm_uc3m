@@ -1,10 +1,10 @@
-## Mortality tab
+# Mortality tab
 
-### Description
+## Description
 
 The mortality tab produces a time series plot with *week* in the x-axis and the specific mortality metric chosen in the y-axis. The metrics that can be selected are: Cumulative mortality rate, Cumulative relative mortality rate, Mortality improvement factor and Excess mortality. The plot can be static (using [ggplot2](https://ggplot2.tidyverse.org/reference/ggplot.html)) or interactive (using [plotly](https://plotly.com/r/)).
 
-### Controls
+## Controls
 
 +  *Selection of metric* to plot.
     + **Options**:
@@ -58,7 +58,7 @@ The mortality tab produces a time series plot with *week* in the x-axis and the 
 
 + *Generate plot button*: generates the plot, will notify with a red label when parameters have been changed. It has to be clicked to generate the plot whenever the paramaters have been changed.
 
-### Download controls
+## Download controls
 
 + *Selection of image size* in pixels by pixels.
   + **Options** 

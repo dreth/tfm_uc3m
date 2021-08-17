@@ -1,6 +1,6 @@
-## Database information and update tab
+# Database information and update tab
 
-### Description
+## Description
 
 The database information and update section contains information with respect to the different databases. This information is updated every time the app is newly launched. The information shown is the following:
 
@@ -14,7 +14,7 @@ The database information and update section contains information with respect to
   + Latest date for which there is obtainable data from INE.
   + The original database ID from INE.
 
-### Controls
+## Controls
 
 The only control available is the *update database* button, which allows for the database to be updated. 
 
