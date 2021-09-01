@@ -1,7 +1,7 @@
 ---
 title: "Development of an automatic tool for periodic surveillance of actuarial and demographic indicators"
 author: "Daniel Alonso, María Luz Durbán Reguera, Bernardo D'Auria"
-date: "July-August 2021"
+date: "August-September 2021"
 header-includes: \usepackage{amsmath}
 output: 
     pdf_document:
@@ -28,19 +28,15 @@ fig.path = "./figures/"
 
 \newpage
 
-# Summary
+# 1 - Summary
 
 As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic and future similarly deadly events has become increasingly important. It is intended with this project to develop a tool to easily monitor a selection of demographic measures. All related to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously, or perhaps other smaller scale events which could increase mortality in a likely fashion.
 
 The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) [Shiny-based](https://shiny.rstudio.com/) dashboard (developed in R) where such measures are displayed in different visualizations across time. The dashboard is containerized using Docker, in order to make possible to run and use in in any operating system. The data is acquired from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs. It is then treated by several Python scripts and stored in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated by anyone running the application.
 
-# Introduction
+The application allows for active, real-time monitoring of mortality and life expectancy of the population of Spain, through an [open-source](https://github.com/dreth/tfm_uc3m) shiny web-based dashboard.
 
-The COVID-19 pandemic has led to a widespread and noticeable temporary increase in mortality, as well as to a reduction in life expectancy throughout Spain. This arises a need to monitor these demographic measures more closely and in real time. 
-
-This project consists in developing an application which allows for active, real-time monitoring of mortality and life expectancy of the population of Spain, through an [open-source](https://github.com/dreth/tfm_uc3m) shiny web-based dashboard.
-
-The application itself consists of the following functionality:
+The application itself has the following functionality:
 
 - Visualizing several mortality metrics:
     - Excess mortality
@@ -52,11 +48,14 @@ The application itself consists of the following functionality:
 
 - Visualizing a map of Spain with the previous metrics per autonomous community (CCAA)
 
-All metrics are calculated weekly with data obtained from INE and Eurostat, starting from the year 2010.
+All metrics are calculated weekly with data obtained from INE and Eurostat after an extensive data pre-processing pipeline, starting from the year 2010. The application then reads the treated data and generates 2 different kinds of visualizations for the metric selected (described in the [metrics](#Metrics) section), one is a weekly time series (coloured by year) and a map of Spain where CCAAs are coloured based on a scale. The development was initiated on February 2021 and ended with the first finalized, funcional complete version in August 2021. 
+
+As an open source project, we intend to make it a public good, and anyone can do whatever they want with the original source code as long as they abide to a license. This project is licensed under the [GNU General Public License V3](https://www.gnu.org/licenses/gpl-3.0.en.html).
+
 
 \newpage
 
-# Objectives
+# 2 - Objectives
 
 The main objectives of the project are the following:
 
@@ -64,7 +63,7 @@ The main objectives of the project are the following:
 
     + A big focus of the project was to make this application as simple-to-use as possible, while maintaining the management of system requirements extremely low. The purpose of such approach is to allow virtually anyone that desires to monitor any of the metrics to do so by running a simple shell command. We want any user or institution with access to a computer and the internet to be able to monitor these metrics, or any such metrics which could be possibly added in the future without much hassle. 
 
-    + An important prerequisite was to make the proyect open-source. This allows anyone to freely use and improve the project by adding extra components like other useful mortality-related measures. This makes the project fully auditable and free to use, modify and extend. The project is licensed using the [GNU General Public License V3](https://www.gnu.org/licenses/gpl-3.0.en.html).
+    + An important prerequisite was to make the proyect open-source. This allows anyone to freely use and improve the project by adding extra components like other useful mortality-related measures. This makes the project fully auditable and free to use, modify and extend. 
 
 - To provide the user with the ability to meaningfully customize the plot parameters.
 
@@ -84,7 +83,7 @@ The main objectives of the project are the following:
 
 \newpage
 
-# Motivation
+# 3 - Motivation
 
 As we saw during the COVID-19 pandemic, the most widely publicized measures shown to the public in order to explain the status of the pandemic and the country as a whole were always related to incidence of the virus, death counts, recovery counts, amount of patients at ICU, hospitalized patients by COVID-19 vs total hospitalized patients, etc. However, **Death counts do not tell the whole story**, a death count merely tells us that an amount of people died, it does not tell us how much that amount of deaths affect the population. Also, **all these measures are static**, therefore, we cannot see the effect they cause on the population in the long term, which is where measures like the *cumulative relative mortality rate* or *life expectancy* come in, these show the impact of deaths and their long lasting effect relative to the population over time. 
 
@@ -92,13 +91,13 @@ As an example, 100 people dying over the course of a week within a municipality 
 
 The application allows monitoring some of these measures in real time. Whenever it is desired to fetch new data (if available), the data can be fetched with a click. The measures can be instantly computed with a click and visualized to observe the evolution of the population at any time, by age group, sex and by autonomous community (CCAA) of Spain. Showcasing particular usefulness within events that cause large amounts of deaths (like a pandemic, war, or heat wave) or that reduce the general populations life expectancy (as the application can also visualize the evolution of life expectancy over time).
 
-## Inspiration
+## 4 - Inspiration
 
 The [Mortality monitor reports](https://www.actuaries.org.uk/learn-and-develop/continuous-mortality-investigation/other-cmi-outputs/mortality-monitor) published on a weekly basis by the Institute and Faculty of Actuaries of the UK was the strongest influece. The application essentially offers the same metrics and more. The intention is to improve this already quite good and useful report, make it interactive and customizable, and localize it to Spain. Currently, neither the INE (National Statistics Institute of Spain) or any other Spanish institution offer these metrics along with the rest of the features the app offers (visualizing maps, life expectancy, etc) on a per-week basis.
 
 The [COVID-19 vaccine surveillance report: Week 27](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1000512/Vaccine_surveillance_report_-_week_27.pdf), published by the PHE (Public Health England) also partly exemplifies a similar idea in its "direct impact on infection and mortality" section. 
 
-## Advantages of an open source application over weekly reports in PDF format
+## 4.1 - Advantages of an open source application over weekly reports in PDF format
 
 There are several advantages an application could potentially have over static, weekly PDF reports like the one previously linked in the [Inspiration] section:
 
@@ -112,7 +111,7 @@ There are several advantages an application could potentially have over static, 
 
 - The measures will be as up-to-date as the data source is. As these reports take time to construct and analyze, they will take longer to be released, so the user can simply open the application and update the database whenever they desire to do so.
 
-## Why is monitoring mortality/life expectancy metrics important?
+## 4.2 - Why is monitoring mortality/life expectancy metrics important?
 
 As it is with any demographic measure, knowing general metrics about population is important to many companies, institutions and individuals, to list a few:
 
@@ -122,7 +121,7 @@ As it is with any demographic measure, knowing general metrics about population 
 
 - Ordinary people. Perhaps mere curiosity or desire to be informed, being able to know in a timely manner whether the population is at risk or healthy helps people make choices regarding how to take care of themselves or how to take care of their loved ones.
 
-# Metrics computed by the application {#Metrics}
+# 5 - Metrics computed by the application {#Metrics}
 
 The application's visualizations are especially focused on 3 specific mortality metrics inspired by [the regular rolling report by UK's Institute and Faculty of Actuaries](https://www.actuaries.org.uk/learn-and-develop/continuous-mortality-investigation/other-cmi-outputs/mortality-monitor):
 
@@ -140,7 +139,7 @@ Given the host of other possible metrics to be included, which are also related 
 
 \newpage
 
-## Excess mortality {#EM}
+## 5.1 - Excess mortality {#EM}
 
 The term *excess mortality* ($EM$) refers to a measurement which corresponds to the difference between the average deaths which have ocurred during the $n$ years prior to the current $t$ time. Typically, the window of years to compute the average deaths is often $n = 5$. For the application, a window of $n = 5$ years is used to compute the measurement.
 
@@ -182,7 +181,7 @@ In Figure 1, we can clearly notice a pattern where 2020 severely exceeded the mo
 
 \newpage
 
-## Cumulative mortality rate {#CMR}
+## 5.2 - Cumulative mortality rate {#CMR}
 
 The *cumulative mortality rate* ($CMR$) represents the ratio between the sum of all deaths during the first week of a year up to a user-defined week of the same year, and the population at that same user-defined week and year, where weeks must be $1 \leq w \leq 52$.
 
@@ -208,7 +207,7 @@ Here we see an example of the $CMR$ time series computed by the application:
 
 Figure 2, in contrast to the Figure 1 shows the long term cumulative effect of increased mortality. Here 2020 rises above every other year in terms of $CMR$. We can also see 2021 showing a meaningful recovery from 2020 but following the path of 2015, which prior to the arrival of the pandemic was considered a particularly bad year in terms of mortality.
 
-## Cumulative relative mortality rate {#CRMR}
+## 5.3 - Cumulative relative mortality rate {#CRMR}
 
 The *cumulative relative mortality rate* ($CRMR$) corresponds to the ratio of the difference between the cumulative mortality rate ($CMR$) at a specified week and the average $CMR$ between years $n-k$ and $n-1$ inclusive, and the average $CMR$ in that same range of years for their last week (the 52nd week).
 
@@ -241,7 +240,7 @@ As we can notice in Figure 3, 2020 severely exceeded the previous years' $CRMR$ 
 
 \newpage
 
-## Cumulative mortality improvement factor {#CMIF}
+## 5.4 - Cumulative mortality improvement factor {#CMIF}
 
 The *cumulative mortality improvement factor* ($CMIF$) at a specific week $w$ of a year $y$ is an actuarial measure defined as the ratio of the difference between the $CMR$ at week $w$ for the previous year $y-1$ and the $CMR$ at week $w$ for the current year $y$, and the $CMR$ at week 52 for the previous year $y-1$.
 
@@ -273,7 +272,7 @@ Comparatively we can say that rises in $CRMR$ correspond with declines in $CMIF$
 
 \newpage
 
-## Life expectancy {#LE}
+## 5.5 - Life expectancy {#LE}
 
 *Life expectancy* ($LE$) is a measure that estimates the time an organism is expected to live. It is computed for a specific age group $A$ using a *life table*, which is a table commonly used in actuarial science, demography and life insurance policy risk modelling that shows the probability that a person of a certain age or age group will die before reaching their next birthday or entering the next age group. The last column of it commonly corresponds with the *life expectancy* for that age or age group based on that probability of death.
 
@@ -402,7 +401,7 @@ We can see in Figure 5 how notably life expectancy dropped during the pandemic, 
 
 \newpage
 
-# Technologies used
+# 6 - Technologies used
 
 The application utilizes several tools/services to perform the entire process of data querying, pre-processing, hosting and plotting.
 
@@ -414,7 +413,7 @@ The application utilizes several tools/services to perform the entire process of
 
 - [**GitHub**](https://github.com) is a hosting provider for software development projects and version control using Git. We use it to host the application's [code](https://github.com/dreth/tfm_uc3m), the [Docker container](https://github.com/dreth/tfm_uc3m/pkgs/container/tfm_uc3m) and the [data](https://github/tfm_uc3m_data) used by the application.
 
-# Data pipelines, hosting and application layout
+# 7 - Data pipelines, hosting and application layout {#Pipelines}
 
 There are 3 key components to this application:
 
@@ -426,11 +425,11 @@ There are 3 key components to this application:
 
 - **Docker container**: The application is then packaged and containerized in order to make it platform-agnostic using [Docker](https://docker.com). To view the Dockerfile that generates the container, see [Appendix C](#AppendixC).
 
-## Data querying and updating
+## 7.1 - Data querying and updating
 
 The data querying process goes over two APIs, the Eurostat API and the INE API.
 
-### Eurostat API querying
+### 7.1.1 - Eurostat API querying
 
 In order to query the Eurostat API, we need to execute several queries using the [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L23) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script.
 
@@ -444,7 +443,7 @@ In order to query the Eurostat API:
 
 The previously mentioned  [```query_eurostat```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L23) function does this, thereby simplifying the process of querying by just passing the parameters to the function as desired.
 
-#### Death dataset update pipeline
+#### 7.1.1.1 - Death dataset update pipeline
 
 As the Eurostat API returns a JSON, we must convert this response object into a workable pandas dataframe and eventually a CSV file, for easier storage and updating. 
 
@@ -466,7 +465,7 @@ The pipeline followed from when the data is obtained until it's updated the data
 
 8. The acquired/updated dataset is exported as a CSV file.
 
-### INE API querying
+### 7.1.2 - INE API querying
 
 To query the INE API, a single query is executed using the [```query_INE_pop```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L146) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. 
 
@@ -474,7 +473,7 @@ The function executes a single query with data starting at the date defined by t
 
 In order to query from INE we have to use their [data request](https://www.ine.es/dyngs/DataLab/en/manual.html?cid=1259945947373) (in Spanish) methods. In particular, the ones described in the "*Obtención de datos Sistema Tempus3*" section. In our case, we must create a URL like: ["https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/{df_id}?date={start}:{end}"]{color="green"}, where *df_id* is the ID of the database (**9681** for us), and *start* being where the time series will start and *end* where it will end. If *end* is left empty, then it'll fetch the most recent data.
 
-#### Population dataset update pipeline
+#### 7.1.2.1 - Population dataset update pipeline
 
 The INE API returns a JSON file with somewhat unique formatting, therefore, in order to generate a clean dataset and update the database with the cleaned up dataset, we need to go through a few steps. The intermediate step detailing the cleaning and pre-processing pipeline is detailed in the [data pre-processing pipeline](#PopDatasetPipeline) section for the population dataset.
 
@@ -490,11 +489,11 @@ The INE API returns a JSON file with somewhat unique formatting, therefore, in o
 
 6. The acquired/updated dataset is exported as a CSV file.
 
-## Data pre-processing pipeline {#PreProcessingPipeline}
+## 7.2 - Data pre-processing pipeline {#PreProcessingPipeline}
 
 After the data is acquired, then a pipeline to convert the raw JSON response from the APIs must be ran in order to construct actionable dataframes to store and use for the app. In these two sections there will be a description of all the steps in the pipeline for each of the two datasets. 
 
-### Pipeline for the deaths dataset {#DeathDatasetPipeline}
+### 7.2.1 - Pipeline for the deaths dataset {#DeathDatasetPipeline}
 
 The biggest challenge that the *deaths* dataset imposed was dealing with the indexing for the JSON response, as it had additional, and admittedly useless or empty data entries within the JSON. Also, the data obtained included a 53rd week for those years that don't fit the same exact number of weeks, this must be dealt with as well.
 
@@ -520,7 +519,7 @@ The pipeline steps are the following:
 
 7. The *year_week* column is dropped and the resulting, cleaned up DataFrame is returned.
 
-### Pipeline for the population dataset {#PopDatasetPipeline}
+### 7.2.2 - Pipeline for the population dataset {#PopDatasetPipeline}
 
 The population dataset response JSON came with challenges:
 
@@ -594,7 +593,7 @@ All the steps are performed within the [```generate_pop_df```](https://github.co
 
 14. Only data up until the latest week in the deaths dataset is [kept](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L431). Empty values are [removed](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L434) from the DataFrame, and the columns are finally [reordered](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L441) prior to being outputted in order to match the column order of the deaths dataset.
 
-## Dataset update methodology after pre-processing {#DatasetUpdateMethodology}
+## 7.3 - Dataset update methodology after pre-processing {#DatasetUpdateMethodology}
 
 After the data is ran through the [pre-processing pipeline](#PreProcessingPipeline), the [```perform_update_datasets```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L447-L488) is ran when performing an update. This function goes through several steps in order to avoid replacing the entire datasets with each update. The steps are as follows:
 
@@ -612,13 +611,13 @@ After the data is ran through the [pre-processing pipeline](#PreProcessingPipeli
 
 7. All three datasets are [concatenated](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L482), the marker column is [dropped](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L485) and the dataset is [returned](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L488) with a clean index.
 
-## Data hosting
+## 7.4 - Data hosting
 
 The data is hosted in both the [dreth/tfm_uc3m](https://github.com/dreth/tfm_uc3m) repository and the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository, however, the newest data, and the one that is pulled every time the app is launched from docker (to check for changes) is contained in the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository.
 
 Every time a user performs a database update through the docker container, the application will push the changes to the [dreth/tfm_uc3m_data](https://github.com/dreth/tfm_uc3m_data) repository.
 
-## Application Layout
+## 7.5 - Application Layout
 
 The application consists of 6 sections (or tabs). Each tab has a set of controls and features which will be described in this section. 
 
@@ -640,7 +639,7 @@ And the documentation:
 
 - [[**Docs**]{color="black"}](#DocsLayout)
 
-### Mortality {#MortalityLayout}
+### 7.5.1 - Mortality {#MortalityLayout}
 
 - **Description**: The mortality tab produces a time series plot with *week* in the x-axis and the specific mortality metric chosen (of those described in the [metrics](#Metrics)) section in the y-axis. The metrics that can be selected are: [[Cumulative mortality rate]{color="black"}](#CMR), [[Cumulative relative mortality rate]{color="black"}](#CRMR), [[Mortality improvement factor]{color="black"}](#CMIF) and [[Excess mortality]{color="black"}](#EM).
 
@@ -662,7 +661,7 @@ And the documentation:
     + *Selection of image format*, which will return the image using the desired formatting, the default is PNG.
     + *Selection of image size*, if predefined, the dimension selector will show. All sizes in the predefined dimension selector are square. If custom, two number selectors show with width and height selection, any number can be inputted in them.
 
-### Maps {#MapsLayout}
+### 7.5.2 - Maps {#MapsLayout}
 
 - **Description**: The maps tab produces a choropleth map of Spain by CCAA, where each CCAA is coloured according to the metric selected. Any metric from the [metrics](#Metrics) section can be selected.
 
@@ -675,7 +674,7 @@ And the documentation:
     + *Selection of a week* to plot for, between week 1 and 52. The week range allowed will vary depending on the year.
     + *Selection of a year* to plot for, between the lowest year in the data (2010 at the time of writing) and what the current year may be. As there might have ocurred zero deaths in some CCAAs in some specific weeks, life expectancy may be NA if no deaths were recorded for a specific age group.
 
-### Life expectancy {#LifeExpLayout}
+### 7.5.3 - Life expectancy {#LifeExpLayout}
 
 - **Description**: The life expectancy tab produces either a time series of life expectancy (either at birth or for a selected age group). The time series is based on weekly life tables, therefore it's also possible to individually generate a life table for any week of the available years. The first selector allows selecting between the time series plot and the life table.
 
@@ -697,7 +696,7 @@ And the documentation:
 
 - **Download controls** are identical to those described in the [mortality](#MortalityLayout) section.
 
-### Database tables {#DBTablesLayout}
+### 7.5.4 - Database tables {#DBTablesLayout}
 
 - **Description**: The database tables section allows anyone to filter the database according to any desired parameters, visualize a sample of their selection and be able to download the filtered raw data in *CSV* format.
 
@@ -710,7 +709,7 @@ And the documentation:
     + *Selection of year range* to filter by. This is a discrete slider, so any range of years between 2010 and up to the current year can be selected to download.
     + Button to *download* the filtered dataset.
 
-### DB info and update {#DBInfoLayout}
+### 7.5.5 - DB info and update {#DBInfoLayout}
 
 - **Description**: The database information and update section contains information with respect to the different databases. This information is updated every time the app is newly launched. The information shown is the following:
 
@@ -726,11 +725,11 @@ And the documentation:
 
 - **Controls**: The only control available is the *update database* button, which allows for the database to be updated. If the app is being run using the *docker* container, then updating the database from the app will upload any newly updated data to the [data repository](https://github.com/dreth/tfm_uc3m_data) if there is data available. 
 
-### Documentation {#DocsLayout}
+### 7.5.6 - Documentation {#DocsLayout}
 
 - **Description**: The documentation section contains the documentation for each tab. It includes description of each section and instructions on use them. 
 
-# Glossary
+# 8 - Glossary
 
 This glossary includes definitions to terminology readers might not be familiar with.
 
@@ -754,13 +753,13 @@ This glossary includes definitions to terminology readers might not be familiar 
 
 - **container**: packaged application which includes all of its requirements and allows users to run the application by shrinking its requirements to only the containerization software itself.
 
-# Appendix
+# 9 - Appendix
 
 This project has a large amount of code, therefore only some code chunks from the Python, R and Docker parts will be shown in this appendix. All the code shown in the appendix is from what has been written up to August 2021. Any future extra additions to the application will be in the displayed in the project's [repository](https://github.com/dreth/tfm_uc3m).
 
 The last appendix will show the project repository tree structure, with an explanation of each file in the [main repository's](https://github.com/dreth/tfm_uc3m) file tree, their purpose and what they contain.
 
-## Appendix A: Python
+## 9.1 - Appendix A: Python
 
 The first component of the project is the data. All the data querying and pre-processing parts of the project are written in python. There's several functions that do different things. In this section, each one will be explained and linked to the specific lines of code on github that define them. 
 
@@ -846,7 +845,7 @@ There are many other functions defined in the [**functions.py**](https://github.
 
 The script is somewhat long with between 70 and 80 lines of code and it can be fully seen on its [corresponding page](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py) within the repository file tree.
 
-## Appendix B: R
+## 9.2 - Appendix B: R
 
 Everything coded in R corresponds to the application itself. There are 3 R scripts in particular, these are described in detail in [Appendix D](#AppendixD)
 
@@ -949,7 +948,7 @@ label = h4(strong('Generate plot'))
 
 \normalsize
 
-## Appendix C: Docker {#AppendixC}
+## 9.3 - Appendix C: Docker {#AppendixC}
 
 In order to containerize the application, Docker was used. The container to create the application was created from the following [**Dockerfile**](https://github.com/dreth/tfm_uc3m/blob/main/docker/Dockerfile). 
 
@@ -1073,13 +1072,13 @@ CMD cd ./tfm_uc3m && git pull && cd ../tfm_uc3m_data &&
 
 \normalsize
 
-## Appendix D: Project repository tree structure {#AppendixD}
+## 9.4 - Appendix D: Project repository tree structure {#AppendixD}
 
 \definecolor{darkspringgreen}{rgb}{0.09, 0.45, 0.27}
 
 The project consists of two repositories and their respectives [**subfolders**]{color="darkspringgreen"}, [**files**]{color="red"} and [**databases**]{color="purple"}:
 
-### [**The main project repository** (*dreth/tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
+### 9.4.1 - [**The main project repository** (*dreth/tfm_uc3m*)](https://github.com/dreth/tfm_uc3m)
 
 - [**api**]{color="darkspringgreen"}: Contains all files related to the querying, acquisition, manipulation of new data from the two aggregated data sources (INE and Eurostat), along with various log files used to keep track of some metadata from the data sources (last updated data and provisional data). 
     - [**logs**]{color="darkspringgreen"}: This folder contains log files used in the DB info section of the application to display diagnostic info about the databases.
@@ -1139,7 +1138,7 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 - [**README.md**]{color="red"}: Readme file explaining how to run the app and some basic information about it.
 
-### [**The data repository** (*dreth/tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
+### 9.4.2 - [**The data repository** (*dreth/tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
 
 - [**ccaa_guide**]{color="darkspringgreen"}: This folder contains files used to match CCAA names with their Eurostat denomination, as there can be multiple denominations for a single CCAA at times (like it happens with Madrid and Canarias). The files are in several different formats, like *.txt* and *.p*. The *.p* file corresponds to a binarized python object representing a python dictionary with the contents of the *.txt* file.
 
@@ -1153,7 +1152,7 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 \newpage
 
-# References
+# 10 - References
 
 <div id="refs"></div>
 
