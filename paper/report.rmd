@@ -69,7 +69,7 @@ The main objectives of the project are the following:
 
     + The application itself should have several controls that allow the user to customize visualizations. Some of them are: what years to visualize, what metrics to visualize, what range of weeks to visualize (between 1 and 52), which CCAAs or age groups to aggregate, whether to make the plots interactive (using *plotly*) or static (using *ggplot2*), and so on. Different options will be available for different plots.
 
-- To p3rovide the user the ability to download the plots and the data (with or without filtering).
+- To provide the user the ability to download the plots and the data (with or without filtering).
 
     + The application shall include a download button with several options for all plots displayed within the application. The user can select the size of the plot from a list of predefined sizes, or specify the image resolution and the format from a list of available ones. We intend to make it so that any plot generated within the app can be downloaded.
 
