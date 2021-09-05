@@ -146,4 +146,4 @@ If the container ID and tag do not show up when running ```docker ps```, the con
 
 ## License
 
-This project is licensed under the GNU General Public License v3, the license can be seen on the [COPYING](https://github.com/dreth/tfm_uc3m/COPYING) file in the root directory of this repository.
+This project is licensed under the GNU General Public License v3, the license can be seen on the [LICENSE](https://github.com/dreth/tfm_uc3m/LICENSE) file in the root directory of this repository.

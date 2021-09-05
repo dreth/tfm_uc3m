@@ -1134,7 +1134,7 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 - [**paper**]{color="darkspringgreen"}: Folder containing this report and all the files the report depends on.
 
-- [**COPYING**]{color="red"}: This file contains the GNU General Public License V3, as the project is licensed under it.
+- [**LICENSE**]{color="red"}: This file contains the GNU General Public License V3, as the project is licensed under it.
 
 - [**README.md**]{color="red"}: Readme file explaining how to run the app and some basic information about it.
 
