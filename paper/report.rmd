@@ -30,15 +30,15 @@ fig.path = "./figures/"
 
 # 1 - Summary
 
-As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic and future similarly deadly events has become increasingly important. It is intended with this project to develop a tool to easily monitor a selection of demographic measures. All related to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously, or perhaps other smaller scale events which could increase mortality in a likely fashion.
+As a result of the COVID-19 pandemic and its large impact across Spain, the monitoring of demographic measures as a direct result of deaths related to such pandemic, as well as similarly future deadly events, has become increasingly important. This project intends to develop a tool to easily monitor a selection of demographic measures, all related to collective deaths of individuals as a result of relevant worldwide events like the one mentioned previously, or perhaps other smaller scale events which could increase mortality in a likely fashion.
 
-The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) [Shiny-based](https://shiny.rstudio.com/) dashboard (developed in R) where such measures are displayed in different visualizations across time. The dashboard is containerized using Docker, in order to make possible to run and use in in any operating system. The data is acquired from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs. It is then treated by several Python scripts and stored in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated by anyone running the application.
+The tool consists of an [open-source](https://github.com/dreth/tfm_uc3m) [Shiny-based](https://shiny.rstudio.com/) dashboard (developed in R) where such measures are computed and promptly displayed to simplify the data analysis. The application is containerized using Docker, that enables to make possible to run and use it in any operating system. The data is acquired from the [INE](https://ine.es/) and [Eurostat](https://ec.europa.eu/eurostat/) APIs, freely available on the internet. It is then treated by several Python scripts and stored in a GitHub [repository](https://github.com/dreth/tfm_uc3m_data) where it can be updated anytime during the application's runtime.
 
-The application allows for active, real-time monitoring of mortality and life expectancy of the population of Spain, through an [open-source](https://github.com/dreth/tfm_uc3m) shiny web-based dashboard.
+The application allows for active, real-time monitoring of mortality and life expectancy of the Spanish population.
 
 The application itself has the following functionality:
 
-- Visualizing several mortality metrics:
+- Computation and visualization of several mortality metrics:
     - Excess mortality
     - Cumulative mortality rate
     - Cumulative relative mortality rate
@@ -46,11 +46,11 @@ The application itself has the following functionality:
 
 - Visualizing life expectancy and constructing life tables
 
-- Visualizing a map of Spain with the previous metrics per autonomous community (CCAA)
+- Visualization of a map of Spain with the previous metrics per autonomous community (CCAA)
 
 All metrics are calculated weekly with data obtained from INE and Eurostat after an extensive data pre-processing pipeline, starting from the year 2010. The application then reads the treated data and generates 2 different kinds of visualizations for the metric selected (described in the [metrics](#Metrics) section), one is a weekly time series (coloured by year) and a map of Spain where CCAAs are coloured based on a scale. The development was initiated on February 2021 and ended with the first finalized, funcional complete version in August 2021. 
 
-As an open source project, we intend to make it a public good, and anyone can do whatever they want with the original source code as long as they abide to a license. This project is licensed under the [GNU General Public License V3](https://www.gnu.org/licenses/gpl-3.0.en.html).
+As an open source project, we intend to make it a public good, and anyone can do whatever they want with the original source code as long as they abide to a license. This project is licensed under the [GNU General Public License V3](https://github.com/dreth/tfm_uc3m/blob/main/LICENSE).
 
 
 \newpage
@@ -59,9 +59,9 @@ As an open source project, we intend to make it a public good, and anyone can do
 
 The main objectives of the project are the following:
 
-- To provide an open-source, simple-to-use, web-based, OS-agnostic tool to compute and visualize common mortality-related metrics and life expectancy in time series plots, and static or interactive maps.
+- To provide an open-source, easy-to-use, web-based, OS-agnostic tool to compute and visualize common mortality-related metrics and life expectancy in time series plots, and static or interactive maps.
 
-    + A big focus of the project was to make this application as simple-to-use as possible, while maintaining the management of system requirements extremely low. The purpose of such approach is to allow virtually anyone that desires to monitor any of the metrics to do so by running a simple shell command. We want any user or institution with access to a computer and the internet to be able to monitor these metrics, or any such metrics which could be possibly added in the future without much hassle. 
+    + A big focus of the project was to make this application as simple as possible to use, while maintaining the management of system requirements extremely low. The purpose of such approach is to allow virtually anyone that desires to monitor any of the metrics to do so by running a simple shell command. We want any user or institution with access to a computer and the internet to be able to monitor these metrics, or any such metrics which could be possibly added in the future without much hassle. 
 
     + An important prerequisite was to make the proyect open-source. This allows anyone to freely use and improve the project by adding extra components like other useful mortality-related measures. This makes the project fully auditable and free to use, modify and extend. 
 
@@ -75,7 +75,7 @@ The main objectives of the project are the following:
 
 - Allow the user to update and upload the data to the corresponding GitHub [repository](https://github.com/dreth/tfm_uc3m_data) hosting the data, from within the application.
 
-    + The data is constantly changing, and as soon as the data sources have new data available, the application will tell the user there is new data, and the user will be able to update the data with the click of a button. The updated data will be fetched, ran through the pipeline, and uploaded to the [data repository](https://github.com/dreth/tfm_uc3m_data) for the project on GitHub. This ensures that the data is always updated and anyone is able to do so for everyone else from anywhere in the world.
+    + The data is constantly changing, and as soon as the data sources have new data available, the application will notify the user about the existence of new data, and the user will be able to update the data by clicking a button. The updated data will be fetched, ran through the pipeline, and uploaded to the [data repository](https://github.com/dreth/tfm_uc3m_data) for the project on GitHub. This ensures that the data is always updated and anyone is able to do so for everyone else from anywhere in the world.
 
 - Have data updated in real-time from the official Spanish sources (INE) and Eurostat (also provided by INE).
 
@@ -85,21 +85,21 @@ The main objectives of the project are the following:
 
 # 3 - Motivation
 
-As we saw during the COVID-19 pandemic, the most widely publicized measures shown to the public in order to explain the status of the pandemic and the country as a whole were always related to incidence of the virus, death counts, recovery counts, amount of patients at ICU, hospitalized patients by COVID-19 vs total hospitalized patients, etc. However, **Death counts do not tell the whole story**, a death count merely tells us that an amount of people died, it does not tell us how much that amount of deaths affect the population. Also, **all these measures are static**, therefore, we cannot see the effect they cause on the population in the long term, which is where measures like the *cumulative relative mortality rate* or *life expectancy* come in, these show the impact of deaths and their long lasting effect relative to the population over time. 
+As we saw during the COVID-19 pandemic, the most widely publicized measures shown to the public in order to explain the status of the pandemic and the country as a whole were always related to incidence of the virus, death counts, recovery counts, amount of patients at ICU, hospitalized patients by COVID-19 vs total hospitalized patients, etc. However, **Death counts do not tell the whole story**, a death count merely tells us that an amount of people died, it does not tell us how much that amount of deaths affect the population. Also, **all these measures are static**, therefore, we cannot see the effect they cause on the population in the long term, which is where measures like the *cumulative relative mortality rate* or *life expectancy* come in, they were able to show the impact of deaths and their long lasting effect relative to the population over time. 
 
 As an example, 100 people dying over the course of a week within a municipality of 10,000 inhabitants represents 1% of the population; that same amount of deaths would represent less than 0.01% of the population within a municipality of 1 million inhabitants. Therefore, more robust measures to determine the impact of the deaths caused by a pandemic are needed to really gauge the effect of the pandemic as a whole.
 
-The application allows monitoring some of these measures in real time. Whenever it is desired to fetch new data (if available), the data can be fetched with a click. The measures can be instantly computed with a click and visualized to observe the evolution of the population at any time, by age group, sex and by autonomous community (CCAA) of Spain. Showcasing particular usefulness within events that cause large amounts of deaths (like a pandemic, war, or heat wave) or that reduce the general populations life expectancy (as the application can also visualize the evolution of life expectancy over time).
+The application allows monitoring some of these measures in real time. Whenever it is desired to fetch new data (if available), the data can be fetched with a click. The measures can be instantly computed and visualized to observe the evolution of the population at any time, by age group, sex and by autonomous community (CCAA) of Spain. Showcasing particular usefulness within events that cause large amounts of deaths (like a pandemic, war, or heat wave) or that reduce the general populations life expectancy (as the application can also visualize the evolution of life expectancy over time).
 
-## 4 - Inspiration
+## 4 - Inspiration {#Inspiration}
 
-The [Mortality monitor reports](https://www.actuaries.org.uk/learn-and-develop/continuous-mortality-investigation/other-cmi-outputs/mortality-monitor) published on a weekly basis by the Institute and Faculty of Actuaries of the UK was the strongest influece. The application essentially offers the same metrics and more. The intention is to improve this already quite good and useful report, make it interactive and customizable, and localize it to Spain. Currently, neither the INE (National Statistics Institute of Spain) or any other Spanish institution offer these metrics along with the rest of the features the app offers (visualizing maps, life expectancy, etc) on a per-week basis.
+The [Mortality monitor reports](https://www.actuaries.org.uk/learn-and-develop/continuous-mortality-investigation/other-cmi-outputs/mortality-monitor) published on a weekly basis by the Institute and Faculty of Actuaries of the UK was the strongest influece. The application essentially offers the same metrics and more. The intention is to improve this already quite good and useful report, making it interactive and customizable, and localizing it to Spain. Currently, neither the INE (National Statistics Institute of Spain) or any other Spanish institution offer these metrics along with the rest of the features the app offers (visualizing maps, life expectancy, etc) on a per-week basis.
 
 The [COVID-19 vaccine surveillance report: Week 27](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1000512/Vaccine_surveillance_report_-_week_27.pdf), published by the PHE (Public Health England) also partly exemplifies a similar idea in its "direct impact on infection and mortality" section. 
 
 ## 4.1 - Advantages of an open source application over weekly reports in PDF format
 
-There are several advantages an application could potentially have over static, weekly PDF reports like the one previously linked in the [Inspiration] section:
+There are several advantages an application could potentially have over static, weekly PDF reports like the one metioned in the [previous](#Inspiration) section:
 
 - The user has control over the visualizations, as there are controls to manipulate the parameters of the visualizations and interact with them.  
 
@@ -107,7 +107,7 @@ There are several advantages an application could potentially have over static, 
 
 - The user can choose what measures of those available to show.
 
-- As the application is [open source](https://github.com/dreth/tfm_uc3m), developers could expand the application and add extra features and contribute directly to the project's development.
+- As the application is [open source](https://github.com/dreth/tfm_uc3m), developers could expand the application by adding extra features and contributing directly to the project's development.
 
 - The measures will be as up-to-date as the data source is. As these reports take time to construct and analyze, they will take longer to be released, so the user can simply open the application and update the database whenever they desire to do so.
 
@@ -115,7 +115,7 @@ There are several advantages an application could potentially have over static, 
 
 As it is with any demographic measure, knowing general metrics about population is important to many companies, institutions and individuals, to list a few:
 
-- The Government and the Ministry of Health, the main decisionmakers in terms of public health related issues. These two institutions can use these metrics to construct policies or regulations to protect the general health of the population, prioritize or purchase particular medication or medical utensils if needed, etc.
+- The Government and the Ministry of Health, the main decisionmakers in terms of public health related issues. These two institutions can use these metrics to construct policies, regulations and take measures to protect the general health of the population.
 
 - Insurance companies, those to which customers, companies, governments and other institutions transfer risk in order to protect themselves financially from health-related liabilities or death. Insurance companies directly use life tables to measure risk when providing life insurance to customers, and in order to remain profitable and offer a risk-assessed quality service to their customers these metrics modulate insurance premiums and aid in the process of decisionmaking when it comes to offering a policy to what the company could deem high or low risk customers.
 
@@ -288,7 +288,7 @@ As we need to compute $LE$ for specific weeks/years and display them as a time s
 
 The process is largely inspired from the following methodology explained on the [MEASURE evaluation website](https://www.measureevaluation.org/resources/training/online-courses-and-resources/non-certificate-courses-and-mini-tutorials/multiple-decrement-life-tables/lesson-3.html). However, it was adapted to fit weekly measures by taking data one year prior to the specified week. Calculations after the step 2 described below are nearly identical to those displayed on the previously linked article.
 
-To compute $LE$ we must first compute a life table as follows, note that each step also corresponds to a column of the life table in the same order:
+To compute $LE$ we must first compute a life table as follows, note that each step also corresponds to a column of the life table in the same order and that summations with no summation variable represent column sums:
 
 **1.** Compute the age-specific death rate ${}_{n}m_{x}$:
 
@@ -359,6 +359,8 @@ Where:
 \tag{5}
 {}_{n}L_{x} = \frac{{}_{n}d_{x}}{{}_{n}m_{x}}
 \end{equation}
+
+\newpage
 
 **6.** We calculate the cumulative person-years of life after age $x$, $T_x$. Therefore, for the first age group in the table, the value of $T_x$ will correspond to the sum of all ${}_{n}L_{x}$, the entire 5th column. For the second age group, it'll be the sum of all ${}_{n}L_{x}$ with the exception of the ${}_{n}L_{x}$ value of the first age group, and so on.
 
@@ -521,21 +523,21 @@ The pipeline steps are the following:
 
 ### 7.2.2 - Pipeline for the population dataset {#PopDatasetPipeline}
 
-The population dataset response JSON came with challenges:
+The population dataset response JSON came with the following challenges:
 
 - The raw data had the full names of the CCAAs, so in order to keep the Eurostat standard, as it is shorter and would occupy less space in the repo, they were replaced.
 
-- The sex also needed to be replaced, as it was in Spanish and it didn't go in line with the deaths dataset.
+- The sex also needed to be replaced, as it was in Spanish and therefore wouldn't match the format displayed in the deaths dataset.
 
 - The data is gathered on a bi-yearly basis, therefore, a linear interpolation between the two data points that INE records (in January and June) had to be applied to have weekly data. The linear interpolation had to also look ahead about 6 months, given that the data recorded by INE in either June or January takes about a month to be published. The deaths data is often much more up to date, as it is already recorded on a weekly basis, which sometimes causes the deaths data to go ahead of the population data. 
 
-- The sheer size of the obtained JSON and its somewhat odd formatting compared to the previous one obtained from Eurostat requires a large inefficient loop to process. This looping was done using *numpy* arrays, which are often much faster than *pandas* DataFrames, this introduced a few new challenges in order to keep the updating script much more efficient.
+- The sheer size of the obtained JSON and its somewhat odd formatting compared to the previous one obtained from Eurostat required a large inefficient loop to process. This looping was done using *numpy* arrays, which are often much faster than *pandas* DataFrames, this introduced a few new challenges in order to keep the updating script much more efficient.
 
 - The data came for individual ages, therefore, to match and be able to perform the computation of the metrics [previously mentioned](#Metrics), grouping the people within the same specific age groups present in the previous dataset is needed.
 
 All the steps are performed within the [```generate_pop_df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L190) function defined in the [functions.py](https://github.com/dreth/tfm_uc3m/blob/main/api/functions.py) script. The pipeline steps are the following:
 
-1. Define several dictionaries with reference data and replacements to align the formatting with the deaths dataset. The dictionaries defined are:
+1. Several dictionaries with reference data and replacements to align the formatting with the deaths dataset are defined. These dictionaries are the following:
     
     + [```df```](https://github.com/dreth/tfm_uc3m/blob/report_ref/api/functions.py#L197-L203), which is going to eventually become the final population dataset. It contains as keys the names of the columns of the final population dataset and as values empty lists.
 
@@ -920,7 +922,8 @@ genMortPlot <- eventReactive(input$plotMortalityButton, {
         wk=WEEK, 
         yr=input$yearSliderSelectorMortality[1]:input$yearSliderSelectorMortality[2], 
         ccaas=switch(input$selectCCAAMortalityTotal, 'all'=CCAA, 'select'=input$selectCCAAMortality),
-        age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS, 'select'=input$selectAgeMortality),
+        age_groups=switch(input$selectAgeGroupsMortalityTotal, 'all'=AGE_GROUPS,
+                          'select'=input$selectAgeMortality),
         sexes=input$selectSexesMortality,
         type=input$plotTypeMortality,
         week_range_plot=input$weekSliderSelectorMortality[1]:input$weekSliderSelectorMortality[2],
