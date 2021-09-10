@@ -643,8 +643,9 @@ And the documentation:
 
 ### 7.5.1 - Mortality {#MortalityLayout}
 
-- **Description**: The mortality tab produces a time series plot with *week* in the x-axis and the specific mortality metric chosen (of those described in the [metrics](#Metrics)) section in the y-axis. The metrics that can be selected are: [[Cumulative mortality rate]{color="black"}](#CMR), [[Cumulative relative mortality rate]{color="black"}](#CRMR), [[Mortality improvement factor]{color="black"}](#CMIF) and [[Excess mortality]{color="black"}](#EM).
+![Mortality section screenshot](./images/mortality_section.png){width=91%}
 
+- **Description**: The mortality tab produces a time series plot with *week* in the x-axis and the specific mortality metric chosen (of those described in the [metrics](#Metrics)) section in the y-axis. The metrics that can be selected are: [[Cumulative mortality rate]{color="black"}](#CMR), [[Cumulative relative mortality rate]{color="black"}](#CRMR), [[Mortality improvement factor]{color="black"}](#CMIF) and [[Excess mortality]{color="black"}](#EM).
 
 - **Controls**: The parameters that can be modified for the plot are the following:
 
@@ -663,7 +664,11 @@ And the documentation:
     + *Selection of image format*, which will return the image using the desired formatting, the default is PNG.
     + *Selection of image size*, if predefined, the dimension selector will show. All sizes in the predefined dimension selector are square. If custom, two number selectors show with width and height selection, any number can be inputted in them.
 
+\newpage
+
 ### 7.5.2 - Maps {#MapsLayout}
+
+![Maps section screenshot](./images/maps_section.png)
 
 - **Description**: The maps tab produces a choropleth map of Spain by CCAA, where each CCAA is coloured according to the metric selected. Any metric from the [metrics](#Metrics) section can be selected.
 
@@ -676,9 +681,14 @@ And the documentation:
     + *Selection of a week* to plot for, between week 1 and 52. The week range allowed will vary depending on the year.
     + *Selection of a year* to plot for, between the lowest year in the data (2010 at the time of writing) and what the current year may be. As there might have ocurred zero deaths in some CCAAs in some specific weeks, life expectancy may be NA if no deaths were recorded for a specific age group.
 
+\newpage
+
 ### 7.5.3 - Life expectancy {#LifeExpLayout}
 
+![Life Expectancy section screenshot](./images/life_expectancy_section.png)
+
 - **Description**: The life expectancy tab produces either a time series of life expectancy (either at birth or for a selected age group). The time series is based on weekly life tables, therefore it's also possible to individually generate a life table for any week of the available years. The first selector allows selecting between the time series plot and the life table.
+
 
 - **Plot controls**: The parameters that can be modified for the life expectancy time series plot are the following:
 
@@ -700,6 +710,8 @@ And the documentation:
 
 ### 7.5.4 - Database tables {#DBTablesLayout}
 
+![Database tables section screenshot](./images/db_tables_section.png){width=80%}
+
 - **Description**: The database tables section allows anyone to filter the database according to any desired parameters, visualize a sample of their selection and be able to download the filtered raw data in *CSV* format.
 
 - **Controls**: The controls for this section allow for filtering of the database and selection of the database:
@@ -711,7 +723,11 @@ And the documentation:
     + *Selection of year range* to filter by. This is a discrete slider, so any range of years between 2010 and up to the current year can be selected to download.
     + Button to *download* the filtered dataset.
 
+\newpage
+
 ### 7.5.5 - DB info and update {#DBInfoLayout}
+
+![Database information and update section screenshot](./images/db_info_update_section.png){width=93%}
 
 - **Description**: The database information and update section contains information with respect to the different databases. This information is updated every time the app is newly launched. The information shown is the following:
 
@@ -727,7 +743,11 @@ And the documentation:
 
 - **Controls**: The only control available is the *update database* button, which allows for the database to be updated. If the app is being run using the *docker* container, then updating the database from the app will upload any newly updated data to the [data repository](https://github.com/dreth/tfm_uc3m_data) if there is data available. 
 
+\newpage
+
 ### 7.5.6 - Documentation {#DocsLayout}
+
+![Documentation section screenshot](./images/docs_section.png)
 
 - **Description**: The documentation section contains the documentation for each tab. It includes description of each section and instructions on use them. 
 
@@ -754,6 +774,8 @@ This glossary includes definitions to terminology readers might not be familiar 
 - **shiny**: R web development package.
 
 - **container**: packaged application which includes all of its requirements and allows users to run the application by shrinking its requirements to only the containerization software itself.
+
+\newpage
 
 # 9 - Appendix
 
@@ -846,6 +868,8 @@ There are many other functions defined in the [**functions.py**](https://github.
 - [**query.py**](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py): This script is essentially the set of steps performed to update the database. It queries the data, passes it to the corresponding pre-processing functions (whose steps are described in its corresponding [section](#PreProcessingPipeline)), and then it updates the database in an efficient manner as described in the [update methodology](#DatasetUpdateMethodology) section.
 
 The script is somewhat long with between 70 and 80 lines of code and it can be fully seen on its [corresponding page](https://github.com/dreth/tfm_uc3m/blob/main/api/query.py) within the repository file tree.
+
+\newpage
 
 ## 9.2 - Appendix B: R
 
@@ -987,8 +1011,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 \normalsize
 
-\newpage
-
 3. The python and R packages required to run the application are installed.
 
 \tiny
@@ -1021,7 +1043,7 @@ RUN R -e "install.packages('RcppRoll')"
 
 4. The repositories are cloned.
 
-\tiny
+\small
 
 ```{python, eval=FALSE, echo=TRUE}
 # cloning the project repos
@@ -1033,7 +1055,7 @@ RUN git clone https://github.com/dreth/tfm_uc3m_data.git
 
 5. An *isdocker* file is created with the content "True", in order for the application to determine whether it is or not running in a Docker container or not. The purpose of this is to disable in-app updating for people running the application through any other medium different to the [Docker Hub](https://hub.docker.com/r/dreth/tfm_uc3m) or [GHCR.io](https://github.com/dreth/tfm_uc3m/pkgs/container/tfm_uc3m) container. This line of code is not present in the Dockerfile within the GitHub repository, as this would allow anyone building the container to attempt to update the data and upload it to the [data repository](https://github.com/dreth/tfm_uc3m_data). The problem with this is that the upload to the repository would fail, as the Dockerfile publicly available in the main repository does not contain the pusher credentials to update the data (unlike the Docker Hub or GHCR.io counterparts).
 
-\tiny
+\small
 
 ```{python, eval=FALSE, echo=TRUE}
 # creating a file to identify the runtime of the app as a docker container
@@ -1044,7 +1066,7 @@ RUN touch '/isdocker' && echo "True" > '/isdocker'
 
 6. TCP Port 3838 is exposed in order to locally run the app at [http://0.0.0.0:3838]{color="blue"}. 
 
-\tiny
+\small
 
 ```{python, eval=FALSE, echo=TRUE}
 # select port
@@ -1052,6 +1074,8 @@ EXPOSE 3838/tcp
 ```
 
 \normalsize
+
+\newpage
 
 7. The following somewhat long command is the one launched by the container every time it opens, it performs the following steps:
 
@@ -1063,7 +1087,7 @@ EXPOSE 3838/tcp
 
     + Run the application.
 
-\footnotesize
+\small
 
 ```{python, eval=FALSE, echo=TRUE}
 # running app from repo
@@ -1118,6 +1142,8 @@ The project consists of two repositories and their respectives [**subfolders**]{
 
 &nbsp;
 
+\newpage
+
 - [**data**]{color="darkspringgreen"}: This folder is a subtree of the [**dreth/tfm_uc3m_data**](https://github.com/dreth/tfm_c3m_data) repository, therefore, it contains all the data used in the application along with logs showing diagnostic and historical information about database updates.
     - [**ccaa_guide**]{color="darkspringgreen"}: This folder contains files used to match CCAA names with their Eurostat denomination, as there can be multiple denominations for a single CCAA at times (like it happens with Madrid and Canarias). The files are in several different formats.
     - [**logs**]{color="darkspringgreen"}: This folder contains the log files used to display diagnostic information about database updates (dates).
@@ -1140,6 +1166,8 @@ The project consists of two repositories and their respectives [**subfolders**]{
 - [**LICENSE**]{color="red"}: This file contains the GNU General Public License V3, as the project is licensed under it.
 
 - [**README.md**]{color="red"}: Readme file explaining how to run the app and some basic information about it.
+
+\newpage
 
 ### 9.4.2 - [**The data repository** (*dreth/tfm_uc3m_data*)](https://github.com/dreth/tfm_c3m_data)
 
