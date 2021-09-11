@@ -1,13 +1,19 @@
 # Documentation
 
-## Sections
+Welcome to the docs folder!
 
-### Mortality tab
+The documentation per section is in the [./sections folder](https://github.com/dreth/tfm_uc3m/tree/main/docs/sections).
 
-### Maps tab
+The project is documented using markdown files which are rendered within the app in the *documentation* section.
 
-### Life expectancy tab
+## Links for each section (within the repo tree)
 
-### Database tables tab
+- [Mortality](https://github.com/dreth/tfm_uc3m/blob/main/docs/sections/mortality.md)
 
-### Database information and update tab
+- [Maps](https://github.com/dreth/tfm_uc3m/blob/main/docs/sections/maps.md)
+
+- [Life Expectancy](https://github.com/dreth/tfm_uc3m/blob/main/docs/sections/lifeExp.md)
+
+- [Database Tables](https://github.com/dreth/tfm_uc3m/blob/main/docs/sections/dbTables.md)
+
+- [DB info and update](https://github.com/dreth/tfm_uc3m/blob/main/docs/sections/dbInfo.md)
