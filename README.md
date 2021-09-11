@@ -63,13 +63,6 @@ It might take a bit to download entirely at first as the image is somewhat large
 
 The data can also be updated, however, database updates performed within the app will only be local and won't update the data included within the repo itself. This might change for future updates, but the only limitation from this might be that if the data within the repo is outdated, it will have to be updated directly by whoever has write access to this repository, unless a local update is performed, which the app can perform in the *update database* tab.
 
-#### 
-
-**All features** are available when using this method.
-
-This option is also a docker container like the previously explained one, but this one is pulled from the GitHub Container Repository instead
-
-
 #### Building
 
 **All features except pushing data to the [data repo](https://github.com/dreth/tfm_uc3m_data)** are available using this method.
