@@ -41,7 +41,7 @@ I have created a docker container for the application, this way we avoid any req
 
 You can download docker [here](https://www.docker.com/products/docker-desktop) if you don't have it installed yet, it is the only requirement to run the application.
 
-#### Docker hub
+#### Docker hub or GitHub Container Repository
 
 **All features** are available when using this method.
 
@@ -51,11 +51,24 @@ Given docker is installed, the app can be launched by running the following comm
 docker run -it -p 3838:3838/tcp dreth/tfm_uc3m:latest
 ```
 
+Or, alternatively, you can also pull the container from the GHCR:
+
+```bash
+docker run -it -p 3838:3838/tcp ghcr.io/dreth/tfm_uc3m:latest
+```
+
 Then navigate to [**http://0.0.0.0:3838/**](http://0.0.0.0:3838/) on your web browser.
 
-It might take a bit to download entirely at first as the image is somewhat large, however, once downloaded, the app can be launched and it will always pull the newest version from github. 
+It might take a bit to download entirely at first as the image is somewhat large, however, once downloaded, the app can be launched and it will always pull the newest version from GitHub. 
 
 The data can also be updated, however, database updates performed within the app will only be local and won't update the data included within the repo itself. This might change for future updates, but the only limitation from this might be that if the data within the repo is outdated, it will have to be updated directly by whoever has write access to this repository, unless a local update is performed, which the app can perform in the *update database* tab.
+
+#### 
+
+**All features** are available when using this method.
+
+This option is also a docker container like the previously explained one, but this one is pulled from the GitHub Container Repository instead
+
 
 #### Building
 
