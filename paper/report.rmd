@@ -1,7 +1,7 @@
 ---
 title: "Development of an automatic tool for periodic surveillance of actuarial and demographic indicators"
 author: "Daniel Alonso, María Luz Durbán Reguera, Bernardo D'Auria"
-date: "August-September 2021"
+date: "September 2021"
 header-includes: \usepackage{amsmath}
 output: 
     pdf_document:
@@ -413,7 +413,7 @@ The application utilizes several tools/services to perform the entire process of
 
 - [**Docker**](https://www.docker.com/) is a set of platform as a service products that use OS-level virtualization to package software in *containers*. It's used within the project to containerize the application into a simple package, which allows users to run the application with minimal setup and by installing virtually no requirements (other than Docker itself). The container is also hosted in [Docker Hub](https://hub.docker.com/r/dreth/tfm_uc3m).
 
-- [**GitHub**](https://github.com) is a hosting provider for software development projects and version control using Git. We use it to host the application's [code](https://github.com/dreth/tfm_uc3m), the [Docker container](https://github.com/dreth/tfm_uc3m/pkgs/container/tfm_uc3m) and the [data](https://github/tfm_uc3m_data) used by the application.
+- [**GitHub**](https://github.com) is a hosting provider for software development projects and version control using Git. We use it to host the application's [code](https://github.com/dreth/tfm_uc3m), the [Docker container](https://github.com/dreth/tfm_uc3m/pkgs/container/tfm_uc3m) and the [data](https://github.com/dreth/tfm_uc3m_data) used by the application.
 
 # 7 - Data pipelines, hosting and application layout {#Pipelines}
 
@@ -755,17 +755,17 @@ And the documentation:
 
 This glossary includes definitions to terminology readers might not be familiar with.
 
-- **CCAA**: Autonomous community of Spain
+- **CCAA**: Autonomous community of Spain.
 
-- **API**: application programming interface, which is a connection between computers or programs
+- **API**: application programming interface, which is a connection between computers or programs.
 
-- **Repository**: storage location for software packages
+- **Repository**: storage location for software packages.
 
 - **CSV**: comma-separated values file. It's a plaintext file containing a table with columns and rows separated by commas.
 
 - **open source**: source code made freely available for modification and redistribution. Often under a free software license.
 
-- **ggplot2**: open source data visualization package for R
+- **ggplot2**: open source data visualization package for R.
 
 - **plotly**: refers to a private canadian company which develops data analytics and open source interactive data visualization library of the same name for Python, R, and other programming languages.
 
@@ -991,6 +991,8 @@ FROM rocker/shiny-verse:latest
 
 \normalsize
 
+\newpage
+
 2. Some basic system requirements are pulled from the repositories, like python and git.
 
 \footnotesize
@@ -1188,5 +1190,5 @@ The project consists of two repositories and their respectives [**subfolders**]{
 <div id="refs"></div>
 
 ```{bash, echo=FALSE, warning=FALSE, message=FALSE}
-pdftk "./coverpage/coverpage.pdf" "./report.pdf" cat output "./final_report.pdf"
+pdftk "./coverpage/coverpage.pdf" "./coverpage/blankpage.pdf" "./report.pdf" cat output "./final_report.pdf"
 ```
