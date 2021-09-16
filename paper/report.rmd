@@ -153,7 +153,7 @@ For the years between 2021 and 2027 inclusive, the application uses the same 5-y
 
 The $EM$ for week $w$ of year $y$ is computed as follows:
 
-$$EM_{w, y} = \frac{D_{w, y}}{\overline{D_{w, y-5, y}}}$$
+$$EM_{w, y} = D_{w, y} - \overline{D_{w, y-5, y}}$$
 
 Where:
 
@@ -163,7 +163,7 @@ Where:
 
 Exact definition:
 
-$$EM_{w, y} = \frac{D_{w, y}}{\frac{1}{n} \sum^{n}_{k=1} D_{w, y-k}}$$
+$$EM_{w, y} = D_{w, y} - \frac{1}{n} \sum^{n}_{k=1} D_{w, y-k}$$
 
 Where:
 
